@@ -40,7 +40,11 @@ def queue_reservation_notification(reservation, event):
     )
 
     period = reservation.period
-    event_key = f"{reservation.pk}:{event}:{period.lower.isoformat()}:{period.upper.isoformat()}"
+    # The slot is part of the key, so a booking moved twice gets an e-mail for each move.
+    event_key = (
+        f"{reservation.pk}:{event}:{reservation.slot_id}:"
+        f"{period.lower.isoformat()}:{period.upper.isoformat()}"
+    )
 
     notification, _ = ReservationNotification.objects.get_or_create(
         event_key=event_key,
