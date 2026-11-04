@@ -118,6 +118,22 @@ Python environment and exported Django/database settings:
 * * * * * cd /app && python manage.py expire_no_shows
 ```
 
+### Demo data
+
+To fill an empty database with the demo data set (STP Section 5), run:
+
+```sh
+python manage.py seed_demo_data --seed 2026
+```
+
+It creates the lot "Demo Central" with 500 slots (350 Standard, 60 Two-wheeler, 60 EV,
+30 Accessible), a tariff for each slot type, 120 drivers, and 30 days of reservations:
+completed stays with parking charges (most of them paid), no-shows, cancellations,
+vehicles parked now, and future bookings. The same seed always gives the same plan. If
+the demo lot already exists, the command adds nothing. For tests, `vps/factories.py` has
+`make_*` functions for drivers, staff, vehicles, lots, tariffs, reservations, charges and
+payments.
+
 ## Status
 
 Sprint 1 is under way. The Django project skeleton is in place. CI runs ruff, the test suite on PostgreSQL 16 with a 70% line and 60% branch coverage gate, pip-audit and a Gitleaks secret scan on every pull request.
