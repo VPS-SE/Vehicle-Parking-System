@@ -5,6 +5,7 @@ from datetime import datetime
 from django.contrib.postgres.fields.ranges import DateTimeTZRange
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, transaction
+from django.db.models import Exists, OuterRef
 from django.utils import timezone
 
 from vps.audit.services import log_action
@@ -280,3 +281,64 @@ def create_tariff(
         raise
 
     return tariff
+
+
+# ---------------------------------------------------------------------------
+# Live occupancy (FR-SRCH-03, issue #35)
+# ---------------------------------------------------------------------------
+
+OCCUPANCY_STATES = ("free", "reserved", "occupied", "blocked")
+
+
+def lot_occupancy(now=None):
+    """FR-SRCH-03: free, reserved, occupied and blocked slots per active lot and slot type.
+
+    Each slot is counted once, in the first state that applies: occupied (a vehicle is
+    parked, even one overstaying its window), blocked (a block covers now), reserved (a
+    Reserved booking's window covers now), otherwise free. One query for all lots.
+    """
+    from vps.reservations.models import Reservation
+
+    now = now or timezone.now()
+    slots = (
+        Slot.objects.filter(lot__is_archived=False)
+        .annotate(
+            is_occupied=Exists(
+                Reservation.objects.filter(slot=OuterRef("pk"), status=Reservation.Status.ACTIVE)
+            ),
+            is_blocked=Exists(SlotBlock.objects.filter(slot=OuterRef("pk"), period__contains=now)),
+            is_reserved=Exists(
+                Reservation.objects.filter(
+                    slot=OuterRef("pk"),
+                    status=Reservation.Status.RESERVED,
+                    period__contains=now,
+                )
+            ),
+        )
+        .select_related("lot")
+        .order_by("lot__name", "lot_id", "slot_type")
+    )
+    rows = {}
+    for slot in slots:
+        if slot.is_occupied:
+            state = "occupied"
+        elif slot.is_blocked:
+            state = "blocked"
+        elif slot.is_reserved:
+            state = "reserved"
+        else:
+            state = "free"
+        row = rows.setdefault(
+            slot.lot_id,
+            {"lot": slot.lot, "types": {}, "total": dict.fromkeys(OCCUPANCY_STATES, 0)},
+        )
+        counts = row["types"].setdefault(slot.slot_type, dict.fromkeys(OCCUPANCY_STATES, 0))
+        counts[state] += 1
+        row["total"][state] += 1
+    for row in rows.values():
+        row["total"]["slots"] = sum(row["total"][state] for state in OCCUPANCY_STATES)
+        row["types"] = [
+            {"slot_type": slot_type, "label": Slot.SlotType(slot_type).label, **counts}
+            for slot_type, counts in row["types"].items()
+        ]
+    return list(rows.values())
