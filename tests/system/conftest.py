@@ -17,6 +17,39 @@ def base_url() -> str:
 
 
 @pytest.fixture(scope="session")
+def http_prod_url() -> str:
+    return os.environ.get("VPS_HTTP_PROD_URL", "http://127.0.0.1:8180").rstrip("/")
+
+
+@pytest.fixture(scope="session")
+def tls_url() -> str:
+    return os.environ.get("VPS_TLS_URL", "https://127.0.0.1:8443").rstrip("/")
+
+
+@pytest.fixture(scope="session")
+def server_logs_path() -> str:
+    return os.environ.get(
+        "VPS_SERVER_LOGS",
+        "/tmp/claude-1000/-home-viviansobers-Documents-SEM-5-SE-Vehicle-Parking-System/9f662486-9041-4504-88bb-a3ed18ff8e55/scratchpad/sys2",
+    )
+
+
+@pytest.fixture(scope="session")
+def driver_context(browser: Browser, base_url: str):
+    """Session-scoped context for Driver (sys.driver) to avoid rate limiting."""
+    context = browser.new_context()
+    page = context.new_page()
+    page.goto(f"{base_url}/accounts/login/")
+    page.fill("#email", DRIVER_EMAIL)
+    page.fill("#password", PASSWORD)
+    page.click("button[type='submit']")
+    page.wait_for_url(lambda url: "/accounts/login/" not in url)
+    page.wait_for_load_state("networkidle")
+    yield context
+    context.close()
+
+
+@pytest.fixture(scope="session")
 def admin_context(browser: Browser, base_url: str):
     """Session-scoped context for Lot Administrator to avoid rate limiting."""
     context = browser.new_context()
@@ -25,6 +58,7 @@ def admin_context(browser: Browser, base_url: str):
     page.fill("#email", ADMIN_EMAIL)
     page.fill("#password", PASSWORD)
     page.click("button[type='submit']")
+    page.wait_for_url(lambda url: "/accounts/login/" not in url)
     page.wait_for_load_state("networkidle")
     yield context
     context.close()
@@ -39,6 +73,7 @@ def gate_context(browser: Browser, base_url: str):
     page.fill("#email", GATE_EMAIL)
     page.fill("#password", PASSWORD)
     page.click("button[type='submit']")
+    page.wait_for_url(lambda url: "/accounts/login/" not in url)
     page.wait_for_load_state("networkidle")
     yield context
     context.close()

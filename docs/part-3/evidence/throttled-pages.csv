@@ -1,0 +1,16 @@
+page,url,load_time_s,bytes_transferred,size_kb
+sign-in,http://127.0.0.1:8100/accounts/login/,0.188,39475,38.55
+register,http://127.0.0.1:8100/accounts/register/,0.234,40491,39.54
+live-occupancy,http://127.0.0.1:8100/lots/occupancy/,0.305,46891,45.79
+driver-vehicles,http://127.0.0.1:8100/vehicles/,0.224,40132,39.19
+search-with-results,http://127.0.0.1:8100/reservations/search/?lot=1&vehicle=333&start=2026-11-06T10:00&end=2026-11-06T12:00,0.243,42473,41.48
+booking-history,http://127.0.0.1:8100/reservations/history/,0.193,47272,46.16
+gate-dashboard,http://127.0.0.1:8100/gate/,0.16,42807,41.8
+payments,http://127.0.0.1:8100/gate/payments/,0.192,39838,38.9
+check-out,http://127.0.0.1:8100/gate/checkout/,0.246,40440,39.49
+admin-lots,http://127.0.0.1:8100/lots/,0.237,39897,38.96
+tariffs,http://127.0.0.1:8100/lots/tariffs/,0.298,44487,43.44
+revenue-report,http://127.0.0.1:8100/reports/revenue/,0.211,39986,39.05
+occupancy-report,http://127.0.0.1:8100/reports/occupancy/,0.343,40201,39.26
+audit-log,http://127.0.0.1:8100/reports/audit/,0.291,64643,63.13
+waive-charges,http://127.0.0.1:8100/billing/waivers/,0.262,41006,40.04
