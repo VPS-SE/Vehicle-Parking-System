@@ -109,12 +109,12 @@ def test_charge_amount_cannot_be_negative(slot):
 
 def test_create_user_normalises_email_and_hashes_password():
     user = User.objects.create_user(email="Driver@EXAMPLE.com", password="s3cret-pass")
-    assert user.email == "Driver@example.com"
+    assert user.email == "driver@example.com"
     assert user.check_password("s3cret-pass")
     assert user.role == User.Role.DRIVER
     assert not user.is_staff
     assert not user.is_superuser
-    assert str(user) == "Driver@example.com"
+    assert str(user) == "driver@example.com"
 
 
 def test_create_user_requires_email():
