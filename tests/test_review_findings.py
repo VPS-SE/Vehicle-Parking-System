@@ -249,10 +249,6 @@ def test_f06_unpaid_total_for_none_driver_returns_zero(slot):
     assert unpaid_total(None) == Decimal("0.00")
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="F7: SESSION_COOKIE_AGE and SESSION_SAVE_EVERY_REQUEST (SEC-08) not configured in settings",
-)
 def test_f07_session_cookie_configuration_enforces_sec04_sec08():
     """F7: SEC-08 requires 30-minute idle session timeout; settings default to 14 days."""
     # SEC-08 requires 30 minutes (1800 seconds) idle expiration

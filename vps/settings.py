@@ -114,3 +114,17 @@ DEFAULT_FROM_EMAIL = os.environ.get(
     "DEFAULT_FROM_EMAIL",
     EMAIL_HOST_USER or "webmaster@localhost",
 )
+
+# Session and cookie security (SEC-04, SEC-08)
+SESSION_COOKIE_AGE = 1800  # 30 minutes idle timeout
+SESSION_SAVE_EVERY_REQUEST = True
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = "Lax"
+
+if not DEBUG:
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_SSL_REDIRECT = True
+    # The container healthcheck calls /healthz over plain HTTP inside the network.
+    SECURE_REDIRECT_EXEMPT = [r"^healthz$"]
+    SECURE_HSTS_SECONDS = 31536000  # 1 year
