@@ -46,6 +46,7 @@ class User(AbstractUser):
     role = models.CharField(max_length=10, choices=Role.choices, default=Role.DRIVER)
     accessible_permit = models.BooleanField(default=False)
     failed_attempts = models.PositiveSmallIntegerField(default=0)
+    first_failed_at = models.DateTimeField(null=True, blank=True)
     locked_until = models.DateTimeField(null=True, blank=True)
 
     USERNAME_FIELD = "email"

@@ -1,10 +1,12 @@
 """Account registration rules shared by forms and other callers."""
 
 import re
+from datetime import timedelta
 
 from django.contrib.auth import SESSION_KEY
 from django.contrib.auth.password_validation import validate_password
 from django.contrib.sessions.models import Session
+from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, transaction
 from django.utils import timezone
@@ -12,8 +14,15 @@ from django.utils import timezone
 from vps.accounts.models import User
 from vps.accounts.roles import Function, can
 from vps.audit.models import AuditLog
+from vps.audit.services import log_action
 
 DUPLICATE_EMAIL = "An account with this e-mail already exists"
+
+MAX_FAILED_ATTEMPTS = 5
+LOCKOUT_DURATION = timedelta(minutes=15)
+FAILURE_WINDOW = timedelta(minutes=15)
+IP_RATE_LIMIT_MAX_ATTEMPTS = 10
+IP_RATE_LIMIT_WINDOW_SECONDS = 60
 
 
 def register_driver(*, full_name, email, mobile, password):
@@ -208,3 +217,110 @@ def reactivate_staff(admin, staff):
         )
 
     return staff
+
+
+def get_client_ip(request) -> str:
+    """The peer address. X-Forwarded-For is client-controlled, so it is not trusted here."""
+    return request.META.get("REMOTE_ADDR", "")
+
+
+def is_ip_rate_limited(ip_address: str) -> bool:
+    """SEC-02: limit sign-in attempts to 10 per minute per IP address."""
+    if not ip_address:
+        return False
+    key = f"signin_attempts:{ip_address}"
+    now = timezone.now().timestamp()
+    attempts = cache.get(key) or []
+    valid_attempts = [t for t in attempts if now - t < IP_RATE_LIMIT_WINDOW_SECONDS]
+    if len(valid_attempts) >= IP_RATE_LIMIT_MAX_ATTEMPTS:
+        return True
+    valid_attempts.append(now)
+    cache.set(key, valid_attempts, timeout=IP_RATE_LIMIT_WINDOW_SECONDS)
+    return False
+
+
+def is_locked(user: User | None) -> bool:
+    """SEC-02: return True if the account is currently locked."""
+    if not user or not user.locked_until:
+        return False
+    return user.locked_until > timezone.now()
+
+
+def record_failed_sign_in(
+    *,
+    email: str,
+    ip_address: str = "",
+    user: User | None = None,
+) -> User | None:
+    """SEC-02: record failed sign-in attempt, lock account if 5th failure in 15m, and audit."""
+    if user is None and email:
+        user = User.objects.filter(email__iexact=email).first()
+
+    now = timezone.now()
+
+    if user is not None:
+        with transaction.atomic():
+            user = User.objects.select_for_update().get(pk=user.pk)
+            if (
+                (user.locked_until is not None and user.locked_until <= now)
+                or (
+                    user.first_failed_at is not None
+                    and (now - user.first_failed_at > FAILURE_WINDOW)
+                )
+                or (user.failed_attempts == 0)
+            ):
+                user.failed_attempts = 1
+                user.first_failed_at = now
+                user.locked_until = None
+            else:
+                user.failed_attempts += 1
+                if not user.first_failed_at:
+                    user.first_failed_at = now
+
+            is_locking = False
+            if user.failed_attempts >= MAX_FAILED_ATTEMPTS:
+                user.locked_until = now + LOCKOUT_DURATION
+                is_locking = True
+
+            user.save(update_fields=["failed_attempts", "first_failed_at", "locked_until"])
+
+        log_action(
+            actor=None,
+            action="auth.failed",
+            target=f"user:{user.pk}",
+            after={"email": user.email, "ip": ip_address},
+        )
+        if is_locking:
+            log_action(
+                actor=None,
+                action="auth.locked",
+                target=f"user:{user.pk}",
+                after={
+                    "email": user.email,
+                    "ip": ip_address,
+                    "locked_until": user.locked_until.isoformat(),
+                },
+            )
+        return user
+
+    # Unknown e-mail - record auth.failed without revealing whether account exists
+    log_action(
+        actor=None,
+        action="auth.failed",
+        target=f"email:{email}",
+        after={"email": email, "ip": ip_address},
+    )
+    return None
+
+
+def reset_failed_sign_in(user: User) -> None:
+    """SEC-02: reset failed attempt counter and lockout on successful sign-in."""
+    if (
+        user.failed_attempts != 0
+        or user.first_failed_at is not None
+        or user.locked_until is not None
+    ):
+        user.failed_attempts = 0
+        user.first_failed_at = None
+        user.locked_until = None
+        user.save(update_fields=["failed_attempts", "first_failed_at", "locked_until"])
