@@ -57,7 +57,7 @@ Section 16 of the Software Test Plan defines 43 test cases (TC-01 through TC-43)
 | **TC-31** | Manual time correction is limited and audited | FR-GATE-06, SAF-03, SEC-07 | Integration | `tests/test_time_correction.py::test_tc31_step1_past_exit_is_billed_and_audited_with_reason`<br>`tests/test_time_correction.py::test_tc31_step2_exit_more_than_24_hours_ago_is_refused`<br>`tests/test_time_correction.py::test_tc31_step3_correction_without_reason_is_refused` | Full | Exit time 2 hours ago with reason is accepted and audited; exit time 25 hours ago (>24h) is refused; correction without reason is refused. |
 | **TC-32** | Reallocate when the reserved slot is still occupied | FR-GATE-07 | Integration | `tests/test_reallocation.py::test_tc32_occupied_slot_is_swapped_for_a_free_one`<br>`tests/test_check_in.py::test_check_in_reallocates_when_slot_occupied` | Full | Check-in when booked slot S1 is occupied reallocates booking to free slot S2 and displays new slot code on attendant console. |
 | **TC-33** | Tariff in force at entry is used | FR-BILL-01, BR-08 | Unit | `tests/test_tariffs.py::test_tc33_charge_uses_tariff_in_force_at_entry`<br>`tests/test_checkout.py::test_tc33_uses_tariff_at_entry` | Full | New tariff effective today does not alter charge for vehicle entered yesterday (billed at Rs 40/h); vehicle entering today is billed at Rs 50/h. |
-| **TC-34** | Occupancy and revenue reports export to CSV | FR-RPT-02, FR-RPT-03 | Integration | none | In development (Sprint 3) | Occupancy and revenue reports and CSV export are part of issues #57, #58, #59 in Sprint 3. |
+| **TC-34** | Occupancy and revenue reports export to CSV | FR-RPT-02, FR-RPT-03 | Integration | `tests/test_revenue_report.py` | Partial | Revenue totals by lot, slot type and payment method, date-range validation, and CSV export are covered. Occupancy reporting/export remains in development (issues #57 and #59). |
 | **TC-35** | Forecast bands and baseline label | FR-FCST-01, FR-FCST-02 | Unit | none | In development (Sprint 3) | Forecast probability bands (Low, Medium, High) and "Estimate" baseline label are issue #61 in Sprint 3. |
 | **TC-36** | Booking, gate and forecast response times | NFR-PERF-02, NFR-PERF-05 | System | none | Manual-system-only | Requires Locust load testing suite mixing reservations, check-ins, check-outs across 50 users and 1,000 forecast calls. |
 | **TC-37** | Page weight and load time | NFR-PERF-04 | System | none | Manual-system-only | Requires browser network throttling (10 Mbps) to verify page transfer size (<=500 KB) and load latency (<=3s). |
@@ -75,9 +75,9 @@ Section 16 of the Software Test Plan defines 43 test cases (TC-01 through TC-43)
 | Category | Count | Test Cases |
 | :--- | :---: | :--- |
 | **Full** | 22 | TC-01, TC-05, TC-06, TC-07, TC-08, TC-09, TC-10, TC-11, TC-12, TC-13, TC-14, TC-21, TC-22, TC-23, TC-24, TC-25, TC-27, TC-29, TC-30, TC-31, TC-32, TC-33 |
-| **Partial** | 6 | TC-02, TC-04, TC-15, TC-16, TC-17, TC-19 |
+| **Partial** | 7 | TC-02, TC-04, TC-15, TC-16, TC-17, TC-19, TC-34 |
 | **None** | 2 | TC-03, TC-39 |
-| **In development (Sprint 3)** | 5 | TC-20, TC-26, TC-28, TC-34, TC-35 |
+| **In development (Sprint 3)** | 4 | TC-20, TC-26, TC-28, TC-35 |
 | **Manual-system-only** | 8 | TC-18, TC-36, TC-37, TC-38, TC-40, TC-41, TC-42, TC-43 |
 | **Total** | **43** | **TC-01 to TC-43** |
 
