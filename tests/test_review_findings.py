@@ -185,10 +185,7 @@ def test_f04_slot_blocks_and_staff_creation_are_audited(slot):
     assert AuditLog.objects.filter(target__icontains="gatestaff@example.com").exists()
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="F5: send_mail network I/O executed while holding PostgreSQL row locks in transaction",
-)
+@pytest.mark.django_db(transaction=True)
 def test_f05_email_sending_not_performed_inside_database_transaction(monkeypatch, slot):
     """F5: send_mail network call must execute outside atomic database transaction block."""
     driver = User.objects.create_user(email="driver@example.com", full_name="Driver User")

@@ -10,6 +10,7 @@ class ReservationNotification(models.Model):
 
     class Status(models.TextChoices):
         PENDING = "pending", "Pending"
+        SENDING = "sending", "Sending"
         SENT = "sent", "Sent"
         FAILED = "failed", "Failed"
 
@@ -34,6 +35,7 @@ class ReservationNotification(models.Model):
     last_error = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     sent_at = models.DateTimeField(null=True, blank=True)
+    claimed_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         ordering = ["created_at"]
