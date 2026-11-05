@@ -210,3 +210,36 @@ def test_free_slots_judge_each_reservation_on_its_own():
     )
 
     assert [s.code for s in services.free_slots(lot, car, at(10), at(12))] == ["S1"]
+
+
+def _book_window_in_thread(barrier, driver, vehicle, lot, start):
+    try:
+        barrier.wait()
+        return services.reserve(driver, vehicle, lot, start, start + timedelta(minutes=30))
+    except ValidationError as error:
+        return error.message_dict["__all__"][0]
+    finally:
+        connection.close()
+
+
+@pytest.mark.django_db(transaction=True)
+@pytest.mark.parametrize("run", range(5))
+def test_concurrent_bookings_with_free_slots_all_succeed(run):
+    """NFR-PERF-02, FR-ALLOC-03: 30 drivers book overlapping windows at once in a lot with 30
+    free slots. Each gets a different slot; none fails with a database deadlock."""
+    lot = make_lot(name=f"Lot C{run}", slots=[(f"S{i:02d}", "Standard", i) for i in range(1, 31)])
+    drivers = [make_driver(n) for n in range(30)]
+    barrier = threading.Barrier(len(drivers))
+
+    with ThreadPoolExecutor(max_workers=len(drivers)) as pool:
+        results = list(
+            pool.map(
+                lambda n: _book_window_in_thread(
+                    barrier, *drivers[n], lot, at(10) + timedelta(minutes=n % 3)
+                ),
+                range(len(drivers)),
+            )
+        )
+
+    assert all(isinstance(result, Reservation) for result in results), results
+    assert len({result.slot_id for result in results}) == 30
