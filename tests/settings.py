@@ -3,6 +3,7 @@
 import os
 
 os.environ.setdefault("DJANGO_SECRET_KEY", "test-only-key-never-use-in-production")
+os.environ.setdefault("DJANGO_DEBUG", "True")
 
 from vps.settings import *
 
