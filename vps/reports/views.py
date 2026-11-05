@@ -1,6 +1,7 @@
 import csv
 from datetime import timedelta
 
+from django.core.paginator import Paginator
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.shortcuts import render
 from django.utils import timezone
@@ -10,7 +11,7 @@ from django.views.decorators.http import require_GET
 from vps.accounts.permissions import function_required
 from vps.accounts.roles import Function
 from vps.reports import services
-from vps.reports.forms import OccupancyReportForm, RevenueReportForm
+from vps.reports.forms import AuditSearchForm, OccupancyReportForm, RevenueReportForm
 
 REVENUE_COLUMNS = [
     "Lot",
@@ -130,3 +131,28 @@ def occupancy_csv(request):
         for row in _occupancy_rows(form)
     )
     return response
+
+
+@function_required(Function.REPORTS)
+@require_GET
+def audit_log(request):
+    """FR-RPT-04: search the audit log by actor, action and date range (read-only)."""
+    form = AuditSearchForm(request.GET or None)
+    entries = None
+    if not form.is_bound:
+        entries = services.search_audit()
+    elif form.is_valid():
+        entries = services.search_audit(**form.cleaned_data)
+    page = Paginator(entries, 50).get_page(request.GET.get("page")) if entries is not None else None
+    query = request.GET.copy()
+    query.pop("page", None)
+    return render(
+        request,
+        "reports/audit.html",
+        {
+            "form": form,
+            "page": page,
+            "query": query.urlencode(),
+            "actions": services.audit_actions(),
+        },
+    )

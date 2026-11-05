@@ -182,3 +182,33 @@ def occupancy_report(lot, start_date, end_date, now=None):
                 )
         day += timedelta(days=1)
     return rows
+
+
+def search_audit(actor="", action="", start_date=None, end_date=None):
+    """FR-RPT-04: audit entries filtered by actor e-mail, action and date range, newest first.
+
+    actor matches part of the e-mail; action matches from the start, so "tariff" finds every
+    tariff entry. Both ends of the date range are included.
+    """
+    from vps.audit.models import AuditLog
+
+    entries = AuditLog.objects.select_related("actor")
+    if actor:
+        entries = entries.filter(actor__email__icontains=actor.strip())
+    if action:
+        entries = entries.filter(action__istartswith=action.strip())
+    if start_date:
+        entries = entries.filter(
+            at__gte=timezone.make_aware(datetime.combine(start_date, time.min))
+        )
+    if end_date:
+        next_day = timezone.make_aware(datetime.combine(end_date + timedelta(days=1), time.min))
+        entries = entries.filter(at__lt=next_day)
+    return entries.order_by("-at", "-id")
+
+
+def audit_actions():
+    """The distinct action names recorded so far, for the search box's suggestions."""
+    from vps.audit.models import AuditLog
+
+    return list(AuditLog.objects.order_by("action").values_list("action", flat=True).distinct())
