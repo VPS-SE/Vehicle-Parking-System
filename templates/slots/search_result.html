@@ -10,14 +10,14 @@
       suitable slot{{ slot_count|pluralize }} available for your selected window.
     </p>
     {% if forecast %}
-      <div class="forecast-panel" aria-label="Forecast">
-        <h3>Chance of a free slot when you arrive</h3>
+      <section class="forecast-panel" aria-labelledby="forecast-heading">
+        <h3 id="forecast-heading">Chance of a free slot when you arrive</h3>
         {% if forecast.message %}
           <p>{{ forecast.message }}</p>
         {% else %}
           <p><strong>{{ forecast.percent }}%</strong> ({{ forecast.band }}){% if forecast.estimate %} · Estimate{% endif %}</p>
         {% endif %}
-      </div>
+      </section>
     {% endif %}
     {% if confirm_url and slot_count %}
       <form method="post" action="{{ confirm_url }}" class="booking-form">
