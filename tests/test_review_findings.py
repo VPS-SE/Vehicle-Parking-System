@@ -149,10 +149,6 @@ def test_f03_admin_permitted_to_correct_entry_time(client, slot):
     assert view_resp.status_code == 200
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="F4: Slot blocks and staff creation do not write audit log entries (SEC-07)",
-)
 def test_f04_slot_blocks_and_staff_creation_are_audited(slot):
     """F4: SEC-07 mandates audit entries for every slot block and staff creation."""
     User.objects.create_user(

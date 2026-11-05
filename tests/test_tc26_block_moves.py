@@ -89,7 +89,11 @@ def test_tc26_booking_moves_then_is_cancelled_free(lot, admin):
     assert not r.charges.exists()
     assert [c.booking_ref for c in second.cancelled] == [r.booking_ref]
     assert ReservationNotification.objects.filter(event="cancelled", reservation=r).exists()
-    actions = list(AuditLog.objects.order_by("id").values_list("action", "after"))
+    actions = list(
+        AuditLog.objects.filter(action__startswith="reservation.")
+        .order_by("id")
+        .values_list("action", "after")
+    )
     assert actions[0] == ("reservation.moved_by_block", {"from_slot": "S1", "to_slot": "S4"})
     assert actions[1][0] == "reservation.cancelled_by_block"
     assert actions[1][1]["fee_inr"] == "0.00"

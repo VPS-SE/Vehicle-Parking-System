@@ -95,7 +95,7 @@ def create_staff(request):
 
     if request.method == "POST" and form.is_valid():
         try:
-            staff = services.create_staff(**form.cleaned_data)
+            staff = services.create_staff(**form.cleaned_data, actor=request.user)
         except ValidationError as error:
             for field, errors in error.error_dict.items():
                 form.add_error(field, errors)
