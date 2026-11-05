@@ -220,10 +220,6 @@ def test_f05_email_sending_not_performed_inside_database_transaction(monkeypatch
     assert was_in_atomic[0] is False
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="F6: unpaid_total(None) aggregates all walk-in charges instead of returning 0.00",
-)
 def test_f06_unpaid_total_for_none_driver_returns_zero(slot):
     """F6: unpaid_total(None) must return 0.00 and not leak walk-in charges."""
     now = timezone.now()
