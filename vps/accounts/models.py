@@ -1,12 +1,18 @@
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.db.models.functions import Lower
 
 
 class UserManager(BaseUserManager):
     """Manager for email-authenticated users."""
 
     use_in_migrations = True
+
+    @classmethod
+    def normalize_email(cls, email):
+        email = super().normalize_email(email)
+        return email.lower() if email else email
 
     def _create_user(self, email, password, **extra_fields):
         if not email:
@@ -32,6 +38,15 @@ class UserManager(BaseUserManager):
             raise ValueError("A superuser must have is_superuser=True.")
         return self._create_user(email, password, **extra_fields)
 
+    def get_by_natural_key(self, username):
+        return self.get(
+            **{
+                f"{self.model.USERNAME_FIELD}__iexact": (
+                    username.strip() if isinstance(username, str) else username
+                )
+            }
+        )
+
 
 class User(AbstractUser):
     class Role(models.TextChoices):
@@ -46,6 +61,7 @@ class User(AbstractUser):
     role = models.CharField(max_length=10, choices=Role.choices, default=Role.DRIVER)
     accessible_permit = models.BooleanField(default=False)
     failed_attempts = models.PositiveSmallIntegerField(default=0)
+    first_failed_at = models.DateTimeField(null=True, blank=True)
     locked_until = models.DateTimeField(null=True, blank=True)
 
     USERNAME_FIELD = "email"
@@ -54,6 +70,12 @@ class User(AbstractUser):
 
     class Meta:
         indexes = [models.Index(fields=["role", "is_active"], name="user_role_active_idx")]
+        constraints = [
+            models.UniqueConstraint(
+                Lower("email"),
+                name="accounts_user_email_lower_uniq",
+            ),
+        ]
 
     def __str__(self):
         return self.email

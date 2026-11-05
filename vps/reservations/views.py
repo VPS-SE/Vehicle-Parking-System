@@ -12,26 +12,30 @@ from django.urls import reverse
 from django.views.decorators.http import require_GET, require_POST
 
 from vps.accounts.permissions import function_required
-from vps.accounts.roles import Function, can
+from vps.accounts.roles import Function
 from vps.billing.models import Charge
 from vps.reservations.forms import ReservationSearchForm
 from vps.reservations.models import Reservation
 from vps.reservations.services import cancel_reservation, free_slots, reserve, validate_window
 
 SEARCH_FIELDS = ("lot", "vehicle", "start", "end")
+SEARCH_PARAMS = (*SEARCH_FIELDS, "vehicle_type")
 
 
 @require_GET
 @function_required(Function.SEARCH)
 def slot_search(request):
     """FR-SRCH-01: count the slots free for the chosen vehicle and window."""
-    searched = any(request.GET.get(name) for name in SEARCH_FIELDS)
+    searched = any(request.GET.get(name) for name in SEARCH_PARAMS)
     form = ReservationSearchForm(request.GET if searched else None, user=request.user)
     context = {
         "lots": form.fields["lot"].queryset,
         "vehicles": form.fields["vehicle"].queryset,
         "selected_lot": request.GET.get("lot", ""),
         "selected_vehicle": request.GET.get("vehicle", ""),
+        "for_driver": form.for_driver,
+        "vehicle_types": form.fields["vehicle_type"].choices,
+        "selected_vehicle_type": request.GET.get("vehicle_type", ""),
         "start": request.GET.get("start", ""),
         "end": request.GET.get("end", ""),
         "slot_count": None,
@@ -41,17 +45,20 @@ def slot_search(request):
     }
     if searched:
         if form.is_valid():
-            lot, vehicle, start, end = (form.cleaned_data[name] for name in SEARCH_FIELDS)
+            lot, start, end = (form.cleaned_data[name] for name in ("lot", "start", "end"))
+            vehicle = form.search_vehicle()
             try:
                 validate_window(lot, start, end)
             except ValidationError as error:
                 context["search_error"] = error.messages[0]
             else:
                 context["slot_count"] = len(free_slots(lot, vehicle, start, end))
-                if can(request.user, Function.OWN_RESERVATIONS):
+                if form.for_driver:
                     context["confirm_url"] = reverse("reservations:confirm")
-        else:
+        elif form.for_driver:
             context["search_error"] = "Choose a lot, one of your vehicles, a start and an end."
+        else:
+            context["search_error"] = "Choose a lot, a start and an end."
     htmx = request.headers.get("HX-Request") == "true"
     template = "slots/search_result.html" if htmx else "slots/search.html"
     return render(request, template, context)

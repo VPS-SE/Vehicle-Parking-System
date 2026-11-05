@@ -1,15 +1,18 @@
 """Reservation e-mails (FR-RES-07): queued with the change, sent by the scheduler."""
 
+from datetime import timedelta
 from smtplib import SMTPException
 
 from django.conf import settings
 from django.core.mail import send_mail
 from django.db import transaction
+from django.db.models import Q
 from django.utils import timezone
 
 from vps.notifications.models import ReservationNotification
 
 MAX_ATTEMPTS = 5
+STALE_CLAIM = timedelta(minutes=10)
 
 
 def queue_reservation_notification(reservation, event):
@@ -60,9 +63,35 @@ def queue_reservation_notification(reservation, event):
     return notification
 
 
-def process_pending_notifications(batch_size=50):
-    """Send pending notification emails."""
+def _claim_next(tried, now, stale_after):
+    """Mark the oldest sendable row as SENDING and commit, so no lock is held while mailing.
 
+    A row left in SENDING by a process that died is picked up again after stale_after.
+    """
+    Status = ReservationNotification.Status
+    with transaction.atomic():
+        notification = (
+            ReservationNotification.objects.select_for_update(skip_locked=True)
+            .filter(
+                Q(status=Status.PENDING)
+                | Q(status=Status.SENDING, claimed_at__lte=now - stale_after),
+                attempts__lt=MAX_ATTEMPTS,
+            )
+            .exclude(pk__in=tried)
+            .order_by("created_at")
+            .first()
+        )
+        if notification is not None:
+            notification.status = Status.SENDING
+            notification.claimed_at = now
+            notification.attempts += 1
+            notification.save(update_fields=["status", "claimed_at", "attempts"])
+    return notification
+
+
+def process_pending_notifications(batch_size=50, stale_after=STALE_CLAIM):
+    """Send pending notification e-mails, one short transaction before and after each send."""
+    Status = ReservationNotification.Status
     sent = 0
     failed = 0
     # One attempt per notification per run: the scheduler runs every minute, so retries
@@ -70,56 +99,34 @@ def process_pending_notifications(batch_size=50):
     tried = []
 
     for _ in range(batch_size):
-        with transaction.atomic():
-            notification = (
-                ReservationNotification.objects.select_for_update(skip_locked=True)
-                .filter(
-                    status=ReservationNotification.Status.PENDING,
-                    attempts__lt=MAX_ATTEMPTS,
-                )
-                .exclude(pk__in=tried)
-                .order_by("created_at")
-                .first()
+        notification = _claim_next(tried, timezone.now(), stale_after)
+        if notification is None:
+            break
+        tried.append(notification.pk)
+
+        try:
+            result = send_mail(
+                subject=notification.subject,
+                message=notification.message,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[notification.recipient_email],
+                fail_silently=False,
             )
-
-            if notification is None:
-                break
-
-            tried.append(notification.pk)
-            notification.attempts += 1
-
-            try:
-                result = send_mail(
-                    subject=notification.subject,
-                    message=notification.message,
-                    from_email=settings.DEFAULT_FROM_EMAIL,
-                    recipient_list=[notification.recipient_email],
-                    fail_silently=False,
-                )
-
-                if result != 1:
-                    raise RuntimeError("Email backend did not confirm delivery.")
-
-                notification.status = ReservationNotification.Status.SENT
-                notification.sent_at = timezone.now()
-                notification.last_error = ""
-                sent += 1
-
-            except (SMTPException, OSError, RuntimeError) as error:
-                notification.last_error = str(error)
-
-                if notification.attempts >= MAX_ATTEMPTS:
-                    notification.status = ReservationNotification.Status.FAILED
-
-                failed += 1
-
-            notification.save(
-                update_fields=[
-                    "attempts",
-                    "status",
-                    "sent_at",
-                    "last_error",
-                ]
+            if result != 1:
+                raise RuntimeError("Email backend did not confirm delivery.")
+        except (SMTPException, OSError, RuntimeError) as error:
+            notification.last_error = str(error)
+            notification.status = (
+                Status.FAILED if notification.attempts >= MAX_ATTEMPTS else Status.PENDING
             )
+            failed += 1
+        else:
+            notification.status = Status.SENT
+            notification.sent_at = timezone.now()
+            notification.last_error = ""
+            sent += 1
+
+        notification.claimed_at = None
+        notification.save(update_fields=["status", "sent_at", "last_error", "claimed_at"])
 
     return {"sent": sent, "failed": failed}

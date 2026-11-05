@@ -273,8 +273,10 @@ def _active_reservation(query):
 
 def correct_entry_time(attendant, query, entry_time, reason, now=None):
     """FR-GATE-06: record the entry time noted on paper for a vehicle that is still parked."""
-    if not can(attendant, Function.GATE_OPERATIONS):
-        raise ValidationError({"__all__": "Only Gate Attendants may correct entry times."})
+    if not can(attendant, Function.CORRECT_TIMES):
+        raise ValidationError(
+            {"__all__": "Only Gate Attendants and Lot Administrators may correct entry times."}
+        )
     now = now or timezone.now()
     reason = _validate_correction("entry_time", entry_time, reason, now)
     with transaction.atomic():
@@ -341,8 +343,17 @@ def checkout_vehicle(query, attendant, now=None, exit_time=None, reason=""):
 
     FR-GATE-06: after an outage, exit_time is the time noted on paper and needs a reason.
     """
-    if not can(attendant, Function.GATE_OPERATIONS):
-        raise ValidationError({"__all__": "Only Gate Attendants may check out vehicles."})
+    if exit_time is None and not can(attendant, Function.GATE_OPERATIONS):
+        raise ValidationError(
+            {
+                "__all__": "Only Gate Attendants may check out vehicles; Lot Administrators "
+                "may only record an exit time noted on paper."
+            }
+        )
+    if exit_time is not None and not can(attendant, Function.CORRECT_TIMES):
+        raise ValidationError(
+            {"__all__": "Only Gate Attendants and Lot Administrators may correct exit times."}
+        )
 
     now = now or timezone.now()
     correction = {}

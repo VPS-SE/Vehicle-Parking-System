@@ -270,15 +270,26 @@ def test_checkout_displays_form_errors(client, attendant, data):
     assert response.context["form"].errors
 
 
-@pytest.mark.parametrize("role", ["Driver", "Admin"])
-def test_views_forbid_other_roles(client, booking, role):
-    client.force_login(User.objects.create_user(email="other@example.com", role=role))
+def test_views_forbid_drivers(client, booking):
+    client.force_login(User.objects.create_user(email="other@example.com", role="Driver"))
     for response in (
         client.get("/gate/checkout/"),
         client.post("/gate/checkout/", {"query": booking.booking_ref}),
         client.get(f"/gate/receipt/{booking.booking_ref}/"),
     ):
         assert response.status_code == 403
+    assert not Charge.objects.exists()
+
+
+def test_admin_cannot_do_an_ordinary_checkout(client, booking):
+    """FR-GATE-06 / Table 5: admins open the page only to record a paper exit time."""
+    client.force_login(User.objects.create_user(email="admin@example.com", role="Admin"))
+    page = client.get("/gate/checkout/")
+    assert page.status_code == 200
+    assert page.context["corrections_only"] is True
+    response = client.post("/gate/checkout/", {"query": booking.booking_ref})
+    assert response.status_code == 200
+    assert "may only record an exit time" in str(response.context["form"].non_field_errors())
     assert not Charge.objects.exists()
 
 

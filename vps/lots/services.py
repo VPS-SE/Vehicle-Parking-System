@@ -206,6 +206,18 @@ def block_slot(
                 raise ValidationError({"period": OVERLAPPING_BLOCK_MESSAGE}) from error
             raise
         block.moved, block.cancelled = _clear_blocked_slot(block, actor)
+        log_action(
+            actor=actor,
+            action="slot.blocked",
+            target=f"slot:{slot.lot_id}/{slot.code}",
+            after={
+                "starts_at": starts_at.isoformat(),
+                "ends_at": ends_at.isoformat(),
+                "reason": reason,
+                "moved_count": len(block.moved),
+                "cancelled_count": len(block.cancelled),
+            },
+        )
 
     return block
 

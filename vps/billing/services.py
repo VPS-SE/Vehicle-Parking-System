@@ -64,6 +64,8 @@ def unpaid_charges(query):
 
 def unpaid_total(driver):
     """FR-BILL-05: the sum of a Driver's charges that have no payment yet."""
+    if getattr(driver, "pk", None) is None:  # None, AnonymousUser or an unsaved user
+        return Decimal("0.00")
     total = Charge.objects.filter(reservation__driver=driver, payment__isnull=True).aggregate(
         total=Sum("amount_inr")
     )["total"]

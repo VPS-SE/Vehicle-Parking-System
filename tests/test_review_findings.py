@@ -47,10 +47,6 @@ def slot(lot):
     return Slot.objects.create(lot=lot, code="R-01", distance_rank=1)
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="F1: Case-insensitive email duplicates not rejected at registration",
-)
 def test_f01_case_insensitive_duplicate_email_rejected():
     """F1: registering ASHA@example.com when asha@example.com exists must be rejected."""
     account_services.register_driver(
@@ -73,10 +69,6 @@ def test_f01_case_insensitive_duplicate_email_rejected():
     assert User.objects.filter(email__iexact="asha@example.com").count() == 1
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="F2: Account lockout and HTTP 423 after 5 failed sign-ins (SEC-02) not implemented",
-)
 def test_f02_account_lockout_after_five_failed_logins(client):
     """F2: 5 failed logins within window must lock account and return HTTP 423 on 6th attempt."""
     account_services.register_driver(
@@ -105,10 +97,6 @@ def test_f02_account_lockout_after_five_failed_logins(client):
     assert user.locked_until > timezone.now()
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="F3: Lot Administrator denied access to correct entry times (Table 5 Appendix B.3)",
-)
 def test_f03_admin_permitted_to_correct_entry_time(client, slot):
     """F3: Lot Administrator must be permitted to correct entry times per permission matrix."""
     admin = User.objects.create_user(
@@ -149,10 +137,6 @@ def test_f03_admin_permitted_to_correct_entry_time(client, slot):
     assert view_resp.status_code == 200
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="F4: Slot blocks and staff creation do not write audit log entries (SEC-07)",
-)
 def test_f04_slot_blocks_and_staff_creation_are_audited(slot):
     """F4: SEC-07 mandates audit entries for every slot block and staff creation."""
     User.objects.create_user(
@@ -185,10 +169,7 @@ def test_f04_slot_blocks_and_staff_creation_are_audited(slot):
     assert AuditLog.objects.filter(target__icontains="gatestaff@example.com").exists()
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="F5: send_mail network I/O executed while holding PostgreSQL row locks in transaction",
-)
+@pytest.mark.django_db(transaction=True)
 def test_f05_email_sending_not_performed_inside_database_transaction(monkeypatch, slot):
     """F5: send_mail network call must execute outside atomic database transaction block."""
     driver = User.objects.create_user(email="driver@example.com", full_name="Driver User")
@@ -220,10 +201,6 @@ def test_f05_email_sending_not_performed_inside_database_transaction(monkeypatch
     assert was_in_atomic[0] is False
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="F6: unpaid_total(None) aggregates all walk-in charges instead of returning 0.00",
-)
 def test_f06_unpaid_total_for_none_driver_returns_zero(slot):
     """F6: unpaid_total(None) must return 0.00 and not leak walk-in charges."""
     now = timezone.now()
@@ -249,10 +226,6 @@ def test_f06_unpaid_total_for_none_driver_returns_zero(slot):
     assert unpaid_total(None) == Decimal("0.00")
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="F7: SESSION_COOKIE_AGE and SESSION_SAVE_EVERY_REQUEST (SEC-08) not configured in settings",
-)
 def test_f07_session_cookie_configuration_enforces_sec04_sec08():
     """F7: SEC-08 requires 30-minute idle session timeout; settings default to 14 days."""
     # SEC-08 requires 30 minutes (1800 seconds) idle expiration
@@ -261,4 +234,6 @@ def test_f07_session_cookie_configuration_enforces_sec04_sec08():
 
     assert cookie_age is not None
     assert cookie_age <= 1800, f"SESSION_COOKIE_AGE is {cookie_age}, must be <= 1800s"
-    assert save_every_req is True, "SESSION_SAVE_EVERY_REQUEST must be True for idle sliding timeout"
+    assert save_every_req is True, (
+        "SESSION_SAVE_EVERY_REQUEST must be True for idle sliding timeout"
+    )
