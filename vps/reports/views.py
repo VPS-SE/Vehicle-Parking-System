@@ -156,21 +156,3 @@ def audit_log(request):
             "actions": services.audit_actions(),
         },
     )
-    response = HttpResponse(content_type="text/csv; charset=utf-8")
-    response["Content-Disposition"] = f'attachment; filename="{filename}"'
-    writer = csv.writer(response)
-    writer.writerow(OCCUPANCY_COLUMNS)
-    writer.writerows(
-        [
-            row["lot_name"],
-            f"{row['date']:%Y-%m-%d}",
-            f"{row['hour']:02d}",
-            row["slot_type_label"],
-            row["total_slots"],
-            f"{row['average_occupied']:.2f}",
-            f"{row['occupancy_pct']:.1f}",
-            f"{row['average_blocked']:.2f}",
-        ]
-        for row in _occupancy_rows(form)
-    )
-    return response
