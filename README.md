@@ -134,6 +134,35 @@ the demo lot already exists, the command adds nothing. For tests, `vps/factories
 `make_*` functions for drivers, staff, vehicles, lots, tariffs, reservations, charges and
 payments.
 
+### Occupancy forecast
+
+The forecast is a separate FastAPI service in `forecast/` (FR-FCST-01 to FR-FCST-03). For a
+lot, a vehicle type and an arrival up to 24 hours ahead, `GET /v1/forecast` returns the chance
+that an eligible slot is free, with a Low, Medium or High band. The search page shows it next
+to the slot count. If the service does not answer within 2 seconds, or `FORECAST_URL` is
+empty, search still works and the panel says "Forecast not available".
+
+`python -m forecast.train.train` retrains the model from completed reservations. It connects
+through the read-only `forecast_ro` role, which can read only the lot, slot and reservation
+columns it needs. Until there are 4 weeks of history it trains on simulated arrivals instead,
+and the page labels the result "Estimate". With Compose, the `forecast-trainer` service runs
+the job at start-up and then once a week, and `forecast` serves the latest model. Set
+`FORECAST_DB_PASSWORD` in `.env` before the database volume is first created; the role is made
+by `docker/postgres/init/02-forecast-role.sh`.
+
+To run it without Docker:
+
+```sh
+python -m venv .venv-forecast
+.venv-forecast/bin/pip install -r forecast/requirements-dev.txt
+FORECAST_DB_URL=postgresql://forecast_ro:PASSWORD@localhost:5432/vps \
+  .venv-forecast/bin/python -m forecast.train.train --model-dir models
+FORECAST_MODEL_DIR=models .venv-forecast/bin/uvicorn forecast.app.main:app --port 8001
+(cd forecast && ../.venv-forecast/bin/pytest)
+```
+
+Then start Django with `FORECAST_URL=http://localhost:8001`.
+
 ## Status
 
 Sprint 1 is under way. The Django project skeleton is in place. CI runs ruff, the test suite on PostgreSQL 16 with a 70% line and 60% branch coverage gate, pip-audit and a Gitleaks secret scan on every pull request.

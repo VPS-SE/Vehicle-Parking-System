@@ -89,6 +89,8 @@ def restore_lot(lot):
     lot.is_archived = False
     lot.save(update_fields=["is_archived"])
     return lot
+
+
 # ---------------------------------------------------------------------------
 # Slot creation (FR-LOT-02 / #31)
 # ---------------------------------------------------------------------------
@@ -136,23 +138,22 @@ def create_slot(*, lot: Lot, code: str, slot_type: str, distance_rank: int) -> S
         with transaction.atomic():
             slot.save()
     except IntegrityError as error:
-        constraint = getattr(
-            getattr(error.__cause__, "diag", None), "constraint_name", None
-        )
+        constraint = getattr(getattr(error.__cause__, "diag", None), "constraint_name", None)
         if constraint == "slot_lot_code_uniq":
             raise ValidationError({"code": DUPLICATE_SLOT_MESSAGE}) from error
         if constraint == "slot_distance_rank_positive":
             raise ValidationError(
                 {
                     "distance_rank": (
-                        "Distance rank must be a positive integer "
-                        "(1 is nearest to the exit)."
+                        "Distance rank must be a positive integer (1 is nearest to the exit)."
                     )
                 }
             ) from error
         raise
 
     return slot
+
+
 OVERLAPPING_BLOCK_MESSAGE = "This slot already has a block that overlaps the requested period."
 
 
@@ -277,8 +278,7 @@ TARIFF_IN_PAST_MESSAGE = (
     "A new tariff cannot start in the past: charges use the tariff in force at entry."
 )
 TARIFF_DUPLICATE_MESSAGE = (
-    "A tariff for this parking lot and slot type already exists "
-    "with the selected effective date."
+    "A tariff for this parking lot and slot type already exists with the selected effective date."
 )
 
 
@@ -317,6 +317,12 @@ def create_tariff(
         raise ValidationError({"effective_from": TARIFF_DUPLICATE_MESSAGE})
 
     target = f"lot:{lot.pk}/slot_type:{slot_type}"
+    # SEC-07 / TC-19: the old value is the rate this tariff replaces from its start date.
+    previous = (
+        Tariff.objects.filter(lot=lot, slot_type=slot_type, effective_from__lt=effective_from)
+        .order_by("-effective_from")
+        .first()
+    )
 
     try:
         with transaction.atomic():
@@ -326,7 +332,14 @@ def create_tariff(
                 actor=actor,
                 action="tariff.change",
                 target=target,
-                before=None,
+                before=(
+                    {
+                        "hourly_rate_inr": str(previous.hourly_rate_inr),
+                        "effective_from": previous.effective_from.isoformat(),
+                    }
+                    if previous
+                    else None
+                ),
                 after={
                     "hourly_rate_inr": str(tariff.hourly_rate_inr),
                     "effective_from": tariff.effective_from.isoformat(),
@@ -339,9 +352,7 @@ def create_tariff(
             None,
         )
         if constraint == "tariff_effective_uniq":
-            raise ValidationError(
-                {"effective_from": TARIFF_DUPLICATE_MESSAGE}
-            ) from error
+            raise ValidationError({"effective_from": TARIFF_DUPLICATE_MESSAGE}) from error
         raise
 
     return tariff

@@ -43,3 +43,6 @@ htmlcov/
 
 # PDF exports of the deliverables; only the Word files are kept
 /docs/part-1/*.pdf
+
+# Trained forecast models
+/models/

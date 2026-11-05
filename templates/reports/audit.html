@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}Audit log | Vehicle Parking System{% endblock %}
+
+{% block content %}
+<section>
+  <h1>Audit log</h1>
+  <p>Search privileged actions by who did them, what they did and when. Entries cannot be
+    changed or deleted.</p>
+
+  <form method="get" action="{% url 'reports:audit' %}">
+    {{ form.non_field_errors }}
+    {% for field in form %}
+      <p>
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {% if field.name == "action" %}
+          <input type="text" name="action" id="{{ field.id_for_label }}" list="audit-actions"
+                 value="{{ field.value|default:'' }}" maxlength="50">
+        {% else %}
+          {{ field }}
+        {% endif %}
+        {{ field.errors }}
+      </p>
+    {% endfor %}
+    <datalist id="audit-actions">
+      {% for action in actions %}<option value="{{ action }}">{% endfor %}
+    </datalist>
+    <button type="submit">Search</button>
+  </form>
+
+  {% if page is not None %}
+    <p>{{ page.paginator.count }} entr{{ page.paginator.count|pluralize:"y,ies" }} found.</p>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">When</th>
+            <th scope="col">Actor</th>
+            <th scope="col">Action</th>
+            <th scope="col">Target</th>
+            <th scope="col">Old value</th>
+            <th scope="col">New value</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for entry in page %}
+            <tr>
+              <td>{{ entry.at|date:"Y-m-d H:i:s" }}</td>
+              <td>{% if entry.actor %}{{ entry.actor.email }}{% else %}System{% endif %}</td>
+              <td>{{ entry.action }}</td>
+              <td>{{ entry.target }}</td>
+              <td><code>{{ entry.before|default_if_none:"" }}</code></td>
+              <td><code>{{ entry.after|default_if_none:"" }}</code></td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="6">No entries match.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% if page.has_other_pages %}
+      <nav aria-label="Audit log pages">
+        {% if page.has_previous %}<a href="?{{ query }}&amp;page={{ page.previous_page_number }}">Newer</a>{% endif %}
+        Page {{ page.number }} of {{ page.paginator.num_pages }}
+        {% if page.has_next %}<a href="?{{ query }}&amp;page={{ page.next_page_number }}">Older</a>{% endif %}
+      </nav>
+    {% endif %}
+  {% endif %}
+</section>
+{% endblock %}
