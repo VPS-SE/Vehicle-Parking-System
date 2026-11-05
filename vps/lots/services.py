@@ -7,6 +7,7 @@ from django.core.exceptions import ValidationError
 from django.db import IntegrityError, transaction
 from django.utils import timezone
 
+from vps.audit.models import AuditLog
 from vps.audit.services import log_action
 from vps.lots.models import Lot, Slot, SlotBlock, Tariff
 
@@ -160,9 +161,13 @@ def block_slot(
     starts_at: datetime,
     ends_at: datetime,
     reason: str,
+    actor=None,
 ) -> SlotBlock:
     """
-    Block a slot for the given period with a reason (FR-LOT-03).
+    Block a slot for the given period with a reason (FR-LOT-03), then move each Reserved
+    booking that overlaps it to another eligible free slot, or cancel it free (FR-LOT-04).
+
+    The returned block carries ``moved`` and ``cancelled`` lists of the affected bookings.
 
     Raises ValidationError if:
     - the period is invalid (end <= start)
@@ -190,18 +195,65 @@ def block_slot(
 
     block = SlotBlock(slot=slot, period=period, reason=reason)
 
-    try:
-        with transaction.atomic():
-            block.save()
-    except IntegrityError as error:
-        constraint = getattr(
-            getattr(error.__cause__, "diag", None), "constraint_name", None
-        )
-        if constraint == "slotblock_period_no_overlap":
-            raise ValidationError({"period": OVERLAPPING_BLOCK_MESSAGE}) from error
-        raise
+    with transaction.atomic():
+        try:
+            with transaction.atomic():
+                block.save()
+        except IntegrityError as error:
+            constraint = getattr(getattr(error.__cause__, "diag", None), "constraint_name", None)
+            if constraint == "slotblock_period_no_overlap":
+                raise ValidationError({"period": OVERLAPPING_BLOCK_MESSAGE}) from error
+            raise
+        block.moved, block.cancelled = _clear_blocked_slot(block, actor)
 
     return block
+
+
+def _clear_blocked_slot(block, actor):
+    """FR-LOT-04: move or cancel the Reserved bookings a new block overlaps."""
+    # Imported here: reservations depends on lots, not the other way round.
+    from vps.notifications.models import ReservationNotification
+    from vps.notifications.services import queue_reservation_notification
+    from vps.reservations.models import Reservation
+    from vps.reservations.services import booking_vehicle, free_slots, move_reservation
+
+    moved, cancelled = [], []
+    affected = (
+        Reservation.objects.select_for_update(of=("self",))
+        .select_related("slot__lot", "driver")
+        .filter(slot=block.slot, status=Reservation.Status.RESERVED, period__overlap=block.period)
+        .order_by("period")
+    )
+    for reservation in affected:
+        old_code = reservation.slot.code
+        vehicle = booking_vehicle(reservation)
+        window = reservation.period
+        # The new block already hides this slot from free_slots.
+        candidates = free_slots(block.slot.lot, vehicle, window.lower, window.upper)
+        target = f"reservation:{reservation.booking_ref}"
+        if move_reservation(reservation, candidates, vehicle):
+            AuditLog.objects.create(
+                actor=actor,
+                action="reservation.moved_by_block",
+                target=target,
+                before={"from_slot": old_code},
+                after={"from_slot": old_code, "to_slot": reservation.slot.code},
+            )
+            queue_reservation_notification(reservation, ReservationNotification.Event.MOVED)
+            moved.append(reservation)
+        else:
+            reservation.status = Reservation.Status.CANCELLED
+            reservation.save(update_fields=["status"])
+            AuditLog.objects.create(
+                actor=actor,
+                action="reservation.cancelled_by_block",
+                target=target,
+                before={"status": Reservation.Status.RESERVED, "slot": old_code},
+                after={"status": Reservation.Status.CANCELLED, "fee_inr": "0.00"},
+            )
+            queue_reservation_notification(reservation, ReservationNotification.Event.CANCELLED)
+            cancelled.append(reservation)
+    return moved, cancelled
 
 
 # ---------------------------------------------------------------------------

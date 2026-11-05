@@ -6,7 +6,7 @@ from math import ceil
 from types import SimpleNamespace
 
 from django.core.exceptions import ValidationError
-from django.db import IntegrityError, connection, transaction
+from django.db import connection, transaction
 from django.db.backends.postgresql.psycopg_any import DateTimeTZRange
 from django.db.models import Q
 from django.utils import timezone
@@ -17,7 +17,13 @@ from vps.audit.models import AuditLog
 from vps.billing.models import Charge
 from vps.lots.models import Tariff
 from vps.reservations.models import Reservation
-from vps.reservations.services import NO_SLOT, _try_book, free_slots
+from vps.reservations.services import (
+    NO_SLOT,
+    _try_book,
+    booking_vehicle,
+    free_slots,
+    move_reservation,
+)
 from vps.vehicles.models import Vehicle
 from vps.vehicles.services import normalise_registration, validate_registration
 
@@ -34,8 +40,6 @@ SLOT_STILL_OCCUPIED = (
     "The booked slot is still occupied and no other suitable slot is free. "
     "Ask the driver to wait or direct them to another lot."
 )
-# For a booking whose vehicle is no longer registered, keep to the booked slot's kind.
-_VEHICLE_TYPE_FOR_SLOT = {"TwoWheeler": "TwoWheeler", "EV": "EV"}
 
 
 def _reallocate_if_occupied(reservation):
@@ -53,16 +57,7 @@ def _reallocate_if_occupied(reservation):
     )
     if reservation.slot_id not in occupied:
         return None
-    vehicle = (
-        Vehicle.objects.select_related("owner")
-        .filter(owner=reservation.driver, registration_no=reservation.vehicle_reg_no)
-        # A removed record can share the plate with a different type; the active one wins.
-        .order_by("-is_active", "-pk")
-        .first()
-    ) or SimpleNamespace(
-        vehicle_type=_VEHICLE_TYPE_FOR_SLOT.get(reservation.slot.slot_type, "Car"),
-        owner=reservation.driver,
-    )
+    vehicle = booking_vehicle(reservation)
     period = reservation.period
     candidates = [
         slot
@@ -70,18 +65,7 @@ def _reallocate_if_occupied(reservation):
         if slot.pk not in occupied
     ]
 
-    def try_move(slot):
-        try:
-            with transaction.atomic():
-                Reservation.objects.filter(pk=reservation.pk).update(slot=slot)
-        except IntegrityError as error:
-            constraint = getattr(getattr(error.__cause__, "diag", None), "constraint_name", None)
-            if constraint != "reservation_slot_period_no_overlap":
-                raise
-            return False  # A concurrent booking took it; try the next best.
-        return True
-
-    new_slot = allocate_slot_with_retry(candidates, vehicle, try_move)
+    new_slot = move_reservation(reservation, candidates, vehicle)
     if new_slot is None:
         raise ValidationError({"__all__": SLOT_STILL_OCCUPIED})
     return new_slot
