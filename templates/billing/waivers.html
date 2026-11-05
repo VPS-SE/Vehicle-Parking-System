@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}Waive charges · VPS{% endblock %}
+{% block content %}
+<h1>Waive charges</h1>
+<p>A waived charge no longer counts as unpaid. Every waiver needs a written reason and is recorded in the audit log.</p>
+<form method="get" action="{% url 'billing:waivers' %}">
+  <div class="field">
+    <label for="waiver-query">Booking reference or vehicle registration number</label>
+    <input id="waiver-query" name="q" type="search" value="{{ q }}">
+  </div>
+  <button type="submit">Search unpaid charges</button>
+</form>
+<table>
+  <caption>Unpaid charges</caption>
+  <thead>
+    <tr>
+      <th scope="col">Booking reference</th>
+      <th scope="col">Vehicle</th>
+      <th scope="col">Charge kind</th>
+      <th scope="col">Amount</th>
+      <th scope="col">Waiver</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for charge in charges %}
+    <tr>
+      <td>{{ charge.reservation.booking_ref }}</td>
+      <td>{{ charge.reservation.vehicle_reg_no }}</td>
+      <td>{{ charge.get_kind_display }}</td>
+      <td>Rs {{ charge.amount_inr|floatformat:2 }}</td>
+      <td>
+        <form method="post" action="{% url 'billing:waive' charge.pk %}">
+          {% csrf_token %}
+          <input type="hidden" name="q" value="{{ q }}">
+          <label for="reason-{{ charge.pk }}">Reason for waiving the {{ charge.get_kind_display|lower }} charge on {{ charge.reservation.booking_ref }}</label>
+          <textarea id="reason-{{ charge.pk }}" name="reason" rows="2" maxlength="{{ reason_max_length }}" required></textarea>
+          <button type="submit">Waive charge</button>
+        </form>
+      </td>
+    </tr>
+  {% empty %}
+    <tr><td colspan="5">{% if q %}No unpaid charges found.{% else %}Search by booking reference or registration number.{% endif %}</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+<table>
+  <caption>Recent waivers</caption>
+  <thead>
+    <tr>
+      <th scope="col">When</th>
+      <th scope="col">Booking reference</th>
+      <th scope="col">Charge</th>
+      <th scope="col">Amount</th>
+      <th scope="col">Waived by</th>
+      <th scope="col">Reason</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for waiver in recent %}
+    <tr>
+      <td>{{ waiver.waived_at|date:"Y-m-d H:i" }}</td>
+      <td>{{ waiver.charge.reservation.booking_ref }}</td>
+      <td>{{ waiver.charge.get_kind_display }}</td>
+      <td>Rs {{ waiver.charge.amount_inr|floatformat:2 }}</td>
+      <td>{{ waiver.waived_by.email }}</td>
+      <td>{{ waiver.reason }}</td>
+    </tr>
+  {% empty %}
+    <tr><td colspan="6">No charges have been waived yet.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

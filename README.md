@@ -82,8 +82,10 @@ docker compose up --build
 ```
 
 Open http://localhost:8000/healthz to check the application and database.
-The web service runs migrations before starting Django, and source changes reload
-automatically. PostgreSQL data stays in a named volume. On first initialization,
+The web service runs migrations, then serves the app with Gunicorn using
+`GUNICORN_WORKERS` worker processes (8 by default, one database connection each).
+Gunicorn does not reload on source changes: run `docker compose restart web`, or use
+`python manage.py runserver` on the host while developing. PostgreSQL data stays in a named volume. On first initialization,
 the database gets `btree_gist` in the application database and `template1` so
 new test databases also have the extension.
 

@@ -149,7 +149,7 @@ def booking_history(request):
         .prefetch_related(
             Prefetch(
                 "charges",
-                queryset=Charge.objects.select_related("payment").order_by("id"),
+                queryset=Charge.objects.select_related("payment", "waiver").order_by("id"),
             )
         )
         .order_by("-id")

@@ -34,7 +34,12 @@ services:
     command:
       - sh
       - -c
-      - python manage.py migrate && exec python manage.py runserver 0.0.0.0:8000
+      # Gunicorn's fixed pool of sync workers keeps database connections bounded (one per
+      # worker); the development server opened one per request thread (D-1).
+      - >-
+        python manage.py migrate &&
+        exec gunicorn vps.wsgi:application --bind 0.0.0.0:8000
+        --workers "$${GUNICORN_WORKERS:-8}" --timeout 60 --access-logfile -
     ports:
       - "8000:8000"
     volumes:

@@ -34,6 +34,7 @@ gate_or_corrections = role_required(
     *PERMISSIONS[Function.GATE_OPERATIONS], *PERMISSIONS[Function.CORRECT_TIMES]
 )
 
+
 @function_required(Function.GATE_OPERATIONS)
 @require_GET
 def payments(request):
@@ -137,10 +138,15 @@ def correct_entry(request):
 
 def _receipt_context(reservation):
     """FR-BILL-04: itemised charges, billable time and payment state of a completed stay."""
-    charges = list(reservation.charges.select_related("payment").order_by("id"))
+    charges = list(reservation.charges.select_related("payment", "waiver").order_by("id"))
     total = sum((charge.amount_inr for charge in charges), Decimal("0.00"))
     payments = [charge.payment for charge in charges if hasattr(charge, "payment")]
     paid_total = sum((payment.charge.amount_inr for payment in payments), Decimal("0.00"))
+    # BR-09: a waived charge is settled without a payment.
+    waived_total = sum(
+        (charge.amount_inr for charge in charges if hasattr(charge, "waiver")), Decimal("0.00")
+    )
+    balance_due = total - paid_total - waived_total
 
     parking_end = reservation.exit_time
     if not reservation.is_walk_in:
@@ -155,9 +161,9 @@ def _receipt_context(reservation):
             reservation.exit_time - (reservation.period.upper + CHECKOUT_GRACE)
         )
 
-    if paid_total == total:
-        payment_status = "Paid"
-    elif paid_total:
+    if balance_due == 0:
+        payment_status = "Paid" if not waived_total else "Settled (waived)"
+    elif paid_total or waived_total:
         payment_status = "Partially paid"
     else:
         payment_status = "Unpaid"
@@ -171,7 +177,8 @@ def _receipt_context(reservation):
         "total": total,
         "total_amount": total,
         "paid_total": paid_total,
-        "balance_due": total - paid_total,
+        "waived_total": waived_total,
+        "balance_due": balance_due,
         "payment": max(payments, key=lambda payment: payment.paid_at, default=None),
         "payment_status": payment_status,
     }
