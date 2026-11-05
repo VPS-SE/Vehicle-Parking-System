@@ -5,7 +5,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("accounts", "0002_srs_role_labels"),
+        ("accounts", "0003_user_accounts_user_email_lower_uniq"),
     ]
 
     operations = [
