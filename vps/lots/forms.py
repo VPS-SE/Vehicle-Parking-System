@@ -66,3 +66,24 @@ class TariffForm(forms.Form):
         label="Effective from",
         widget=forms.DateInput(attrs={"type": "date"}),
     )
+
+
+class SlotBlockForm(forms.Form):
+    """FR-LOT-03: block one slot of a lot for a period, with a reason."""
+
+    slot = forms.ModelChoiceField(queryset=Slot.objects.none(), label="Slot")
+    starts_at = forms.DateTimeField(
+        label="Blocked from",
+        input_formats=["%Y-%m-%dT%H:%M"],
+        widget=forms.DateTimeInput(attrs={"type": "datetime-local"}, format="%Y-%m-%dT%H:%M"),
+    )
+    ends_at = forms.DateTimeField(
+        label="Blocked until",
+        input_formats=["%Y-%m-%dT%H:%M"],
+        widget=forms.DateTimeInput(attrs={"type": "datetime-local"}, format="%Y-%m-%dT%H:%M"),
+    )
+    reason = forms.CharField(label="Reason", max_length=200, required=False)
+
+    def __init__(self, *args, lot, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["slot"].queryset = lot.slots.order_by("code")

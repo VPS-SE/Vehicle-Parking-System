@@ -13,6 +13,7 @@ urlpatterns = [
     path("<int:pk>/edit/", views.lot_edit, name="edit"),
     path("<int:pk>/archive/", views.lot_archive, name="archive"),
     path("<int:pk>/restore/", views.lot_restore, name="restore"),
+    path("<int:pk>/block/", views.block_slot, name="block"),
     path("tariffs/", views.tariff_list, name="tariffs"),
     path("tariffs/save/", views.tariff_create, name="tariff_create"),
 ]

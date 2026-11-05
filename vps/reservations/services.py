@@ -2,6 +2,7 @@
 
 from datetime import timedelta
 from decimal import Decimal
+from types import SimpleNamespace
 
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, connection, transaction
@@ -18,6 +19,7 @@ from vps.lots.models import Slot
 from vps.notifications.models import ReservationNotification
 from vps.notifications.services import queue_reservation_notification
 from vps.reservations.models import Reservation
+from vps.vehicles.models import Vehicle
 
 NO_SLOT = "No slot available for this window"
 LIMIT_REACHED = "You already have 2 open reservations. Cancel one before booking another."
@@ -72,6 +74,48 @@ def free_slots(lot, vehicle, start, end):
         .exclude(Exists(held))
         .select_related("lot")
     )
+
+
+# For a booking whose vehicle is no longer registered, keep to the booked slot's kind.
+_VEHICLE_TYPE_FOR_SLOT = {"TwoWheeler": "TwoWheeler", "EV": "EV"}
+
+
+def booking_vehicle(reservation):
+    """The vehicle a booking was made for, used to decide which slots it may move to."""
+    return (
+        Vehicle.objects.select_related("owner")
+        .filter(owner=reservation.driver, registration_no=reservation.vehicle_reg_no)
+        # A removed record can share the plate with a different type; the active one wins.
+        .order_by("-is_active", "-pk")
+        .first()
+    ) or SimpleNamespace(
+        vehicle_type=_VEHICLE_TYPE_FOR_SLOT.get(reservation.slot.slot_type, "Car"),
+        owner=reservation.driver,
+    )
+
+
+def move_reservation(reservation, candidates, vehicle):
+    """Move a booking to the best candidate slot (FR-ALLOC-02); return it, or None if none fit.
+
+    Each move runs in a savepoint, so a concurrent booking of the same slot makes it try the
+    next best instead of failing.
+    """
+
+    def try_move(slot):
+        try:
+            with transaction.atomic():
+                Reservation.objects.filter(pk=reservation.pk).update(slot=slot)
+        except IntegrityError as error:
+            constraint = getattr(getattr(error.__cause__, "diag", None), "constraint_name", None)
+            if constraint != "reservation_slot_period_no_overlap":
+                raise
+            return False
+        return True
+
+    new_slot = allocate_slot_with_retry(candidates, vehicle, try_move)
+    if new_slot is not None:
+        reservation.slot = new_slot
+    return new_slot
 
 
 def check_booking_limits(driver):
