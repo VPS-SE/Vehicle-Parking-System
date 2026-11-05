@@ -10,6 +10,10 @@
     Enter an active booking reference or vehicle registration number
     to record the vehicle's exit and calculate its charges.
   </p>
+  {% if corrections_only %}
+  <p>As a Lot Administrator you can only record an exit time noted on paper during an
+    outage: enter that time and the reason below.</p>
+  {% endif %}
 
   <form method="post">
     {% csrf_token %}

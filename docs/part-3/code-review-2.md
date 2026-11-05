@@ -9,6 +9,10 @@
 
 ---
 
+## Status
+
+All three findings are fixed on this branch: G1 (staff search by vehicle type, or every type), G2 (admins can record a paper exit time on the check-out page) and G3 (the create-staff page extends the site layout). Their reproduction tests no longer carry xfail markers. Full suite after the fixes: 663 passed.
+
 ## 1. Executive Summary
 
 An extended manual and automated code review of the Vehicle Parking System was conducted following the implementation of fixes for findings F1 through F7. The review evaluated the completeness and correctness of earlier fixes, analyzed git history (`b962c35..HEAD`), and performed a systematic audit across all application layers, models, services, views, and templates.

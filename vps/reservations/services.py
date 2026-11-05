@@ -59,7 +59,10 @@ def validate_window(lot, start, end, now=None):
 
 
 def free_slots(lot, vehicle, start, end):
-    """Slots in the lot that suit the vehicle and are neither blocked nor held for the window."""
+    """Slots in the lot that suit the vehicle and are neither blocked nor held for the window.
+
+    vehicle=None counts slots of every type (staff searching without a vehicle).
+    """
     period = DateTimeTZRange(start, end)
     # One subquery, so status and overlap must hold for the same reservation. Two
     # conditions in a single exclude() across a relation may match different rows.
@@ -68,8 +71,9 @@ def free_slots(lot, vehicle, start, end):
         status__in=[Reservation.Status.RESERVED, Reservation.Status.ACTIVE],
         period__overlap=period,
     )
+    slot_types = Slot.SlotType.values if vehicle is None else eligible_slot_types(vehicle)
     return list(
-        Slot.objects.filter(lot=lot, slot_type__in=eligible_slot_types(vehicle))
+        Slot.objects.filter(lot=lot, slot_type__in=slot_types)
         .exclude(blocks__period__overlap=period)
         .exclude(Exists(held))
         .select_related("lot")

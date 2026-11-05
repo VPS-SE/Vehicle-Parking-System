@@ -28,6 +28,11 @@ from vps.gate.services import (
 from vps.lots.models import Lot
 from vps.reservations.models import Reservation
 
+# Check-out is a gate operation, but a Lot Administrator may use the same page to record an
+# exit time noted on paper during an outage (FR-GATE-06, SRS Table 5); the service decides.
+gate_or_corrections = role_required(
+    *PERMISSIONS[Function.GATE_OPERATIONS], *PERMISSIONS[Function.CORRECT_TIMES]
+)
 
 @function_required(Function.GATE_OPERATIONS)
 @require_GET
@@ -81,7 +86,7 @@ def walk_in(request):
     return render(request, "gate/walk_in.html", {"form": form})
 
 
-@function_required(Function.GATE_OPERATIONS)
+@gate_or_corrections
 @require_http_methods(["GET", "POST"])
 def checkout(request):
     """FR-GATE-04: check out an active vehicle and display its receipt."""
@@ -103,7 +108,11 @@ def checkout(request):
                 booking_ref=reservation.booking_ref,
             )
 
-    return render(request, "gate/checkout.html", {"form": form})
+    return render(
+        request,
+        "gate/checkout.html",
+        {"form": form, "corrections_only": not can(request.user, Function.GATE_OPERATIONS)},
+    )
 
 
 @function_required(Function.CORRECT_TIMES)
@@ -176,7 +185,7 @@ def _completed_reservation(booking_ref):
     )
 
 
-@function_required(Function.GATE_OPERATIONS)
+@gate_or_corrections
 def receipt(request, booking_ref):
     """Display the itemised checkout receipt."""
     reservation = _completed_reservation(booking_ref)

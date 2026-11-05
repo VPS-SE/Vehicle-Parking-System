@@ -42,10 +42,6 @@ def slot(lot):
     return slot
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="G1: Staff cannot search slots because ReservationSearchForm requires user-owned vehicle",
-)
 def test_g01_staff_can_search_parking_slots(client, lot):
     """G1: Attendants and Admins have Function.SEARCH but cannot search slots without owning vehicles."""
     attendant = User.objects.create_user(
@@ -70,10 +66,6 @@ def test_g01_staff_can_search_parking_slots(client, lot):
     assert response.context["slot_count"] is not None
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="G2: Lot Administrator denied permission to record outage exit times",
-)
 def test_g02_admin_permitted_to_record_outage_exit_time(client, slot):
     """G2: Table 5 permits Admin to correct exit times, but checkout_vehicle requires GATE_OPERATIONS."""
     from vps.reservations.models import Reservation
@@ -113,10 +105,6 @@ def test_g02_admin_permitted_to_record_outage_exit_time(client, slot):
     assert view_resp.status_code == 200
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="G3: create_staff template does not extend base.html or render success message flashes",
-)
 def test_g03_staff_creation_renders_success_message(client):
     """G3: create_staff template fails to display success flash messages or site navigation."""
     admin = User.objects.create_user(

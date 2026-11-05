@@ -38,6 +38,7 @@
       </select>
     </div>
 
+    {% if for_driver %}
     <div class="field">
       <label for="vehicle">Your vehicle</label>
       <select id="vehicle" name="vehicle" required>
@@ -53,6 +54,16 @@
         {% endfor %}
       </select>
     </div>
+    {% else %}
+    <div class="field">
+      <label for="vehicle_type">Vehicle type</label>
+      <select id="vehicle_type" name="vehicle_type">
+        {% for value, label in vehicle_types %}
+          <option value="{{ value }}" {% if selected_vehicle_type == value %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    {% endif %}
 
     <div class="field">
       <label for="start">Start date and time</label>

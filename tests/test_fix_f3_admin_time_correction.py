@@ -185,9 +185,10 @@ def test_admin_cannot_use_ordinary_gate_operations(client, admin_user, active_bo
     client.force_login(admin_user)
 
     # Ordinary check-out page
-    assert client.get("/gate/checkout/").status_code == 403
+    # The check-out page opens for admins only to record a paper exit time (G2).
+    assert client.get("/gate/checkout/").status_code == 200
     # Ordinary check-out POST (without exit_time)
-    assert client.post("/gate/checkout/", {"query": active_booking.booking_ref}).status_code == 403
+    assert client.post("/gate/checkout/", {"query": active_booking.booking_ref}).status_code == 200
 
     # Gate console dashboard and endpoints
     assert client.get("/gate/").status_code == 403
@@ -221,7 +222,7 @@ def test_admin_cannot_use_ordinary_gate_operations(client, admin_user, active_bo
     # Service layer: ordinary check-out refused for admin
     with pytest.raises(ValidationError) as exc:
         gate_services.checkout_vehicle(active_booking.booking_ref, attendant=admin_user)
-    assert "Only Gate Attendants may check out vehicles." in str(exc.value)
+    assert "Only Gate Attendants may check out vehicles" in str(exc.value)
 
     # Service layer: walk-in refused for admin
     with pytest.raises(ValidationError) as exc:
