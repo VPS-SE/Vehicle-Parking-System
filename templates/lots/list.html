@@ -14,6 +14,7 @@
       <td>{{ lot.opens_at|time:"H:i" }}–{{ lot.closes_at|time:"H:i" }}</td>
       <td>{{ lot.slot_count }}</td>
       <td><a href="{% url 'lots:edit' lot.pk %}">Edit <span>{{ lot.name }}</span></a>
+        {% if not archived %} · <a href="{% url 'lots:block' lot.pk %}">Block a slot</a>{% endif %}
         {% if archived %}
         <form class="inline" method="post" action="{% url 'lots:restore' lot.pk %}">{% csrf_token %}<button type="submit">Restore {{ lot.name }}</button></form>
         {% else %}

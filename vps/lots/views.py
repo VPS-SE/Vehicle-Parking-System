@@ -5,12 +5,12 @@ from django.core.exceptions import ValidationError
 from django.db.models import Count
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
-from django.views.decorators.http import require_POST, require_safe
+from django.views.decorators.http import require_http_methods, require_POST, require_safe
 
 from vps.accounts.permissions import function_required
 from vps.accounts.roles import Function
 from vps.lots import services
-from vps.lots.forms import LotForm, TariffForm
+from vps.lots.forms import LotForm, SlotBlockForm, TariffForm
 from vps.lots.models import Lot, Tariff
 
 
@@ -74,6 +74,34 @@ def lot_restore(request, pk):
     services.restore_lot(get_object_or_404(Lot, pk=pk))
     messages.success(request, "Parking lot restored successfully.")
     return redirect("lots:list")
+
+
+@function_required(Function.MANAGE_LOTS)
+@require_http_methods(["GET", "POST"])
+def block_slot(request, pk):
+    """FR-LOT-03/04: block a slot; Reserved bookings in the period are moved or cancelled."""
+    lot = get_object_or_404(Lot.objects.active(), pk=pk)
+    form = SlotBlockForm(request.POST if request.method == "POST" else None, lot=lot)
+    if request.method == "POST" and form.is_valid():
+        try:
+            block = services.block_slot(**form.cleaned_data, actor=request.user)
+        except ValidationError as error:
+            for field, errors in error.error_dict.items():
+                form.add_error(field if field in form.fields else None, errors)
+        else:
+            messages.success(
+                request,
+                f"Slot {block.slot.code} blocked: {len(block.moved)} booking(s) moved, "
+                f"{len(block.cancelled)} cancelled free of charge.",
+            )
+            for reservation in block.moved:
+                messages.info(request, f"{reservation.booking_ref} moved to {reservation.slot.code}.")
+            for reservation in block.cancelled:
+                messages.warning(
+                    request, f"{reservation.booking_ref} cancelled: no other slot was free."
+                )
+            return redirect("lots:block", pk=lot.pk)
+    return render(request, "lots/block.html", {"form": form, "lot": lot})
 
 
 def _tariff_page(request, form):

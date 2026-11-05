@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Block a slot · {{ lot.name }} · VPS{% endblock %}
+{% block content %}
+<h1>Block a slot in {{ lot.name }}</h1>
+<p>
+  Reserved bookings for the blocked period are moved to another suitable free slot, and
+  the driver is e-mailed the new slot. If no slot is free, the booking is cancelled
+  without a fee and the driver is told.
+</p>
+<form method="post" novalidate>
+  {% csrf_token %}
+  {{ form.non_field_errors }}
+  {% for field in form %}
+  <div class="field">
+    {{ field.label_tag }} {{ field }}
+    {{ field.errors }}
+  </div>
+  {% endfor %}
+  <button type="submit">Block slot</button>
+  <a href="{% url 'lots:list' %}">Back to parking lots</a>
+</form>
+{% endblock %}
