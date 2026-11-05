@@ -13,7 +13,6 @@ from django.utils import timezone
 
 from vps.accounts.models import User
 from vps.accounts.roles import Function, can
-from vps.audit.models import AuditLog
 from vps.audit.services import log_action
 
 DUPLICATE_EMAIL = "An account with this e-mail already exists"
@@ -62,7 +61,7 @@ def register_driver(*, full_name, email, mobile, password):
             raise ValidationError({"email": DUPLICATE_EMAIL}) from error
         raise
 
-def create_staff(*, full_name, email, mobile, password, role):
+def create_staff(*, full_name, email, mobile, password, role, actor=None):
     full_name = full_name.strip()
     email = User.objects.normalize_email(email.strip())
 
@@ -102,13 +101,20 @@ def create_staff(*, full_name, email, mobile, password, role):
 
     try:
         with transaction.atomic():
-            return User.objects.create_user(
+            staff = User.objects.create_user(
                 email=email,
                 password=password,
                 full_name=full_name,
                 mobile=mobile,
                 role=role,
             )
+            log_action(
+                actor=actor,
+                action="staff.created",
+                target=f"user:{staff.email}",
+                after={"role": staff.role, "full_name": staff.full_name},
+            )
+            return staff
     except IntegrityError as error:
         constraint = getattr(getattr(error.__cause__, "diag", None), "constraint_name", None)
         if constraint in EMAIL_CONSTRAINTS:
@@ -125,7 +131,7 @@ def set_accessible_permit(admin, driver, has_permit):
     if driver.accessible_permit == has_permit:
         return driver
     with transaction.atomic():
-        AuditLog.objects.create(
+        log_action(
             actor=admin,
             action="driver.permit_changed",
             target=f"user:{driver.pk}",
@@ -175,7 +181,7 @@ def deactivate_staff(admin, staff):
 
         _invalidate_user_sessions(staff)
 
-        AuditLog.objects.create(
+        log_action(
             actor=admin,
             action="staff.deactivated",
             target=f"user:{staff.pk}",
@@ -205,7 +211,7 @@ def reactivate_staff(admin, staff):
         staff.is_active = True
         staff.save(update_fields=["is_active"])
 
-        AuditLog.objects.create(
+        log_action(
             actor=admin,
             action="staff.reactivated",
             target=f"user:{staff.pk}",
