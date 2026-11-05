@@ -11,7 +11,7 @@
 
 ## Status
 
-All three findings are fixed on this branch: G1 (staff search by vehicle type, or every type), G2 (admins can record a paper exit time on the check-out page) and G3 (the create-staff page extends the site layout). Their reproduction tests no longer carry xfail markers. Full suite after the fixes: 663 passed.
+All three findings are fixed on this branch: G1 (staff search by vehicle type, or every type), G2 (admins can record a paper exit time on the check-out page) and G3 (the create-staff page extends the site layout). Their reproduction tests no longer carry xfail markers. Full suite after the fixes: 672 passed.
 
 ## 1. Executive Summary
 
