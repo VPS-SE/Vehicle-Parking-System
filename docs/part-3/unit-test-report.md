@@ -16,10 +16,10 @@ Unit and integration tests for the Django application (`tests/`) and for the for
 
 | Suite | Command | Started | Tests | Passed | Failed | Errors | Skipped | Time (s) | Raw output |
 |---|---|---|---|---|---|---|---|---|---|
-| Application | `./run-tests.sh -q --junitxml=docs/part-3/evidence/junit.xml` | 2026-11-05 18:19 | 723 | 723 | 0 | 0 | 0 | 112.2 | `evidence/junit.xml` |
-| Forecast service | `./run-forecast-tests.sh -q --junitxml=...` | 2026-11-05 18:21 | 16 | 16 | 0 | 0 | 0 | 1.8 | `evidence/forecast-junit.xml` |
+| Application | `./run-coverage.sh run -m pytest -q --junitxml=docs/part-3/evidence/junit.xml` | 2026-11-05 22:48 | 771 | 771 | 0 | 0 | 0 | 128.3 | `evidence/junit.xml` |
+| Forecast service | `./run-forecast-tests.sh -q --junitxml=...` | 2026-11-05 22:35 | 16 | 16 | 0 | 0 | 0 | 2.1 | `evidence/forecast-junit.xml` |
 
-The coverage run at 20:12 ran the application suite again and also got 723 passed (`evidence/coverage-run.txt`). No test is marked xfail or skipped. The ten code review findings (F1 to F7, G1 to G3) were fixed before this run, so their reproduction tests now run as ordinary tests.
+The application suite ran under coverage, so the JUnit file and the coverage figures come from the same run (`evidence/coverage-run.txt`). It ran on branch `test/part3-closeout`, which adds the charge waiver and Gunicorn change (PR #129) and the booking lock fix (PR #130) to `main`. An earlier run on 5 November, before those changes, had 723 tests; the 48 added since are the waiver tests (22), the TC-45 to TC-49 business-rule tests (21) and the concurrent-booking test (5 runs). No test is marked xfail or skipped.
 
 ## Results by test file
 
@@ -35,6 +35,7 @@ The coverage run at 20:12 ran the application suite again and also got 723 passe
 | `tests/test_booking_history.py` | 8 | 8 | 0 |
 | `tests/test_booking_history_template.py` | 3 | 3 | 0 |
 | `tests/test_cancellation.py` | 12 | 12 | 0 |
+| `tests/test_charge_waiver.py` | 22 | 22 | 0 |
 | `tests/test_check_coverage.py` | 8 | 8 | 0 |
 | `tests/test_check_in.py` | 9 | 9 | 0 |
 | `tests/test_checkout.py` | 43 | 43 | 0 |
@@ -67,7 +68,7 @@ The coverage run at 20:12 ran the application suite again and also got 723 passe
 | `tests/test_printable_receipt_template.py` | 3 | 3 | 0 |
 | `tests/test_reallocation.py` | 8 | 8 | 0 |
 | `tests/test_reservation_confirmation_template.py` | 2 | 2 | 0 |
-| `tests/test_reservations.py` | 28 | 28 | 0 |
+| `tests/test_reservations.py` | 33 | 33 | 0 |
 | `tests/test_revenue_report.py` | 7 | 7 | 0 |
 | `tests/test_review_findings.py` | 7 | 7 | 0 |
 | `tests/test_review_findings_2.py` | 3 | 3 | 0 |
@@ -89,6 +90,7 @@ The coverage run at 20:12 ran the application suite again and also got 723 passe
 | `tests/test_tc28_occupancy.py` | 5 | 5 | 0 |
 | `tests/test_tc39_password_storage.py` | 1 | 1 | 0 |
 | `tests/test_tc43_quality_gates.py` | 10 | 10 | 0 |
+| `tests/test_tc45_tc49_business_rules.py` | 21 | 21 | 0 |
 | `tests/test_time_correction.py` | 14 | 14 | 0 |
 | `tests/test_vehicle_registration_template.py` | 3 | 3 | 0 |
 | `tests/test_vehicle_removal.py` | 7 | 7 | 0 |
@@ -136,13 +138,19 @@ Each Test Plan case below has unit or integration tests that ran and passed. The
 | TC-33 | Tariff in force at entry is used | `tests/test_checkout.py`, `tests/test_tariffs.py` | 3 tests, 3 passed |
 | TC-34 | Occupancy and revenue reports export to CSV | `tests/test_occupancy_report.py`, `tests/test_revenue_report.py` | 19 tests, 19 passed |
 | TC-35 | Forecast bands and baseline label | `forecast/tests/test_forecast.py`, `tests/test_forecast_panel.py` | 12 tests, 12 passed |
-| TC-38 | TLS, cookie flags and idle timeout | `tests/test_fix_f7_session_security.py` | 7 tests, 7 passed |
-| TC-39 | Password storage and data masking | `tests/test_tc39_password_storage.py` | 1 test, 1 passed |
+| TC-38 | TLS, cookie flags and idle timeout | `tests/test_fix_f7_session_security.py` | 8 tests, 8 passed |
+| TC-39 | Password storage and data masking | `tests/test_tc39_password_storage.py` | 3 tests, 3 passed |
 | TC-40 | No secrets in the repository | `tests/test_settings.py` | 1 test, 1 passed |
 | TC-43 | Coverage and lint gates in CI | `tests/test_check_coverage.py`, `tests/test_tc43_quality_gates.py` | 18 tests, 18 passed |
 | TC-44 | Code review findings are fixed and regression-tested | `tests/test_fix_f1_email_case_insensitivity.py`, `tests/test_fix_f2_account_lockout.py`, `tests/test_fix_f3_admin_time_correction.py`, `tests/test_fix_f4_audit_slot_blocks_and_staff.py`, `tests/test_fix_f5_notifications.py`, `tests/test_fix_f6_unpaid_total.py`, `tests/test_fix_f7_session_security.py`, `tests/test_fix_g1_staff_search.py`, `tests/test_review_findings.py`, `tests/test_review_findings_2.py` | 62 tests, 62 passed |
+| TC-45 | Only Gate Attendants perform gate operations and payments | `tests/test_tc45_tc49_business_rules.py` | 1 test, 1 passed |
+| TC-46 | A third Reserved booking is refused until one is cancelled | `tests/test_tc45_tc49_business_rules.py` | 1 test, 1 passed |
+| TC-47 | Cancellation and no-show fees at the 60-minute boundary | `tests/test_tc45_tc49_business_rules.py` | 1 test, 1 passed |
+| TC-48 | A booking is held for 15 minutes after its start | `tests/test_tc45_tc49_business_rules.py` | 1 test, 1 passed |
+| TC-49 | Billing blocks, 1-hour minimum and overstay grace | `tests/test_tc45_tc49_business_rules.py` | 17 tests, 17 passed |
+| TC-50 | An administrator waives a charge with a written reason | `tests/test_charge_waiver.py` | 23 tests, 23 passed |
 
 ## Failures
 
-None. Both suites passed with 0 failures and 0 errors.
+None in the final runs. Both suites passed with 0 failures and 0 errors. One new test failed before its fix: `test_concurrent_bookings_with_free_slots_all_succeed` failed 5 of 5 runs until slot allocation was serialised per lot (defect D-4 in the System Validation Report). It was written to reproduce the deadlocks and false "no slot" refusals that the booking load test found.
 

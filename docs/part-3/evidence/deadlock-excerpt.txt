@@ -1,0 +1,9 @@
+  File "/home/viviansobers/Documents/SEM 5/SE/Vehicle-Parking-System/.venv/lib64/python3.13/site-packages/psycopg/cursor.py", line 117, in execute
+    raise ex.with_traceback(None)
+psycopg.errors.DeadlockDetected: deadlock detected
+DETAIL:  Process 56586 waits for ShareLock on transaction 109594; blocked by process 56587.
+Process 56587 waits for ShareLock on transaction 109595; blocked by process 56586.
+HINT:  See server log for query details.
+CONTEXT:  while checking exclusion constraint on tuple (79,149) in relation "reservations_reservation"
+
+The above exception was the direct cause of the following exception:

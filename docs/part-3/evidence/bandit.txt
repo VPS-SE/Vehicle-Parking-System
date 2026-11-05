@@ -1,0 +1,71 @@
+Thu Nov  5 10:51:29 PM IST 2026
+$ bandit -r vps forecast -x "*/migrations/*,*/tests/*" -f txt
+[main]	INFO	profile include tests: None
+[main]	INFO	profile exclude tests: None
+[main]	INFO	cli include tests: None
+[main]	INFO	cli exclude tests: None
+[main]	INFO	running on Python 3.13.14
+Working... ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00
+Run started:2026-11-05 17:21:30.351330+00:00
+
+Test results:
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: forecast/train/simulate.py:23:10
+22	    """Stays as (lot_id, slot_type, entry, exit) for each slot over the given days."""
+23	    rng = random.Random(seed)
+24	    stays = []
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: vps/factories.py:121:10
+120	    """
+121	    rng = random.Random(seed)
+122	    slot_count = sum(DEMO_SLOTS.values())
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: vps/factories.py:148:10
+147	    today = timezone.localdate(now)
+148	    rng = random.Random(seed + 1)
+149	    lot = make_lot(DEMO_LOT_NAME, DEMO_SLOTS)
+
+--------------------------------------------------
+>> Issue: [B310:blacklist] Audit url open for permitted schemes. Allowing use of file:/ or custom schemes is often unexpected.
+   Severity: Medium   Confidence: High
+   CWE: CWE-22 (https://cwe.mitre.org/data/definitions/22.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b310-urllib-urlopen
+   Location: vps/reservations/forecast.py:31:13
+30	    try:
+31	        with urlopen(
+32	            f"{settings.FORECAST_URL}/v1/forecast?{query}", timeout=settings.FORECAST_TIMEOUT
+33	        ) as response:
+34	            data = json.load(response)
+
+--------------------------------------------------
+
+Code scanned:
+	Total lines of code: 4347
+	Total lines skipped (#nosec): 0
+	Total potential issues skipped due to specifically being disabled (e.g., #nosec BXXX): 0
+
+Run metrics:
+	Total issues (by severity):
+		Undefined: 0
+		Low: 3
+		Medium: 1
+		High: 0
+	Total issues (by confidence):
+		Undefined: 0
+		Low: 0
+		Medium: 0
+		High: 4
+Files skipped (0):

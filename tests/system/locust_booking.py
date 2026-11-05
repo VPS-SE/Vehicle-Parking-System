@@ -16,13 +16,15 @@ from locust import HttpUser, between, task
 
 SESSIONS_FILE = os.environ.get(
     "VPS_LOAD_SESSIONS",
-    "/tmp/claude-1000/-home-viviansobers-Documents-SEM-5-SE-Vehicle-Parking-System/9f662486-9041-4504-88bb-a3ed18ff8e55/scratchpad/sys2/load-sessions.json",
+    "load-sessions.json",
 )
 
 with open(SESSIONS_FILE) as f:
     _data = json.load(f)
     DRIVERS = _data.get("drivers", [])
     ATTENDANTS = _data.get("attendants", [])
+
+CLOSES_AT = tuple(int(x) for x in os.environ.get("VPS_LOT_CLOSES_AT", "23:59").split(":"))
 
 driver_queue = queue.Queue()
 for d in DRIVERS:
@@ -46,6 +48,8 @@ class BookingUser(HttpUser):
         match = re.search(r"load\.driver(\d+)", self.driver.get("email", ""))
         if match:
             driver_num = int(match.group(1))
+            # On a fresh seed_demo_data --seed 2026 database the 120 demo vehicles come first,
+            # so load.driverNNN owns vehicle 120 + NNN (checked for all 200 before the runs).
             self.vehicle_id = str(120 + driver_num)
         else:
             self.vehicle_id = "121"
@@ -64,11 +68,13 @@ class BookingUser(HttpUser):
         start = now + timedelta(minutes=2)
         end = start + timedelta(minutes=30)
 
-        # Lot Demo Central hours: 06:00 to 23:00
+        # Lot hours: 06:00 to CLOSES_AT (the test lot was set to close at 23:59 for an
+        # evening run). A window that would end after closing moves to the next morning.
+        closes = now.replace(hour=CLOSES_AT[0], minute=CLOSES_AT[1], second=0, microsecond=0)
         if start.hour < 6:
             start = now.replace(hour=7, minute=0, second=0, microsecond=0)
             end = start + timedelta(minutes=30)
-        elif start.hour >= 22 and start.minute > 25:
+        elif end > closes:
             start = (now + timedelta(days=1)).replace(hour=7, minute=0, second=0, microsecond=0)
             end = start + timedelta(minutes=30)
 

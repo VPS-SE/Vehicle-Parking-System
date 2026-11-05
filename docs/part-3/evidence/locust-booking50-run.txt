@@ -1,37 +1,30 @@
-Thu Nov  5 10:19:46 PM IST 2026
-[2026-11-05 22:19:46,789] vivianasus/INFO/locust.main: Starting Locust 2.47.0
-[2026-11-05 22:19:46,790] vivianasus/INFO/locust.main: Run time limit set to 120 seconds
-[2026-11-05 22:19:46,791] vivianasus/INFO/locust.runners: Ramping to 50 users at a rate of 10.00 per second
-[2026-11-05 22:19:50,797] vivianasus/INFO/locust.runners: All users spawned: {"BookingUser": 50} (50 total users)
-[2026-11-05 22:21:46,569] vivianasus/INFO/locust.main: --run-time limit reached, shutting down
-[2026-11-05 22:21:46,598] vivianasus/INFO/locust.main: Shutting down (exit code 1)
+Thu Nov  5 10:28:01 PM IST 2026
+[2026-11-05 22:28:02,020] vivianasus/INFO/locust.main: Starting Locust 2.47.0
+[2026-11-05 22:28:02,021] vivianasus/INFO/locust.main: Run time limit set to 120 seconds
+[2026-11-05 22:28:02,022] vivianasus/INFO/locust.runners: Ramping to 50 users at a rate of 10.00 per second
+[2026-11-05 22:28:06,029] vivianasus/INFO/locust.runners: All users spawned: {"BookingUser": 50} (50 total users)
+[2026-11-05 22:30:01,805] vivianasus/INFO/locust.main: --run-time limit reached, shutting down
+[2026-11-05 22:30:01,841] vivianasus/INFO/locust.main: Shutting down (exit code 0)
 Type     Name                                                                          # reqs      # fails |    Avg     Min     Max    Med |   req/s  failures/s
 --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
-GET      /gate/payments/                                                                  284     0(0.00%) |    313      26   33947     35 |    2.38        0.00
-GET      /reservations/search/                                                             50     0(0.00%) |     43      30      67     42 |    0.42        0.00
-POST     check-in                                                                         286     0(0.00%) |    320      29   33924     43 |    2.39        0.00
-POST     check-out                                                                        286     0(0.00%) |    503      27   36024     39 |    2.39        0.00
-POST     payment                                                                          284     0(0.00%) |    497      26   36024     35 |    2.38        0.00
-POST     reserve                                                                          475  187(39.37%) |   7815      47   45581     79 |    3.97        1.56
+GET      /gate/payments/                                                                 3001     0(0.00%) |     37      26     121     35 |   25.05        0.00
+GET      /reservations/search/                                                             50     0(0.00%) |     63      31     137     53 |    0.42        0.00
+POST     check-in                                                                        3003     0(0.00%) |     40      27     123     37 |   25.06        0.00
+POST     check-out                                                                       3003     0(0.00%) |     37      25     120     34 |   25.06        0.00
+POST     payment                                                                         3001     0(0.00%) |     34      24     115     32 |   25.05        0.00
+POST     reserve                                                                         3004     0(0.00%) |     73      45     252     66 |   25.07        0.00
 --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
-         Aggregated                                                                      1665  187(11.23%) |   2510      26   45581     44 |   13.93        1.56
+         Aggregated                                                                     15062     0(0.00%) |     44      24     252     36 |  125.71        0.00
 
 Response time percentiles (approximated)
 Type     Name                                                                                  50%    66%    75%    80%    90%    95%    98%    99%  99.9% 99.99%   100% # reqs
 --------|--------------------------------------------------------------------------------|--------|------|------|------|------|------|------|------|------|------|------|------
-GET      /gate/payments/                                                                        35     38     40     42     52     66   1200   4100  34000  34000  34000    284
-GET      /reservations/search/                                                                  42     45     52     55     59     62     68     68     68     68     68     50
-POST     check-in                                                                               43     50     54     56     63     72   1300   4100  34000  34000  34000    286
-POST     check-out                                                                              39     45     49     52     60     78   4400  25000  36000  36000  36000    286
-POST     payment                                                                                35     39     41     43     54     61   3800  25000  36000  36000  36000    284
-POST     reserve                                                                                79   1700   4900  11000  41000  43000  45000  45000  46000  46000  46000    475
+GET      /gate/payments/                                                                        35     37     38     40     47     56     67     80    110    120    120   3001
+GET      /reservations/search/                                                                  53     60     67     81    130    130    140    140    140    140    140     50
+POST     check-in                                                                               37     41     44     46     53     62     77     92    120    120    120   3003
+POST     check-out                                                                              34     37     39     41     49     59     70     87    110    120    120   3003
+POST     payment                                                                                32     34     36     37     43     52     63     70     93    120    120   3001
+POST     reserve                                                                                66     75     81     86    100    120    150    170    240    250    250   3004
 --------|--------------------------------------------------------------------------------|--------|------|------|------|------|------|------|------|------|------|------|------
-         Aggregated                                                                             44     57     64     70   3400  25000  43000  44000  45000  46000  46000   1665
-
-Error report
-# occurrences      Error                                                                                               
-------------------|---------------------------------------------------------------------------------------------------------------------------------------------
-20                 POST reserve: no booking: HTTP 302                                                                  
-167                POST reserve: no booking: HTTP 500                                                                  
-------------------|---------------------------------------------------------------------------------------------------------------------------------------------
+         Aggregated                                                                             36     43     52     57     70     85    100    120    200    250    250  15062
 

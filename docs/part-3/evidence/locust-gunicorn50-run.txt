@@ -1,22 +1,22 @@
-2026-11-05T20:55:52+05:30
-[2026-11-05 20:55:53,070] vivianasus/INFO/locust.main: Starting Locust 2.47.0
-[2026-11-05 20:55:53,070] vivianasus/INFO/locust.main: Run time limit set to 60 seconds
-[2026-11-05 20:55:53,599] vivianasus/INFO/locust.runners: Ramping to 50 users at a rate of 20.00 per second
-[2026-11-05 20:55:55,602] vivianasus/INFO/locust.runners: All users spawned: {"DriverUser": 50} (50 total users)
-[2026-11-05 20:56:52,844] vivianasus/INFO/locust.main: --run-time limit reached, shutting down
-[2026-11-05 20:56:52,873] vivianasus/INFO/locust.main: Shutting down (exit code 0)
+Thu Nov  5 10:40:00 PM IST 2026
+[2026-11-05 22:40:01,344] vivianasus/INFO/locust.main: Starting Locust 2.47.0
+[2026-11-05 22:40:01,345] vivianasus/INFO/locust.main: Run time limit set to 60 seconds
+[2026-11-05 22:40:01,779] vivianasus/INFO/locust.runners: Ramping to 50 users at a rate of 10.00 per second
+[2026-11-05 22:40:05,783] vivianasus/INFO/locust.runners: All users spawned: {"DriverUser": 50} (50 total users)
+[2026-11-05 22:41:01,131] vivianasus/INFO/locust.main: --run-time limit reached, shutting down
+[2026-11-05 22:41:01,161] vivianasus/INFO/locust.main: Shutting down (exit code 0)
 Type     Name                                                                          # reqs      # fails |    Avg     Min     Max    Med |   req/s  failures/s
 --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
-GET      /lots/occupancy/                                                                 689     0(0.00%) |     37      30     173     36 |   11.52        0.00
-GET      /reservations/search/                                                           2150     0(0.00%) |     27      21     193     26 |   35.95        0.00
+GET      /lots/occupancy/                                                                 698     0(0.00%) |     39      31      90     38 |   11.67        0.00
+GET      /reservations/search/                                                           2102     0(0.00%) |     27      21      74     27 |   35.14        0.00
 --------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
-         Aggregated                                                                      2839     0(0.00%) |     30      21     193     27 |   47.47        0.00
+         Aggregated                                                                      2800     0(0.00%) |     30      21      90     28 |   46.81        0.00
 
 Response time percentiles (approximated)
 Type     Name                                                                                  50%    66%    75%    80%    90%    95%    98%    99%  99.9% 99.99%   100% # reqs
 --------|--------------------------------------------------------------------------------|--------|------|------|------|------|------|------|------|------|------|------|------
-GET      /lots/occupancy/                                                                       36     37     38     39     41     43     51     75    170    170    170    689
-GET      /reservations/search/                                                                  26     27     28     29     30     32     42     78    180    190    190   2150
+GET      /lots/occupancy/                                                                       38     40     41     42     45     48     57     72     91     91     91    698
+GET      /reservations/search/                                                                  27     28     29     30     32     35     40     49     63     74     74   2102
 --------|--------------------------------------------------------------------------------|--------|------|------|------|------|------|------|------|------|------|------|------
-         Aggregated                                                                             27     29     33     34     37     40     47     76    180    190    190   2839
+         Aggregated                                                                             28     31     35     36     40     43     49     57     83     91     91   2800
 

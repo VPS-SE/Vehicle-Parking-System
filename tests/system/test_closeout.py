@@ -10,6 +10,7 @@ Covers:
 
 import csv
 import json
+import os
 import re
 import subprocess
 import time
@@ -176,7 +177,9 @@ def test_tc39_mobile_masking_across_attendant_pages(
     now = datetime.now(ZoneInfo("Asia/Kolkata"))
     start_dt = now + timedelta(minutes=5)
     end_dt = start_dt + timedelta(minutes=30)
-    if start_dt.hour < 6 or (start_dt.hour >= 22 and start_dt.minute > 25):
+    # The lot closes at VPS_LOT_CLOSES_AT (the test lot was set to 23:59 for evening runs).
+    close_h, close_m = (int(x) for x in os.environ.get("VPS_LOT_CLOSES_AT", "23:59").split(":"))
+    if start_dt.hour < 6 or end_dt > now.replace(hour=close_h, minute=close_m):
         # Fallback to tomorrow if outside operating hours
         start_dt = (now + timedelta(days=1)).replace(hour=10, minute=0, second=0, microsecond=0)
         end_dt = start_dt + timedelta(hours=2)

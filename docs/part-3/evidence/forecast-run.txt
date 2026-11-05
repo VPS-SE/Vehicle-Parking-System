@@ -1,0 +1,3 @@
+Thu Nov  5 10:35:11 PM IST 2026
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+16 passed, 1 warning in 2.10s

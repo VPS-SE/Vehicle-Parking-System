@@ -30,7 +30,7 @@ def tls_url() -> str:
 def server_logs_path() -> str:
     return os.environ.get(
         "VPS_SERVER_LOGS",
-        "/tmp/claude-1000/-home-viviansobers-Documents-SEM-5-SE-Vehicle-Parking-System/9f662486-9041-4504-88bb-a3ed18ff8e55/scratchpad/sys2",
+        "logs",
     )
 
 

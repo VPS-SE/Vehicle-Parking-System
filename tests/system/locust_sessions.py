@@ -14,7 +14,7 @@ from locust import HttpUser, between, task
 
 SESSIONS_FILE = os.environ.get(
     "VPS_LOAD_SESSIONS",
-    "/tmp/claude-1000/-home-viviansobers-Documents-SEM-5-SE-Vehicle-Parking-System/9f662486-9041-4504-88bb-a3ed18ff8e55/scratchpad/sys2/load-sessions.json",
+    "load-sessions.json",
 )
 
 with open(SESSIONS_FILE) as f:
@@ -43,6 +43,8 @@ class SessionDriverUser(HttpUser):
         match = re.search(r"load\.driver(\d+)", self.driver.get("email", ""))
         if match:
             driver_num = int(match.group(1))
+            # On a fresh seed_demo_data --seed 2026 database the 120 demo vehicles come first,
+            # so load.driverNNN owns vehicle 120 + NNN (checked for all 200 before the runs).
             self.vehicle_id = str(120 + driver_num)
         else:
             self.vehicle_id = "121"

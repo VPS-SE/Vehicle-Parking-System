@@ -7,7 +7,7 @@ vps/accounts/forms.py                                                        16 
 vps/accounts/models.py                                                       55      0      6      0   100%
 vps/accounts/permissions.py                                                  36      0     10      0   100%
 vps/accounts/permit_forms.py                                                  3      0      0      0   100%
-vps/accounts/roles.py                                                        22      0      2      0   100%
+vps/accounts/roles.py                                                        23      0      2      0   100%
 vps/accounts/services.py                                                    172     21     60      7    86%   58-62, 69, 88-89, 96-97, 118-122, 163, 168, 198, 203, 233, 281
 vps/accounts/urls.py                                                          4      0      0      0   100%
 vps/accounts/views.py                                                       138      3     32      1    98%   119, 244-245
@@ -22,22 +22,24 @@ vps/audit/models.py                                                          28 
 vps/audit/services.py                                                        13      0      4      0   100%
 vps/billing/__init__.py                                                       0      0      0      0   100%
 vps/billing/apps.py                                                           4      0      0      0   100%
-vps/billing/models.py                                                        29      2      0      0    93%   27, 47
-vps/billing/services.py                                                      36      0     12      0   100%
+vps/billing/models.py                                                        39      3      0      0    92%   27, 47, 69
+vps/billing/services.py                                                      65      3     26      0    95%   121-125
+vps/billing/urls.py                                                           4      0      0      0   100%
+vps/billing/views.py                                                         28      0      2      0   100%
 vps/environment.py                                                           24      0      8      0   100%
-vps/factories.py                                                            115      2     34      2    97%   81, 198
+vps/factories.py                                                            115      2     34      2    97%   196, 198
 vps/gate/__init__.py                                                          0      0      0      0   100%
 vps/gate/apps.py                                                              4      0      0      0   100%
 vps/gate/forms.py                                                            23      0      2      0   100%
 vps/gate/models.py                                                            0      0      0      0   100%
-vps/gate/services.py                                                        190      2     70      3    98%   89, 315, 422->429
+vps/gate/services.py                                                        192      2     70      3    98%   91, 318, 425->432
 vps/gate/urls.py                                                              4      0      0      0   100%
-vps/gate/views.py                                                           137      6     22      0    96%   126-127, 249-250, 262-263
+vps/gate/views.py                                                           139      6     22      0    96%   127-128, 256-257, 269-270
 vps/lots/__init__.py                                                          0      0      0      0   100%
 vps/lots/apps.py                                                              4      0      0      0   100%
 vps/lots/forms.py                                                            36      0      2      0   100%
 vps/lots/models.py                                                           54      1      0      0    98%   93
-vps/lots/services.py                                                        183     19     66      2    88%   59, 140-152, 185, 204-208, 348-356
+vps/lots/services.py                                                        185     19     68      2    89%   59, 140-152, 185, 204-208, 356-364
 vps/lots/urls.py                                                              4      0      0      0   100%
 vps/lots/views.py                                                            93      6     20      1    90%   46-51, 106
 vps/notifications/__init__.py                                                 0      0      0      0   100%
@@ -63,11 +65,11 @@ vps/reservations/management/__init__.py                                       0 
 vps/reservations/management/commands/__init__.py                              0      0      0      0   100%
 vps/reservations/management/commands/expire_no_shows.py                       7      0      0      0   100%
 vps/reservations/models.py                                                   27      0      0      0   100%
-vps/reservations/services.py                                                143      7     40      2    94%   112-116, 176, 260
+vps/reservations/services.py                                                148     10     40      1    92%   113-117, 185-190, 274
 vps/reservations/urls.py                                                      4      0      0      0   100%
 vps/reservations/views.py                                                    84      3     16      2    95%   65, 82-83
 vps/settings.py                                                              47      0      4      0   100%
-vps/urls.py                                                                   5      0      0      0   100%
+vps/urls.py                                                                   9      1      2      1    82%   26
 vps/vehicles/__init__.py                                                      0      0      0      0   100%
 vps/vehicles/apps.py                                                          4      0      0      0   100%
 vps/vehicles/forms.py                                                        15      0      0      0   100%
@@ -78,4 +80,4 @@ vps/vehicles/views.py                                                        25 
 vps/views.py                                                                 12      0      0      0   100%
 vps/wsgi.py                                                                   4      4      0      0     0%   3-9
 ---------------------------------------------------------------------------------------------------------------------
-TOTAL                                                                      2325     90    536     28    95%
+TOTAL                                                                      2412     98    556     28    95%
