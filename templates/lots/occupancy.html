@@ -1,13 +1,94 @@
 {% extends "base.html" %}
-{% block title %}Live occupancy · VPS{% endblock %}
+{% block title %}Live Occupancy · VPS{% endblock %}
+
 {% block content %}
-<h1>Live occupancy</h1>
-<p>Free, reserved, occupied and blocked slots in each parking lot. This page updates every 30 seconds.</p>
-<div id="occupancy"
-     hx-get="{% url 'lots:occupancy' %}"
-     hx-trigger="every 30s"
-     hx-swap="innerHTML"
-     aria-live="polite">
-  {% include "lots/occupancy_table.html" %}
+<style>
+  .occupancy-page {
+    max-width: 68rem;
+    margin: 1.5rem auto;
+  }
+
+  .occupancy-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .occupancy-heading h1 {
+    margin: 0 0 .35rem;
+    font-size: 1.9rem;
+  }
+
+  .occupancy-heading p {
+    margin: 0;
+    color: #64748b;
+  }
+
+  .occupancy-live {
+    display: inline-flex;
+    align-items: center;
+    gap: .45rem;
+    padding: .45rem .75rem;
+    border-radius: 999px;
+    background: #dcfce7;
+    color: #166534;
+    font-size: .85rem;
+    font-weight: 700;
+  }
+
+  .occupancy-live-dot {
+    width: .55rem;
+    height: .55rem;
+    border-radius: 50%;
+    background: #16a34a;
+  }
+
+  .occupancy-updating {
+    color: #64748b;
+    font-size: .85rem;
+  }
+
+  .occupancy-page #occupancy {
+    min-width: 0;
+  }
+
+  .occupancy-page #occupancy.htmx-request {
+    opacity: .65;
+    transition: opacity .2s ease;
+  }
+
+  @media (max-width: 600px) {
+    .occupancy-heading h1 {
+      font-size: 1.55rem;
+    }
+  }
+</style>
+
+<div class="occupancy-page">
+  <div class="occupancy-heading">
+    <div>
+      <h1>Parking Occupancy</h1>
+      <p>Monitor available capacity and live slot distribution across parking lots.</p>
+    </div>
+
+    <span class="occupancy-live">
+      <span class="occupancy-live-dot"></span>
+      Live monitoring
+    </span>
+  </div>
+
+  <div
+    id="occupancy"
+    hx-get="{% url 'lots:occupancy' %}"
+    hx-trigger="every 30s"
+    hx-swap="innerHTML"
+    aria-live="polite"
+    aria-busy="false"
+  >
+    {% include "lots/occupancy_table.html" %}
+  </div>
 </div>
 {% endblock %}
