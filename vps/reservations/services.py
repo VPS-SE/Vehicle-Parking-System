@@ -15,6 +15,7 @@ from vps.accounts.roles import Function, can
 from vps.allocation.services import allocate_slot_with_retry, eligible_slot_types
 from vps.audit.models import AuditLog
 from vps.billing.models import Charge
+from vps.billing.services import OUTSTANDING
 from vps.lots.models import Slot
 from vps.notifications.models import ReservationNotification
 from vps.notifications.services import queue_reservation_notification
@@ -129,7 +130,7 @@ def check_booking_limits(driver):
     ).count()
     if open_count >= MAX_OPEN_RESERVATIONS:
         raise ValidationError({"__all__": LIMIT_REACHED})
-    if Charge.objects.filter(reservation__driver=driver, payment__isnull=True).exists():
+    if Charge.objects.filter(OUTSTANDING, reservation__driver=driver).exists():
         raise ValidationError({"__all__": UNPAID_CHARGE})
 
 

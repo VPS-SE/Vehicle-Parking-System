@@ -45,3 +45,25 @@ class Payment(models.Model):
 
     def __str__(self):
         return f"Payment for charge {self.charge_id}"
+
+
+class Waiver(models.Model):
+    """BR-09: an Admin's written decision that a charge need not be paid."""
+
+    charge = models.OneToOneField(Charge, on_delete=models.PROTECT, related_name="waiver")
+    reason = models.TextField(max_length=500)
+    waived_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="waivers"
+    )
+    waived_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-waived_at"]
+        constraints = [
+            models.CheckConstraint(
+                condition=~models.Q(reason__regex=r"^\s*$"), name="waiver_reason_not_blank"
+            )
+        ]
+
+    def __str__(self):
+        return f"Waiver for charge {self.charge_id}"

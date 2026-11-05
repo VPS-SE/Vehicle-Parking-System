@@ -38,7 +38,7 @@ def revenue_report(start_date, end_date):
     A charge is dated by its booking's exit time, or by the booking's start when the vehicle
     never parked (late cancellation, no-show). Payments are dated by when they were taken, so
     a day's payments can settle charges from an earlier day. Unpaid is what is still owed on
-    the day's charges. Completed stays are bookings that left that day.
+    the day's charges; a waived charge (BR-09) is not owed. Completed stays are bookings that left that day.
     """
     from vps.reservations.models import Reservation
 
@@ -68,11 +68,12 @@ def revenue_report(start_date, end_date):
         "kind",
         "amount_inr",
         "payment__id",
+        "waiver__id",
     )
-    for lot_id, lot_name, exit_time, period, slot_type, kind, amount, paid in charges:
+    for lot_id, lot_name, exit_time, period, slot_type, kind, amount, paid, waived in charges:
         row = bucket(lot_id, lot_name, exit_time or period.lower, slot_type)
         row[_CHARGE_COLUMN[kind]] += amount
-        if paid is None:
+        if paid is None and waived is None:  # BR-09: a waived charge is no longer owed
             row["unpaid_inr"] += amount
 
     payments = Payment.objects.filter(
