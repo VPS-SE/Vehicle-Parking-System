@@ -1,0 +1,66 @@
+
+{% extends "base.html" %}
+
+{% block title %}Revenue report | Vehicle Parking System{% endblock %}
+
+{% block content %}
+<main>
+  <h1>Revenue report</h1>
+  <p>View payments by parking lot, slot type and payment method for up to 31 days.</p>
+
+  <form method="get" action="{% url 'reports:revenue' %}">
+    {{ form.non_field_errors }}
+    <p>
+      <label for="{{ form.start_date.id_for_label }}">Start date</label>
+      {{ form.start_date }}
+      {{ form.start_date.errors }}
+    </p>
+    <p>
+      <label for="{{ form.end_date.id_for_label }}">End date</label>
+      {{ form.end_date }}
+      {{ form.end_date.errors }}
+    </p>
+    <button type="submit">View report</button>
+  </form>
+
+  {% if rows is not None %}
+    <p>
+      <a href="{% url 'reports:revenue_csv' %}?start_date={{ form.cleaned_data.start_date|date:'Y-m-d' }}&amp;end_date={{ form.cleaned_data.end_date|date:'Y-m-d' }}">
+        Download CSV
+      </a>
+    </p>
+
+    {% if rows %}
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Lot</th>
+              <th scope="col">Address</th>
+              <th scope="col">Slot type</th>
+              <th scope="col">Payment method</th>
+              <th scope="col">Payments</th>
+              <th scope="col">Revenue (INR)</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in rows %}
+              <tr>
+                <td>{{ row.lot_name }}</td>
+                <td>{{ row.lot_address }}</td>
+                <td>{{ row.slot_type_label }}</td>
+                <td>{{ row.payment_method_label }}</td>
+                <td>{{ row.payment_count }}</td>
+                <td>{{ row.revenue_inr|floatformat:2 }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p>No payments were recorded during the selected dates.</p>
+    {% endif %}
+  {% endif %}
+</main>
+{% endblock %}
+
