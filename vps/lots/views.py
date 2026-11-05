@@ -5,7 +5,13 @@ from django.core.exceptions import ValidationError
 from django.db.models import Count
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
-from django.views.decorators.http import require_http_methods, require_POST, require_safe
+from django.utils import timezone
+from django.views.decorators.http import (
+    require_GET,
+    require_http_methods,
+    require_POST,
+    require_safe,
+)
 
 from vps.accounts.permissions import function_required
 from vps.accounts.roles import Function
@@ -150,3 +156,14 @@ def tariff_create(request):
             )
             return redirect("lots:tariffs")
     return _tariff_page(request, form)
+
+
+@require_GET
+def occupancy(request):
+    """FR-SRCH-03: public live occupancy; the page re-fetches its table every 30 seconds."""
+    htmx = request.headers.get("HX-Request") == "true"
+    return render(
+        request,
+        "lots/occupancy_table.html" if htmx else "lots/occupancy.html",
+        {"rows": services.lot_occupancy(), "updated_at": timezone.localtime()},
+    )

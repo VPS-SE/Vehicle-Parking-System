@@ -1306,8 +1306,8 @@
 <body>
   <header>
     <div class="brand">Vehicle Parking System</div>
-    {% if user.is_authenticated %}
-      <nav class="site-nav" aria-label="Main">
+    <nav class="site-nav" aria-label="Main">
+      {% if user.is_authenticated %}
         {% if user.role == "Driver" %}
           <a href="{% url 'vehicles:register' %}">My vehicles</a>
           <a href="{% url 'reservations:search' %}">Find parking</a>
@@ -1325,7 +1325,11 @@
           <a href="{% url 'gate:correct_entry' %}">Correct entry</a>
           <a href="{% url 'gate:payments' %}">Payments</a>
         {% endif %}
-      </nav>
+      {% endif %}
+      <a href="{% url 'lots:occupancy' %}">Live occupancy</a>
+      {% if not user.is_authenticated %}<a href="{% url 'accounts:login' %}">Sign in</a>{% endif %}
+    </nav>
+    {% if user.is_authenticated %}
       <div class="user-info">
         <span>{{ user.email }} ({{ user.get_role_display }})</span>
         {% block sign_out %}

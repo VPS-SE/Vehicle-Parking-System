@@ -8,6 +8,7 @@ app_name = "lots"
 
 urlpatterns = [
     path("", views.lot_list, name="list"),
+    path("occupancy/", views.occupancy, name="occupancy"),
     path("new/", views.lot_create, name="create"),
     path("<int:pk>/edit/", views.lot_edit, name="edit"),
     path("<int:pk>/archive/", views.lot_archive, name="archive"),

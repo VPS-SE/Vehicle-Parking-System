@@ -1,0 +1,24 @@
+{% for row in rows %}
+<section aria-labelledby="lot-{{ row.lot.pk }}">
+  <h2 id="lot-{{ row.lot.pk }}">{{ row.lot.name }}</h2>
+  <table>
+    <thead>
+      <tr><th scope="col">Slot type</th><th scope="col">Free</th><th scope="col">Reserved</th>
+        <th scope="col">Occupied</th><th scope="col">Blocked</th></tr>
+    </thead>
+    <tbody>
+      {% for t in row.types %}
+      <tr><th scope="row">{{ t.label }}</th><td>{{ t.free }}</td><td>{{ t.reserved }}</td>
+        <td>{{ t.occupied }}</td><td>{{ t.blocked }}</td></tr>
+      {% endfor %}
+    </tbody>
+    <tfoot>
+      <tr><th scope="row">All {{ row.total.slots }} slots</th><td>{{ row.total.free }}</td>
+        <td>{{ row.total.reserved }}</td><td>{{ row.total.occupied }}</td><td>{{ row.total.blocked }}</td></tr>
+    </tfoot>
+  </table>
+</section>
+{% empty %}
+<p>No parking lots are open.</p>
+{% endfor %}
+<p><small>Updated {{ updated_at|date:"H:i:s" }}</small></p>
