@@ -14,6 +14,7 @@ from django.views.decorators.http import require_GET, require_POST
 from vps.accounts.permissions import function_required
 from vps.accounts.roles import Function
 from vps.billing.models import Charge
+from vps.reservations.forecast import forecast_panel
 from vps.reservations.forms import ReservationSearchForm
 from vps.reservations.models import Reservation
 from vps.reservations.services import cancel_reservation, free_slots, reserve, validate_window
@@ -53,6 +54,9 @@ def slot_search(request):
                 context["search_error"] = error.messages[0]
             else:
                 context["slot_count"] = len(free_slots(lot, vehicle, start, end))
+                context["forecast"] = forecast_panel(
+                    lot, getattr(vehicle, "vehicle_type", None), start
+                )
                 if form.for_driver:
                     context["confirm_url"] = reverse("reservations:confirm")
         elif form.for_driver:

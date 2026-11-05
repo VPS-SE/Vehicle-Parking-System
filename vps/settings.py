@@ -128,3 +128,8 @@ if not DEBUG:
     # The container healthcheck calls /healthz over plain HTTP inside the network.
     SECURE_REDIRECT_EXEMPT = [r"^healthz$"]
     SECURE_HSTS_SECONDS = 31536000  # 1 year
+
+# Occupancy forecast service (FR-FCST-01..03). Empty means not configured: search still
+# works and the panel says the forecast is not available.
+FORECAST_URL = os.environ.get("FORECAST_URL", "").rstrip("/")
+FORECAST_TIMEOUT = 2.0  # seconds; FR-FCST-03

@@ -5,11 +5,13 @@ services:
       POSTGRES_DB: ${POSTGRES_DB:?Set POSTGRES_DB in .env}
       POSTGRES_USER: ${POSTGRES_USER:?Set POSTGRES_USER in .env}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      FORECAST_DB_PASSWORD: ${FORECAST_DB_PASSWORD:-}
     ports:
       - "${POSTGRES_PORT:-5432}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./docker/postgres/init/01-extensions.sql:/docker-entrypoint-initdb.d/01-extensions.sql:ro
+      - ./docker/postgres/init/02-forecast-role.sh:/docker-entrypoint-initdb.d/02-forecast-role.sh:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\""]
       interval: 5s
@@ -25,6 +27,7 @@ services:
     environment: &web-environment
       POSTGRES_HOST: db
       POSTGRES_PORT: "5432"
+      FORECAST_URL: http://forecast:8001
     depends_on:
       db:
         condition: service_healthy
@@ -69,5 +72,48 @@ services:
     volumes:
       - .:/app
 
+  # FR-FCST-01: the forecast API, on the private network only (no published port).
+  forecast:
+    image: vps-forecast
+    build:
+      context: .
+      dockerfile: forecast/Dockerfile
+    volumes:
+      - forecast_models:/srv/models
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://localhost:8001/v1/health', timeout=5).close()"
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 120s
+
+  # FR-FCST-02: retrain once a week through the read-only role. The first run happens at
+  # start-up, so the service has a (baseline) model straight away.
+  forecast-trainer:
+    image: vps-forecast
+    build:
+      context: .
+      dockerfile: forecast/Dockerfile
+    environment:
+      FORECAST_DB_URL: postgresql://forecast_ro:${FORECAST_DB_PASSWORD:-}@db:5432/${POSTGRES_DB}
+    depends_on:
+      web:
+        condition: service_healthy
+    volumes:
+      - forecast_models:/srv/models
+    command:
+      - sh
+      - -c
+      - |
+        while true; do
+          python -m forecast.train.train || echo "Forecast training failed; retrying in 1 hour"
+          [ -f /srv/models/model.joblib ] && sleep 604800 || sleep 3600
+        done
+
 volumes:
   postgres_data:
+  forecast_models:
