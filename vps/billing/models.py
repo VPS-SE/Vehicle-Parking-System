@@ -51,7 +51,7 @@ class Waiver(models.Model):
     """BR-09: an Admin's written decision that a charge need not be paid."""
 
     charge = models.OneToOneField(Charge, on_delete=models.PROTECT, related_name="waiver")
-    reason = models.TextField(max_length=500)
+    reason = models.CharField(max_length=500)
     waived_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="waivers"
     )

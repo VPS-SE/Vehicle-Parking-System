@@ -8,6 +8,7 @@ from django.db.models import Q, Sum
 
 from vps.accounts.roles import Function, can
 from vps.audit.models import AuditLog
+from vps.audit.services import log_action
 from vps.billing.models import Charge, Payment, Waiver
 from vps.vehicles.services import normalise_registration
 
@@ -93,13 +94,17 @@ def waive_charge(admin, charge, reason):
         )
     try:
         with transaction.atomic():
-            charge = Charge.objects.select_for_update().get(pk=charge.pk)
+            charge = (
+                Charge.objects.select_for_update(of=("self",))
+                .select_related("reservation")
+                .get(pk=charge.pk)
+            )
             if Payment.objects.filter(charge=charge).exists():
                 raise ValidationError({"__all__": ALREADY_PAID})
             if Waiver.objects.filter(charge=charge).exists():
                 raise ValidationError({"__all__": ALREADY_WAIVED})
             waiver = Waiver.objects.create(charge=charge, reason=reason, waived_by=admin)
-            AuditLog.objects.create(
+            log_action(
                 actor=admin,
                 action="charge.waived",
                 target=f"charge:{charge.pk}",

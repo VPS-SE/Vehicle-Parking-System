@@ -13,4 +13,6 @@ COPY --chown=app:app . .
 USER app
 
 EXPOSE 8000
-CMD ["gunicorn", "vps.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "8", "--timeout", "60"]
+# GUNICORN_WORKERS bounds the database connections (one per worker).
+ENV GUNICORN_WORKERS=8
+CMD ["sh", "-c", "exec gunicorn vps.wsgi:application --bind 0.0.0.0:8000 --workers \"$GUNICORN_WORKERS\" --timeout 60"]

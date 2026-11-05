@@ -19,6 +19,7 @@ from vps.factories import (
     make_payment,
     make_reservation,
     make_staff,
+    make_tariff,
 )
 from vps.reports.services import revenue_report
 from vps.reservations.models import Reservation
@@ -198,3 +199,41 @@ def test_driver_history_shows_waived(client, admin, charge):
 def test_admin_nav_links_to_waivers(client, admin):
     client.force_login(admin)
     assert 'href="/billing/waivers/"' in client.get("/reports/audit/").content.decode()
+
+
+@pytest.fixture
+def completed_stay():
+    """A completed stay with a Rs 80 parking charge and a Rs 30 overstay charge."""
+    driver = make_driver()
+    lot = make_lot()
+    make_tariff(lot)
+    slot = lot.slots.get()
+    start = timezone.now() - timedelta(days=1)
+    reservation = make_reservation(
+        driver, slot, start, status=Reservation.Status.COMPLETED, booking_ref="VPS-261104-0007"
+    )
+    reservation.entry_time = start
+    reservation.exit_time = reservation.period.upper + timedelta(minutes=31)
+    reservation.save()
+    parking = make_charge(reservation, amount="80.00")
+    overstay = make_charge(reservation, amount="30.00", kind=Charge.Kind.OVERSTAY)
+    return reservation, parking, overstay
+
+
+def test_receipt_counts_waived_charge_as_settled(client, admin, completed_stay):
+    reservation, parking, overstay = completed_stay
+    attendant = make_staff()
+    client.force_login(attendant)
+    url = f"/gate/receipt/{reservation.booking_ref}/"
+
+    services.waive_charge(admin, overstay, REASON)
+    partial = client.get(url)
+    assert partial.context["waived_total"] == Decimal("30.00")
+    assert partial.context["balance_due"] == Decimal("80.00")
+    assert partial.context["payment_status"] == "Partially paid"
+    assert "Waived" in partial.content.decode()
+
+    make_payment(parking, recorded_by=attendant)
+    settled = client.get(url)
+    assert settled.context["balance_due"] == Decimal("0.00")
+    assert settled.context["payment_status"] == "Settled (waived)"
