@@ -1,3 +1,4 @@
+
 {% extends "base.html" %}
 
 {% block title %}Revenue report | Vehicle Parking System{% endblock %}
@@ -23,11 +24,12 @@
   </form>
 
   {% if rows is not None %}
-    <form method="get" action="{% url 'reports:revenue_csv' %}">
-      <input type="hidden" name="start_date" value="{{ form.cleaned_data.start_date|date:'Y-m-d' }}">
-      <input type="hidden" name="end_date" value="{{ form.cleaned_data.end_date|date:'Y-m-d' }}">
-      <button type="submit">Download CSV</button>
-    </form>
+    <p>
+      <a href="{% url 'reports:revenue_csv' %}?start_date={{ form.cleaned_data.start_date|date:'Y-m-d' }}&amp;end_date={{ form.cleaned_data.end_date|date:'Y-m-d' }}">
+        Download CSV
+      </a>
+    </p>
+
     {% if rows %}
       <div class="table-wrapper">
         <table>
@@ -61,3 +63,4 @@
   {% endif %}
 </main>
 {% endblock %}
+
