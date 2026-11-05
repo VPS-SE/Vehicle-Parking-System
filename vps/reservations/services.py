@@ -142,6 +142,19 @@ def _next_reservation_id():
         return cursor.fetchone()[0]
 
 
+def lock_lot_for_allocation(lot_id):
+    """Serialise slot allocation within one lot until the transaction ends.
+
+    Without it, simultaneous bookings all pick the same best slot, queue on the exclusion
+    constraint, deadlock against each other and run out of retries while slots are still
+    free. Under the lock each booking sees the slots taken by the ones before it.
+    """
+    with connection.cursor() as cursor:
+        cursor.execute(
+            "SELECT pg_advisory_xact_lock(hashtextextended(%s, 0))", [f"allocate:lot:{lot_id}"]
+        )
+
+
 def _try_book(
     slot,
     driver,
@@ -196,6 +209,7 @@ def reserve(driver, vehicle, lot, start, end):
         # Serialise one Driver's bookings so two tabs cannot both pass the limit check.
         User.objects.select_for_update().get(pk=driver.pk)
         check_booking_limits(driver)
+        lock_lot_for_allocation(lot.pk)
 
         def try_book(slot):
             booked["reservation"] = _try_book(slot, driver, vehicle, period)
@@ -247,7 +261,6 @@ def expire_no_shows(now=None):
             )
             expired += 1
     return expired
-
 
 
 LATE_CANCELLATION_WINDOW = timedelta(minutes=60)
