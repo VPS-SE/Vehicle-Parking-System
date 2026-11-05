@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Occupancy report | Vehicle Parking System{% endblock %}
+
+{% block content %}
+<section>
+  <h1>Occupancy report</h1>
+  <p>Average occupancy of one lot for each hour, for up to 31 days.</p>
+
+  <form method="get" action="{% url 'reports:occupancy' %}">
+    {{ form.non_field_errors }}
+    {% for field in form %}
+      <p>
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {{ field.errors }}
+      </p>
+    {% endfor %}
+    <button type="submit">View report</button>
+  </form>
+
+  {% if rows is not None %}
+    <p>
+      <a href="{% url 'reports:occupancy_csv' %}?lot={{ form.cleaned_data.lot.pk }}&amp;start_date={{ form.cleaned_data.start_date|date:'Y-m-d' }}&amp;end_date={{ form.cleaned_data.end_date|date:'Y-m-d' }}">
+        Download CSV
+      </a>
+    </p>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Date</th>
+            <th scope="col">Hour</th>
+            <th scope="col">Slot type</th>
+            <th scope="col">Total slots</th>
+            <th scope="col">Average occupied</th>
+            <th scope="col">Occupancy (%)</th>
+            <th scope="col">Average blocked</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in rows %}
+            <tr>
+              <td>{{ row.date|date:"Y-m-d" }}</td>
+              <td>{{ row.hour|stringformat:"02d" }}:00</td>
+              <td>{{ row.slot_type_label }}</td>
+              <td>{{ row.total_slots }}</td>
+              <td>{{ row.average_occupied|floatformat:2 }}</td>
+              <td>{{ row.occupancy_pct|floatformat:1 }}</td>
+              <td>{{ row.average_blocked|floatformat:2 }}</td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="7">This lot has no slots.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% endif %}
+</section>
+{% endblock %}

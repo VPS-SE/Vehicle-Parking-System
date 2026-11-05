@@ -4,9 +4,9 @@
 {% block title %}Revenue report | Vehicle Parking System{% endblock %}
 
 {% block content %}
-<main>
+<section>
   <h1>Revenue report</h1>
-  <p>View payments by parking lot, slot type and payment method for up to 31 days.</p>
+  <p>Charges, payments by method and unpaid totals per lot, date and slot type, for up to 31 days.</p>
 
   <form method="get" action="{% url 'reports:revenue' %}">
     {{ form.non_field_errors }}
@@ -36,31 +36,41 @@
           <thead>
             <tr>
               <th scope="col">Lot</th>
-              <th scope="col">Address</th>
+              <th scope="col">Date</th>
               <th scope="col">Slot type</th>
-              <th scope="col">Payment method</th>
-              <th scope="col">Payments</th>
-              <th scope="col">Revenue (INR)</th>
+              <th scope="col">Completed stays</th>
+              <th scope="col">Parking (Rs)</th>
+              <th scope="col">Overstay (Rs)</th>
+              <th scope="col">Late cancel and no-show (Rs)</th>
+              <th scope="col">Cash (Rs)</th>
+              <th scope="col">UPI (Rs)</th>
+              <th scope="col">Card (Rs)</th>
+              <th scope="col">Unpaid (Rs)</th>
             </tr>
           </thead>
           <tbody>
             {% for row in rows %}
               <tr>
                 <td>{{ row.lot_name }}</td>
-                <td>{{ row.lot_address }}</td>
+                <td>{{ row.date|date:"Y-m-d" }}</td>
                 <td>{{ row.slot_type_label }}</td>
-                <td>{{ row.payment_method_label }}</td>
-                <td>{{ row.payment_count }}</td>
-                <td>{{ row.revenue_inr|floatformat:2 }}</td>
+                <td>{{ row.completed_stays }}</td>
+                <td>{{ row.parking_inr|floatformat:2 }}</td>
+                <td>{{ row.overstay_inr|floatformat:2 }}</td>
+                <td>{{ row.late_noshow_inr|floatformat:2 }}</td>
+                <td>{{ row.cash_inr|floatformat:2 }}</td>
+                <td>{{ row.upi_inr|floatformat:2 }}</td>
+                <td>{{ row.card_inr|floatformat:2 }}</td>
+                <td>{{ row.unpaid_inr|floatformat:2 }}</td>
               </tr>
             {% endfor %}
           </tbody>
         </table>
       </div>
     {% else %}
-      <p>No payments were recorded during the selected dates.</p>
+      <p>No charges or payments were recorded during the selected dates.</p>
     {% endif %}
   {% endif %}
-</main>
+</section>
 {% endblock %}
 
