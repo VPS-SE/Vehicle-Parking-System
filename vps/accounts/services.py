@@ -14,6 +14,7 @@ from vps.accounts.roles import Function, can
 from vps.audit.models import AuditLog
 
 DUPLICATE_EMAIL = "An account with this e-mail already exists"
+EMAIL_CONSTRAINTS = ("accounts_user_email_key", "accounts_user_email_lower_uniq")
 
 
 def register_driver(*, full_name, email, mobile, password):
@@ -29,7 +30,7 @@ def register_driver(*, full_name, email, mobile, password):
         user.full_clean(exclude=["password"], validate_unique=False, validate_constraints=False)
     except ValidationError as error:
         errors.update(error.message_dict)
-    if User.objects.filter(email=email).exists():
+    if User.objects.filter(email__iexact=email).exists():
         errors["email"] = [DUPLICATE_EMAIL]
     try:
         validate_password(password, user)
@@ -47,9 +48,8 @@ def register_driver(*, full_name, email, mobile, password):
                 role=User.Role.DRIVER,
             )
     except IntegrityError as error:
-        if getattr(getattr(error.__cause__, "diag", None), "constraint_name", None) == (
-            "accounts_user_email_key"
-        ):
+        constraint = getattr(getattr(error.__cause__, "diag", None), "constraint_name", None)
+        if constraint in EMAIL_CONSTRAINTS:
             raise ValidationError({"email": DUPLICATE_EMAIL}) from error
         raise
 
@@ -80,7 +80,7 @@ def create_staff(*, full_name, email, mobile, password, role):
     except ValidationError as error:
         errors.update(error.message_dict)
 
-    if User.objects.filter(email=email).exists():
+    if User.objects.filter(email__iexact=email).exists():
         errors["email"] = [DUPLICATE_EMAIL]
 
     try:
@@ -101,11 +101,8 @@ def create_staff(*, full_name, email, mobile, password, role):
                 role=role,
             )
     except IntegrityError as error:
-        if getattr(
-            getattr(error.__cause__, "diag", None),
-            "constraint_name",
-            None,
-        ) == "accounts_user_email_key":
+        constraint = getattr(getattr(error.__cause__, "diag", None), "constraint_name", None)
+        if constraint in EMAIL_CONSTRAINTS:
             raise ValidationError({"email": DUPLICATE_EMAIL}) from error
         raise
 

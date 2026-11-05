@@ -47,10 +47,6 @@ def slot(lot):
     return Slot.objects.create(lot=lot, code="R-01", distance_rank=1)
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="F1: Case-insensitive email duplicates not rejected at registration",
-)
 def test_f01_case_insensitive_duplicate_email_rejected():
     """F1: registering ASHA@example.com when asha@example.com exists must be rejected."""
     account_services.register_driver(
