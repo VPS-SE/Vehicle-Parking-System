@@ -1,6 +1,8 @@
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "tests.settings"
 testpaths = ["tests"]
+# Browser and load tests run against a live server: ./run-system-tests.sh
+addopts = "--ignore=tests/system"
 
 [tool.coverage.run]
 source = ["vps"]
