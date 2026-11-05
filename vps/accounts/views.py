@@ -5,8 +5,10 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth import views as auth_views
 from django.core.exceptions import PermissionDenied, ValidationError
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
+from django.utils import timezone
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_http_methods, require_POST, require_safe
 
@@ -51,11 +53,41 @@ def sign_in(request):
         next_url, allowed_hosts={request.get_host()}, require_https=request.is_secure()
     ):
         next_url = ""
-    if request.method == "POST" and form.is_valid():
-        user = authenticate(request, **form.cleaned_data)
-        if user is not None:
-            login(request, user)
-            return redirect(next_url or settings.LOGIN_REDIRECT_URL)
+    if request.method == "POST":
+        ip = services.get_client_ip(request)
+        if services.is_ip_rate_limited(ip):
+            return HttpResponse("Too Many Requests", status=429)
+
+        if form.is_valid():
+            email = form.cleaned_data["email"]
+            password = form.cleaned_data["password"]
+            user = User.objects.filter(email__iexact=email).first()
+
+            if user and services.is_locked(user):
+                local_unlock = timezone.localtime(user.locked_until)
+                unlock_time = local_unlock.strftime("%H:%M")
+                return render(
+                    request,
+                    "accounts/login.html",
+                    {
+                        "form": form,
+                        "email": form["email"].value(),
+                        "next": next_url,
+                        "login_error": f"Account locked until {unlock_time}.",
+                        "locked_until": user.locked_until,
+                        "unlock_time": unlock_time,
+                    },
+                    status=423,
+                )
+
+            authenticated_user = authenticate(request, email=email, password=password)
+            if authenticated_user is not None:
+                services.reset_failed_sign_in(authenticated_user)
+                login(request, authenticated_user)
+                return redirect(next_url or settings.LOGIN_REDIRECT_URL)
+
+            services.record_failed_sign_in(email=email, ip_address=ip, user=user)
+
     return render(
         request,
         "accounts/login.html",

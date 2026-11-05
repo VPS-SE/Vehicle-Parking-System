@@ -69,10 +69,6 @@ def test_f01_case_insensitive_duplicate_email_rejected():
     assert User.objects.filter(email__iexact="asha@example.com").count() == 1
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="F2: Account lockout and HTTP 423 after 5 failed sign-ins (SEC-02) not implemented",
-)
 def test_f02_account_lockout_after_five_failed_logins(client):
     """F2: 5 failed logins within window must lock account and return HTTP 423 on 6th attempt."""
     account_services.register_driver(
