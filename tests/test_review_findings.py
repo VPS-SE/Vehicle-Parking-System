@@ -97,10 +97,6 @@ def test_f02_account_lockout_after_five_failed_logins(client):
     assert user.locked_until > timezone.now()
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="F3: Lot Administrator denied access to correct entry times (Table 5 Appendix B.3)",
-)
 def test_f03_admin_permitted_to_correct_entry_time(client, slot):
     """F3: Lot Administrator must be permitted to correct entry times per permission matrix."""
     admin = User.objects.create_user(
@@ -253,4 +249,6 @@ def test_f07_session_cookie_configuration_enforces_sec04_sec08():
 
     assert cookie_age is not None
     assert cookie_age <= 1800, f"SESSION_COOKIE_AGE is {cookie_age}, must be <= 1800s"
-    assert save_every_req is True, "SESSION_SAVE_EVERY_REQUEST must be True for idle sliding timeout"
+    assert save_every_req is True, (
+        "SESSION_SAVE_EVERY_REQUEST must be True for idle sliding timeout"
+    )
