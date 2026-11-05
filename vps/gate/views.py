@@ -106,7 +106,7 @@ def checkout(request):
     return render(request, "gate/checkout.html", {"form": form})
 
 
-@function_required(Function.GATE_OPERATIONS)
+@function_required(Function.CORRECT_TIMES)
 @require_http_methods(["GET", "POST"])
 def correct_entry(request):
     """FR-GATE-06: enter the paper entry time for a vehicle parked during an outage."""

@@ -273,8 +273,10 @@ def _active_reservation(query):
 
 def correct_entry_time(attendant, query, entry_time, reason, now=None):
     """FR-GATE-06: record the entry time noted on paper for a vehicle that is still parked."""
-    if not can(attendant, Function.GATE_OPERATIONS):
-        raise ValidationError({"__all__": "Only Gate Attendants may correct entry times."})
+    if not can(attendant, Function.CORRECT_TIMES):
+        raise ValidationError(
+            {"__all__": "Only Gate Attendants and Lot Administrators may correct entry times."}
+        )
     now = now or timezone.now()
     reason = _validate_correction("entry_time", entry_time, reason, now)
     with transaction.atomic():

@@ -192,7 +192,7 @@ def test_entry_correction_rules(booking, attendant, entry):
     assert not AuditLog.objects.exists()
 
 
-@pytest.mark.parametrize("role", [User.Role.DRIVER, User.Role.ADMIN])
+@pytest.mark.parametrize("role", [User.Role.DRIVER])
 def test_only_attendants_may_correct_times(booking, entry, role):
     user = User.objects.create_user(email="x@example.com", role=role)
     now = entry + timedelta(hours=2)
