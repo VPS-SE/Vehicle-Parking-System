@@ -277,3 +277,14 @@
     padding: 0.75rem 0.65rem;
   }
 }
+
+/* Daylight: the slot count is a bright green on a white tile (large text, 3.3:1). */
+.search-result-hero__count-box {
+  background: var(--surface-solid);
+  border-top: 4px solid var(--green-fill);
+}
+
+.search-result-hero__huge-number {
+  color: var(--green-bright);
+  text-shadow: none;
+}
