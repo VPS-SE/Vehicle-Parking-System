@@ -53,7 +53,7 @@
   margin-top: 1.75rem;
   text-align: center;
   border: 1px solid var(--border-strong);
-  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45);
+  box-shadow: var(--shadow-card);
   position: relative;
   overflow: hidden;
 }
@@ -147,21 +147,21 @@
 }
 
 .forecast-chip--high {
-  background: color-mix(in srgb, var(--green) 16%, transparent);
+  background: var(--green-tint);
   color: var(--green);
-  border: 1px solid color-mix(in srgb, var(--green) 30%, transparent);
+  border: 1px solid color-mix(in srgb, var(--green-fill) 35%, transparent);
 }
 
 .forecast-chip--medium {
-  background: color-mix(in srgb, var(--yellow) 16%, transparent);
+  background: var(--yellow-tint);
   color: var(--yellow);
-  border: 1px solid color-mix(in srgb, var(--yellow) 30%, transparent);
+  border: 1px solid color-mix(in srgb, var(--yellow-fill) 35%, transparent);
 }
 
 .forecast-chip--low {
-  background: color-mix(in srgb, var(--red) 16%, transparent);
+  background: var(--red-tint);
   color: var(--red);
-  border: 1px solid color-mix(in srgb, var(--red) 30%, transparent);
+  border: 1px solid color-mix(in srgb, var(--red-fill) 35%, transparent);
 }
 
 .forecast-estimate {
@@ -184,39 +184,39 @@
 }
 
 .history-table-wrapper:focus-visible {
-  outline: 2px solid var(--pink);
+  outline: 2px solid var(--focus);
   outline-offset: -2px;
 }
 
 /* State Chips */
 .chip-state--reserved {
-  background: color-mix(in srgb, var(--yellow) 16%, transparent);
+  background: var(--yellow-tint);
   color: var(--yellow);
-  border: 1px solid color-mix(in srgb, var(--yellow) 30%, transparent);
+  border: 1px solid color-mix(in srgb, var(--yellow-fill) 35%, transparent);
 }
 
 .chip-state--active {
-  background: color-mix(in srgb, var(--green) 16%, transparent);
+  background: var(--green-tint);
   color: var(--green);
-  border: 1px solid color-mix(in srgb, var(--green) 30%, transparent);
+  border: 1px solid color-mix(in srgb, var(--green-fill) 35%, transparent);
 }
 
 .chip-state--completed {
-  background: color-mix(in srgb, var(--blue) 16%, transparent);
+  background: var(--blue-tint);
   color: var(--blue);
-  border: 1px solid color-mix(in srgb, var(--blue) 30%, transparent);
+  border: 1px solid color-mix(in srgb, var(--blue-fill) 35%, transparent);
 }
 
 .chip-state--cancelled {
-  background: color-mix(in srgb, var(--red) 16%, transparent);
+  background: var(--red-tint);
   color: var(--red);
-  border: 1px solid color-mix(in srgb, var(--red) 30%, transparent);
+  border: 1px solid color-mix(in srgb, var(--red-fill) 35%, transparent);
 }
 
 .chip-state--expired {
-  background: color-mix(in srgb, var(--grey) 16%, transparent);
+  background: var(--grey-tint);
   color: var(--grey);
-  border: 1px solid color-mix(in srgb, var(--grey) 30%, transparent);
+  border: 1px solid color-mix(in srgb, var(--grey-fill) 35%, transparent);
 }
 
 /* Charges list in history table */
