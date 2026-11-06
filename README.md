@@ -1,158 +1,227 @@
+<div align="center">
+
 # Vehicle Parking System
 
-A web application for managing parking slots and tracking vehicles. It is the Level-3 mini-project for Software Engineering (UE24CS341A), Semester 5, Department of Computer Science and Engineering, PES University.
+**Book a slot before you leave, park when you arrive, pay at the gate.**
 
-## Team
+A full parking-lot platform for drivers, gate attendants and lot administrators,<br>
+with race-safe slot allocation and a machine-learning availability forecast.
 
+[![CI](https://github.com/VSP-SE/Vehicle-Parking-System/actions/workflows/ci.yml/badge.svg)](https://github.com/VSP-SE/Vehicle-Parking-System/actions/workflows/ci.yml)
+![Python](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)
+![Django](https://img.shields.io/badge/Django-5.2-092E20?logo=django&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-forecast-009688?logo=fastapi&logoColor=white)
+![Coverage](https://img.shields.io/badge/coverage-95.94%25-2ea44f)
+![Tests](https://img.shields.io/badge/tests-771%20passing-2ea44f)
 
-Team 10, Section C.
+[Features](#features) · [Screenshots](#screenshots) · [Architecture](#architecture) · [Quick start](#quick-start) · [Testing](#testing) · [Docs](#documentation) · [Team](#team)
 
-| Name | SRN | GitHub |
-|---|---|---|
-|D Harikrishnan  | PES1UG24CS136 | [@dhkrish06](https://github.com/dhkrish06) |
-| Dhruv Purushotham Raju | PES1UG24CS154 | [@dhruvpurushotham1718-ui](https://github.com/dhruvpurushotham1718-ui) |
-| A Gitanjali | PES1UG24CS170 | [@git17616](https://github.com/git17616) |
-| Vivian Sobers E | PES1UG24CS901 | [@VivianSobers](https://github.com/VivianSobers) |
+</div>
 
-## Planned stack
+---
 
-- Backend: Python, Django and Django REST Framework
-- Model service: FastAPI
-- Database: PostgreSQL
-- Frontend: server-rendered Django templates
+## Screenshots
 
-## Tooling
+<table>
+  <tr>
+    <td width="50%"><img src="docs/images/search-result.png" alt="Driver slot search with availability forecast"></td>
+    <td width="50%"><img src="docs/images/occupancy.png" alt="Live lot occupancy dashboard"></td>
+  </tr>
+  <tr>
+    <td align="center"><b>Find parking</b><br><sub>Free slots for your vehicle and time, with the chance one is still free when you arrive</sub></td>
+    <td align="center"><b>Live occupancy</b><br><sub>Free, reserved, occupied and blocked slots per lot and slot type</sub></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="docs/images/gate.png" alt="Gate attendant console"></td>
+    <td width="50%"><img src="docs/images/revenue.png" alt="Revenue report with CSV export"></td>
+  </tr>
+  <tr>
+    <td align="center"><b>Gate console</b><br><sub>Check-in, check-out and walk-ins from one screen</sub></td>
+    <td align="center"><b>Revenue report</b><br><sub>Charges, payments by method and unpaid totals, exportable as CSV</sub></td>
+  </tr>
+</table>
 
-| Purpose | Tool |
+<sub>Screenshots taken from the seeded demo data set (`seed_demo_data --seed 2026`).</sub>
+
+## Features
+
+<table>
+<tr>
+<th width="33%">🚗 Drivers</th>
+<th width="33%">🚧 Gate attendants</th>
+<th width="33%">🛠️ Lot administrators</th>
+</tr>
+<tr valign="top">
+<td>
+
+- Register, sign in and reset a password by email
+- Add vehicles (car, two-wheeler, EV)
+- Search free slots by lot, vehicle and time
+- See the forecast chance of a free slot on arrival
+- Book with a confirmation page, email and booking reference
+- Cancel bookings
+- Booking history with any unpaid balance
+
+</td>
+<td>
+
+- One-screen gate console
+- Check in booked vehicles, with automatic reallocation if the slot is still occupied
+- Register walk-in vehicles
+- Check out with parking and overstay charges
+- Take payments by cash, UPI or card
+- Print receipts
+- Correct entry and exit times after an outage
+
+</td>
+<td>
+
+- Create, edit, archive and restore lots
+- Tariffs per slot type
+- Block a slot for a period; its bookings move elsewhere
+- Live occupancy across lots
+- Revenue and occupancy reports with CSV export
+- Search the append-only audit log
+- Waive charges, with a required written reason
+- Staff accounts and accessible-parking permits
+
+</td>
+</tr>
+</table>
+
+### Booking rules
+
+| Rule | Value |
 |---|---|
-| Version control | Git and GitHub |
-| Agile planning and bug tracking | GitHub Projects |
-| CI | GitHub Actions: ruff, PostgreSQL tests, coverage gates and security scans |
-| Testing | pytest with branch coverage |
+| Booking length | 30 minutes to 24 hours |
+| How far ahead | Up to 7 days |
+| Open bookings per driver | At most 2, and none while a charge is unpaid |
+| No-show | Expires 15 minutes after the start time, Rs 50.00 charge, slot freed |
+| Late cancellation | Within 60 minutes of the start, Rs 30.00 charge |
+| Overstay | Billed at 1.5x the tariff after a 10-minute grace period |
+| Slot types | Standard, Two-wheeler, Electric vehicle, Accessible |
 
-## Deliverables
+### Under the hood
 
-Part 1 deliverables are in [`docs/part-1/`](docs/part-1/) as Word files:
+- **Race-safe allocation.** Concurrent bookings for the same lot are serialised with a PostgreSQL advisory lock, so two drivers never get the same slot and nobody is refused while a slot is free. A `btree_gist` exclusion constraint also stops overlapping bookings on a slot at the database level.
+- **Availability forecast.** A separate FastAPI service predicts the chance a suitable slot is free at arrival and labels it Low, Medium or High. It retrains weekly from completed stays. If it does not answer within 2 seconds, search carries on without it.
+- **Audit trail.** Privileged staff actions are written to an append-only log that cannot be edited or deleted.
+- **Role-based access.** Each page and action checks the signed-in user's role.
 
-| Deliverable | File |
-|---|---|
-| Software Requirements Specification | [`VPS_SRS.docx`](docs/part-1/VPS_SRS.docx) |
-| Software Test Plan, with test cases | [`VPS_Test_Plan.docx`](docs/part-1/VPS_Test_Plan.docx) |
-| Software Architecture and Design Specification | [`VPS_SAD.docx`](docs/part-1/VPS_SAD.docx) |
+## Architecture
 
-The UML diagrams are in [`docs/part-1/diagrams/`](docs/part-1/diagrams/) as PlantUML sources with rendered PNGs.
+```mermaid
+flowchart LR
+    U(["Drivers · Attendants · Admins"]) --> W
 
-## Running locally
+    subgraph Compose["docker compose"]
+        W["<b>web</b><br/>Django 5.2 on Gunicorn<br/>:8000"]
+        S["<b>scheduler</b><br/>no-show expiry and<br/>notifications, every 60 s"]
+        F["<b>forecast</b><br/>FastAPI · scikit-learn<br/>:8001"]
+        T["<b>forecast-trainer</b><br/>retrains weekly"]
+        D[("<b>db</b><br/>PostgreSQL 16<br/>btree_gist")]
+        M[/"forecast_models<br/>volume"/]
+    end
 
-Use Python 3.12 or newer and a local PostgreSQL 16 database. Create the database
-and user, then set their credentials in `.env` along with a generated Django
-secret key. Django reads exported environment variables; it does not load `.env`
-automatically. The example file uses shell-compatible values.
-
-```sh
-python3.13 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements-dev.txt
-cp .env.example .env
-# Edit .env with your local values, then export them into the shell.
-set -a
-source .env
-set +a
-python manage.py migrate
-python manage.py runserver
-pytest
+    W <--> D
+    S --> D
+    W -->|"GET /v1/forecast<br/>2 s timeout"| F
+    T -->|"read-only role<br/>forecast_ro"| D
+    T --> M
+    M --> F
 ```
 
-The database user needs permission to create the test database for PostgreSQL
-tests. To run tests without PostgreSQL, use `VPS_TEST_SQLITE=1 pytest`.
+| Service | What it does |
+|---|---|
+| `web` | Runs migrations, then serves the Django app with Gunicorn (`GUNICORN_WORKERS`, default 8) |
+| `scheduler` | Same image as `web`. Runs `expire_no_shows` and `send_reservation_notifications` every 60 seconds |
+| `forecast` | Serves the latest trained model over HTTP |
+| `forecast-trainer` | Trains at start-up and then weekly, through a read-only database role |
+| `db` | PostgreSQL 16, initialised by the scripts in `docker/postgres/init/` |
 
-### With Docker Compose
+UML diagrams (use case, components, data model, sequences, reservation states) are in [`docs/part-1/diagrams/`](docs/part-1/diagrams/).
 
-Install Docker with the Compose plugin, then copy the example environment file:
+## Tech stack
+
+| Layer | Technology |
+|---|---|
+| Web app | Python 3.12, Django 5.2.18, Django REST Framework 3.18.3 |
+| Frontend | Server-rendered Django templates with HTMX |
+| Database | PostgreSQL 16 with `btree_gist`, psycopg 3 |
+| Serving | Gunicorn 26.2.0, Docker Compose |
+| Forecast | FastAPI 0.162.0, Uvicorn 0.54.0, scikit-learn 1.9.1, joblib |
+| Quality | pytest, pytest-django, pytest-cov, ruff, pip-audit, Gitleaks, GitHub Actions |
+
+## Quick start
+
+### With Docker Compose (recommended)
 
 ```sh
-cp .env.example .env
-```
-
-Edit `.env` with a generated Django secret key and a local database password,
-then start the services:
-
-```sh
+git clone https://github.com/VSP-SE/Vehicle-Parking-System.git
+cd Vehicle-Parking-System
+cp .env.example .env        # then set DJANGO_SECRET_KEY and the passwords
 docker compose up --build
 ```
 
-Open http://localhost:8000/healthz to check the application and database.
-The web service runs migrations, then serves the app with Gunicorn using
-`GUNICORN_WORKERS` worker processes (8 by default, one database connection each).
-Gunicorn does not reload on source changes: run `docker compose restart web`, or use
-`python manage.py runserver` on the host while developing. PostgreSQL data stays in a named volume. On first initialization,
-the database gets `btree_gist` in the application database and `template1` so
-new test databases also have the extension.
+Open <http://localhost:8000>. <http://localhost:8000/healthz> reports the app and database status.
 
-To run tests from the host, install `requirements-dev.txt` in the virtual
-environment as above, then start the Compose database and export `.env`:
+Load the demo data (a 500-slot lot, 120 drivers and 30 days of bookings):
 
 ```sh
-docker compose up -d db
-# Wait for db to be healthy in docker compose ps before running tests.
-set -a
-source .env
-set +a
-export POSTGRES_HOST=localhost
-.venv/bin/pytest -q
+docker compose exec web python manage.py seed_demo_data --seed 2026
 ```
 
-Stop the services with `docker compose down`. To reset the database, use
-`docker compose down -v`; this removes the named volume and its data.
+> [!NOTE]
+> Gunicorn does not reload on code changes. Run `docker compose restart web`, or use `python manage.py runserver` on the host while developing. `docker compose down -v` deletes the database volume.
 
-### No-show expiry
+### Without Docker
 
-The Compose `scheduler` service shares the web image and environment. It waits for
-the database and web service to be healthy (so migrations have finished), then runs
-`python manage.py expire_no_shows` every 60 seconds. Reserved bookings expire only
-when more than 15 minutes have passed since their start, freeing the slot and
-recording a Rs 50.00 no-show charge. Repeated runs do not charge again.
+You need Python 3.12 or newer and a local PostgreSQL 16 database.
 
-On a server, run the same command every minute with cron, using the application's
-Python environment and exported Django/database settings:
+```sh
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements-dev.txt
+cp .env.example .env        # edit with your local values
+set -a; source .env; set +a # Django reads exported variables, not .env itself
+python manage.py migrate
+python manage.py runserver
+```
+
+<details>
+<summary><b>Environment variables</b></summary>
+
+| Variable | Purpose |
+|---|---|
+| `DJANGO_SECRET_KEY` | Django secret key (required) |
+| `DJANGO_DEBUG` | `True` for local development only |
+| `DJANGO_ALLOWED_HOSTS` | Comma-separated hostnames |
+| `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD` | Database name and credentials |
+| `POSTGRES_HOST`, `POSTGRES_PORT` | Database host and port for Django on the host (Compose uses `db`) |
+| `FORECAST_DB_PASSWORD` | Password for the trainer's read-only `forecast_ro` role, set before the volume is first created |
+| `FORECAST_URL` | Forecast service URL for Django on the host; empty runs without a forecast |
+| `GUNICORN_WORKERS` | Gunicorn processes in Compose, one database connection each |
+| `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD`, `EMAIL_USE_TLS` | SMTP settings for booking and password-reset email |
+| `VPS_TEST_SQLITE` | `1` runs the tests on SQLite instead of PostgreSQL |
+
+</details>
+
+<details>
+<summary><b>No-show expiry on a server without Compose</b></summary>
+
+Run the command every minute with cron, using the app's Python environment and exported settings:
 
 ```cron
 * * * * * cd /app && python manage.py expire_no_shows
 ```
 
-### Demo data
+Repeated runs never charge the same booking twice.
 
-To fill an empty database with the demo data set (STP Section 5), run:
+</details>
 
-```sh
-python manage.py seed_demo_data --seed 2026
-```
-
-It creates the lot "Demo Central" with 500 slots (350 Standard, 60 Two-wheeler, 60 EV,
-30 Accessible), a tariff for each slot type, 120 drivers, and 30 days of reservations:
-completed stays with parking charges (most of them paid), no-shows, cancellations,
-vehicles parked now, and future bookings. The same seed always gives the same plan. If
-the demo lot already exists, the command adds nothing. For tests, `vps/factories.py` has
-`make_*` functions for drivers, staff, vehicles, lots, tariffs, reservations, charges and
-payments.
-
-### Occupancy forecast
-
-The forecast is a separate FastAPI service in `forecast/` (FR-FCST-01 to FR-FCST-03). For a
-lot, a vehicle type and an arrival up to 24 hours ahead, `GET /v1/forecast` returns the chance
-that an eligible slot is free, with a Low, Medium or High band. The search page shows it next
-to the slot count. If the service does not answer within 2 seconds, or `FORECAST_URL` is
-empty, search still works and the panel says "Forecast not available".
-
-`python -m forecast.train.train` retrains the model from completed reservations. It connects
-through the read-only `forecast_ro` role, which can read only the lot, slot and reservation
-columns it needs. Until there are 4 weeks of history it trains on simulated arrivals instead,
-and the page labels the result "Estimate". With Compose, the `forecast-trainer` service runs
-the job at start-up and then once a week, and `forecast` serves the latest model. Set
-`FORECAST_DB_PASSWORD` in `.env` before the database volume is first created; the role is made
-by `docker/postgres/init/02-forecast-role.sh`.
-
-To run it without Docker:
+<details>
+<summary><b>Running the forecast service without Docker</b></summary>
 
 ```sh
 python -m venv .venv-forecast
@@ -160,11 +229,83 @@ python -m venv .venv-forecast
 FORECAST_DB_URL=postgresql://forecast_ro:PASSWORD@localhost:5432/vps \
   .venv-forecast/bin/python -m forecast.train.train --model-dir models
 FORECAST_MODEL_DIR=models .venv-forecast/bin/uvicorn forecast.app.main:app --port 8001
-(cd forecast && ../.venv-forecast/bin/pytest)
 ```
 
-Then start Django with `FORECAST_URL=http://localhost:8001`.
+Then start Django with `FORECAST_URL=http://localhost:8001`. Until there are 4 weeks of history the trainer uses simulated arrivals, and the search page labels the result "Estimate".
 
-## Status
+</details>
 
-Sprint 1 is under way. The Django project skeleton is in place. CI runs ruff, the test suite on PostgreSQL 16 with a 70% line and 60% branch coverage gate, pip-audit and a Gitleaks secret scan on every pull request.
+## Testing
+
+```sh
+pytest                                                    # app tests on PostgreSQL
+VPS_TEST_SQLITE=1 pytest                                  # or on SQLite
+pytest --cov --cov-branch --cov-report=xml && python scripts/check_coverage.py coverage.xml
+(cd forecast && ../.venv-forecast/bin/pytest)             # forecast service
+pytest -c tests/system/pytest.ini                         # browser tests, against a running server
+```
+
+The browser tests use Playwright, and the load tests (`tests/system/locust_*.py`) use Locust. Install both separately; they are not in the requirements files. The system tests read `VPS_BASE_URL` (default `http://127.0.0.1:8100`), `VPS_HTTP_PROD_URL`, `VPS_TLS_URL` and `VPS_SERVER_LOGS`.
+
+### Part 3 results
+
+| Check | Result |
+|---|---|
+| App test suite | **771 passed**, 0 failed |
+| Line / branch coverage | **95.94% / 91.01%** (CI gate: 70% / 60%) |
+| Test Plan cases | **49 of 51 pass**, none fail; 2 not run (timed user trial, month-long uptime) |
+| Forecast and browser tests | 16 and 17 passed |
+| Load | 200 concurrent sessions with 0 failures; booking, check-in and check-out p95 of 120 ms or less at 50 users |
+| Accessibility | 0 WCAG 2.1 AA violations (axe-core) on 15 pages |
+
+Full reports: [unit tests](docs/part-3/unit-test-report.md) · [line coverage](docs/part-3/code-coverage-report.md) · [branch coverage](docs/part-3/branch-coverage-report.md) · [system validation](docs/part-3/system-validation-report.md) · [code review](docs/part-3/code-review.md) · [second review](docs/part-3/code-review-2.md) · [raw evidence](docs/part-3/evidence/)
+
+### Continuous integration
+
+Every pull request runs ruff, the forecast tests, the full suite on PostgreSQL 16 with the coverage gate, `pip-audit` on both requirements files, and a Gitleaks scan of the whole history.
+
+## Project structure
+
+```text
+.
+├── vps/                  Django project
+│   ├── accounts/         users, roles, sign-in, staff and permits
+│   ├── allocation/       slot eligibility and slot choice
+│   ├── reservations/     search, booking, cancellation, no-show expiry
+│   ├── gate/             check-in, check-out, walk-ins, payments, receipts
+│   ├── billing/          charges, payments and waivers
+│   ├── lots/             lots, slots, tariffs, blocking, live occupancy
+│   ├── vehicles/         driver vehicles
+│   ├── reports/          revenue, occupancy and audit log pages
+│   ├── audit/            append-only audit log
+│   └── notifications/    booking emails
+├── forecast/             FastAPI forecast service and training job
+├── templates/            Django templates
+├── tests/                app tests; tests/system/ has browser and load tests
+├── docker/postgres/init/ database initialisation scripts
+├── scripts/              coverage gate
+├── docs/                 Part 1 and Part 3 documents, README images
+└── compose.yaml
+```
+
+## Documentation
+
+| Document | Link |
+|---|---|
+| Software Requirements Specification | [`docs/part-1/VPS_SRS.docx`](docs/part-1/VPS_SRS.docx) |
+| Software Test Plan | [`docs/part-1/VPS_Test_Plan.docx`](docs/part-1/VPS_Test_Plan.docx) |
+| Software Architecture and Design | [`docs/part-1/VPS_SAD.docx`](docs/part-1/VPS_SAD.docx) |
+| UML diagrams (PlantUML and PNG) | [`docs/part-1/diagrams/`](docs/part-1/diagrams/) |
+| Part 3 test reports and evidence | [`docs/part-3/`](docs/part-3/) |
+| Sprint 1 demo video | [`videos/VPS-Sprint-1-Demo.mp4`](videos/VPS-Sprint-1-Demo.mp4) |
+
+## Team
+
+Team 10, Section C · Software Engineering (UE24CS341A), Semester 5 · Department of Computer Science and Engineering, PES University
+
+| Name | SRN | GitHub |
+|---|---|---|
+|D Harikrishnan  | PES1UG24CS136 | [@dhkrish06](https://github.com/dhkrish06) |
+| Dhruv Purushotham Raju | PES1UG24CS154 | [@dhruvpurushotham1718-ui](https://github.com/dhruvpurushotham1718-ui) |
+| A Gitanjali | PES1UG24CS170 | [@git17616](https://github.com/git17616) |
+| Vivian Sobers E | PES1UG24CS901 | [@VivianSobers](https://github.com/VivianSobers) |
