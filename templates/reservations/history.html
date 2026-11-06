@@ -61,6 +61,12 @@
                   {% if reservation.status == "Reserved" or reservation.status == "Active" %}
                     <br><a href="{% url 'reservations:slot_map' reservation.booking_ref %}">View map</a>
                   {% endif %}
+                  {% if reservation.status == "Reserved" %}
+                    <form method="post" action="{% url 'reservations:cancel' reservation.pk %}" class="history-cancel">
+                      {% csrf_token %}
+                      <button type="submit" class="history-cancel-button" aria-label="Cancel booking {{ reservation.booking_ref }}">Cancel booking</button>
+                    </form>
+                  {% endif %}
                 </td>
                 <td>{{ reservation.slot.lot.name }}</td>
                 <td>{{ reservation.slot.code }}</td>

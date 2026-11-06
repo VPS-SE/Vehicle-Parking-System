@@ -205,3 +205,17 @@ def test_booking_history_badge_shows_real_count(client, history_data):
     assert response.status_code == 200
     assert "2 bookings" in response.content.decode()
 
+
+
+def test_reserved_booking_has_cancel_button(client, history_data):
+    booking = history_data["create_booking"](1)
+    booking.status = Reservation.Status.RESERVED
+    booking.save()
+    done = history_data["create_booking"](2)
+    client.force_login(history_data["driver"])
+
+    content = client.get(reverse("reservations:history")).content.decode()
+
+    assert f'action="{reverse("reservations:cancel", args=[booking.pk])}"' in content
+    assert reverse("reservations:cancel", args=[done.pk]) not in content
+    assert "Cancel booking" in content
