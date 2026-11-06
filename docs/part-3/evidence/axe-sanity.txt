@@ -1,0 +1,6 @@
+Run: ./.venv-sys/bin/python tests/system/axe_sanity.py <load-sessions.json>
+Thu Nov  5 10:45:09 PM IST 2026
+result cards: 1
+violations 0 passes 19 incomplete []
+color-contrast passed nodes: 25
+control page violations: ['color-contrast', 'document-title', 'landmark-one-main', 'page-has-heading-one', 'region']

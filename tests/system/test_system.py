@@ -87,8 +87,10 @@ def test_tc04_vehicle_format(driver_user):
     page.wait_for_load_state("networkidle")
     ts = driver_user["ts"]
 
-    plate1_input = f"ka 0{ts % 9 + 1} ab 1234"
-    plate1_norm = f"KA0{ts % 9 + 1}AB1234"
+    # Unique per run, so the test can be repeated on the same database.
+    digits = f"{ts % 9000 + 1000}"
+    plate1_input = f"ka 0{ts % 9 + 1} ab {digits}"
+    plate1_norm = f"KA0{ts % 9 + 1}AB{digits}"
     plate2 = f"22BH{ts % 9000 + 1000}AA"
     plate3_invalid = f"KA0{ts % 9 + 1}AB12"
 
@@ -189,15 +191,21 @@ def test_tc19_admin_changes_tariff_and_audited(admin_context, base_url: str):
     page.wait_for_load_state("networkidle")
 
     # Change tariff with unique future date to avoid duplicate constraint
-    page.select_option("#tariff-lot", value="1")
-    page.select_option("#tariff-slot-type", value="Standard")
-    page.fill("#tariff-rate", "55.00")
+    # A unique future date per run; on a repeated run the date may already have a tariff, so
+    # try the next days until one is free.
     now = datetime.now(ZoneInfo("Asia/Kolkata"))
-    unique_days = 20 + (int(time.time()) % 150)
-    effective_date = (now + timedelta(days=unique_days)).strftime("%Y-%m-%d")
-    page.fill("#tariff-effective-from", effective_date)
-    page.click(".tariff-form button[type='submit']")
-    page.wait_for_load_state("networkidle")
+    first_day = 20 + (int(time.time()) % 150)
+    for offset in range(10):
+        page.select_option("#tariff-lot", value="1")
+        page.select_option("#tariff-slot-type", value="Standard")
+        page.fill("#tariff-rate", "55.00")
+        effective_date = (now + timedelta(days=first_day + offset)).strftime("%Y-%m-%d")
+        page.fill("#tariff-effective-from", effective_date)
+        page.click(".tariff-form button[type='submit']")
+        page.wait_for_load_state("networkidle")
+        if "Tariff saved" in page.content():
+            break
+        page.goto(f"{base_url}/lots/tariffs/")
 
     content = page.content()
     assert "Tariff saved" in content
