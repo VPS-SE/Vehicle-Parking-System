@@ -1,9 +1,9 @@
-# VPS visual design: "Night Drive"
+# VPS visual design: "Daylight"
 
-The look combines Apple's product pages with the GTA VI site. Apple supplies the
-restraint: big tight headlines, a quiet type scale, generous space, frosted glass and
-soft easing. GTA VI supplies the mood: a deep indigo night, a sunset gradient from
-peach into pink and violet, lavender text accents, and pill-shaped controls.
+The look combines Apple's product pages with a bright, fresh daytime palette. Apple
+supplies the restraint: big tight headlines, a quiet type scale, generous space,
+frosted glass and soft easing. The accent system supplies peach, pink, sky and violet
+energy with pill-shaped controls and clean white surfaces.
 
 The tokens below were measured from the computed styles of apple.com/iphone and
 rockstargames.com/VI (6 November 2026). They are used as inspiration. We do not copy
@@ -34,38 +34,43 @@ proprietary, so we self-host Inter and Inter Tight (SIL Open Font License) inste
 
 ```css
 :root {
-  color-scheme: dark;
-
-  /* Night (GTA VI) */
-  --bg:            #07080f;   /* page */
-  --bg-2:          #0c0d1b;
-  --surface:       rgba(22, 23, 46, 0.62);   /* glass card */
-  --surface-solid: #12132a;
-  --surface-2:     #1a1b36;   /* raised: inputs, table header */
-  --border:        rgba(255, 255, 255, 0.08);
-  --border-strong: rgba(255, 255, 255, 0.16);
-
-  /* Text (Apple dark mode) */
-  --text:   #f5f5f7;
-  --text-2: #c7c7d1;   /* secondary */
-  --text-3: #9a9ab0;   /* tertiary, still at least 4.5:1 on --bg */
-  --lavender: #ccc2f5; /* eyebrows and accents (GTA VI) */
-  --link:   #6cb6ff;
-
-  /* Sunset accent (GTA VI) */
-  --peach:  #fec497;
-  --pink:   #f6879e;
-  --rose:   #e9639b;
-  --violet: #9f87c8;
-  --sunset: linear-gradient(120deg, #fec497 0%, #f6879e 40%, #e9639b 68%, #9f87c8 100%);
-  --on-sunset: #120a14;  /* dark text on sunset buttons */
-
-  /* Status (Apple system colours, dark) */
-  --green:  #30d158;
-  --yellow: #ffd60a;
-  --red:    #ff6961;
-  --blue:   #64d2ff;
-  --grey:   #8e8e9a;
+  color-scheme: light;
+  --bg: #f8f9fc;
+  --bg-2: #eef1f7;
+  --surface: rgba(255, 255, 255, 0.78);
+  --surface-solid: #ffffff;
+  --surface-2: #f2f4f9;
+  --border: rgba(15, 23, 42, 0.08);
+  --border-strong: rgba(15, 23, 42, 0.16);
+  --text: #1d1d1f;
+  --text-2: #424754;
+  --text-3: #5f6675;
+  --lavender: #6d28d9;
+  --link: #0066cc;
+  --peach: #ffb36b;
+  --pink: #ff6b9a;
+  --rose: #e11d74;
+  --violet: #a78bfa;
+  --sunset: linear-gradient(120deg, #ffb36b 0%, #ff8fa3 40%, #ff6b9a 65%, #b794ff 100%);
+  --sunset-ink: linear-gradient(120deg, #ea580c 0%, #e11d74 50%, #7c3aed 100%);
+  --on-sunset: #1d1d1f;
+  --green: #15803d;
+  --yellow: #b45309;
+  --red: #dc2626;
+  --blue: #0369a1;
+  --grey: #64748b;
+  --green-fill: #22c55e;
+  --yellow-fill: #f59e0b;
+  --red-fill: #f43f5e;
+  --blue-fill: #38bdf8;
+  --grey-fill: #94a3b8;
+  --green-tint: #dcfce7;
+  --yellow-tint: #fef3c7;
+  --red-tint: #ffe4e6;
+  --blue-tint: #e0f2fe;
+  --grey-tint: #f1f5f9;
+  --focus: #e11d74;
+  --shadow-card: 0 1px 2px rgba(15, 23, 42, 0.04), 0 12px 32px rgba(15, 23, 42, 0.07);
 
   /* Shape */
   --radius-card: 28px;   /* Apple tiles */
@@ -103,10 +108,9 @@ proprietary, so we self-host Inter and Inter Tight (SIL Open Font License) inste
 
 ## Page frame
 
-- **Background.** `--bg`, with a fixed layered glow behind everything: a large rose
-  radial at the top centre (about 22% alpha), a violet radial at the bottom left and a
-  faint peach radial at the right. It should feel like a city at dusk, and it must stay
-  subtle enough that text contrast holds.
+- **Background.** `--bg`, with a fixed layered glow behind everything: peach at the top
+  right, pink at the top centre, and a soft sky radial at the bottom left. Keep it
+  subtle enough that text contrast always holds.
 - **Header and navigation.** Sticky, with a glass background (`rgba(7, 8, 15, 0.72)`
   plus `--glass`) and a hairline bottom border. The brand wordmark sits on the left with
   a small sunset-gradient mark. Nav links are 14px, `--text-2`, turning `--text` on

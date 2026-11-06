@@ -62,7 +62,7 @@
 }
 
 .accounts-table-wrapper:focus-visible {
-  outline: 2px solid var(--pink);
+  outline: 2px solid var(--focus);
   outline-offset: -2px;
 }
 
@@ -76,27 +76,27 @@
 
 /* Status Chips */
 .chip--active {
-  background: color-mix(in srgb, var(--green) 16%, transparent);
+  background: var(--green-tint);
   color: var(--green);
-  border: 1px solid color-mix(in srgb, var(--green) 30%, transparent);
+  border: 1px solid color-mix(in srgb, var(--green-fill) 35%, transparent);
 }
 
 .chip--deactivated {
-  background: color-mix(in srgb, var(--grey) 16%, transparent);
+  background: var(--grey-tint);
   color: var(--grey);
-  border: 1px solid color-mix(in srgb, var(--grey) 30%, transparent);
+  border: 1px solid color-mix(in srgb, var(--grey-fill) 35%, transparent);
 }
 
 .chip--permit {
-  background: color-mix(in srgb, var(--blue) 16%, transparent);
+  background: var(--blue-tint);
   color: var(--blue);
-  border: 1px solid color-mix(in srgb, var(--blue) 30%, transparent);
+  border: 1px solid color-mix(in srgb, var(--blue-fill) 35%, transparent);
 }
 
 .chip--no-permit {
-  background: color-mix(in srgb, var(--text) 8%, transparent);
-  color: var(--text-3);
-  border: 1px solid var(--border);
+  background: var(--grey-tint);
+  color: var(--grey);
+  border: 1px solid color-mix(in srgb, var(--grey-fill) 35%, transparent);
 }
 
 /* Inline action form buttons */

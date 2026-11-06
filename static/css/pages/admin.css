@@ -70,7 +70,7 @@
 .tariff-table-wrapper[role="region"]:focus-visible,
 .occ-table-wrapper[role="region"]:focus-visible,
 .receipt-table-wrapper[role="region"]:focus-visible {
-  outline: 2px solid var(--pink);
+  outline: 2px solid var(--focus);
   outline-offset: 3px;
 }
 

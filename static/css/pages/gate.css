@@ -32,7 +32,7 @@
   border: 1px solid var(--border);
   border-radius: var(--radius-card);
   padding: clamp(1.25rem, 2.5vw, 1.75rem);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 20px 40px rgba(0, 0, 0, 0.35);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), var(--shadow-card);
   display: flex;
   flex-direction: column;
 }
@@ -76,7 +76,7 @@
   background-color: var(--surface-2);
   border: 1px solid var(--border-strong);
   color: var(--text);
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 .gate-form button {
@@ -178,7 +178,7 @@ fieldset.outage-fieldset p {
 }
 
 .receipt-table-wrapper:focus-visible {
-  outline: 2px solid var(--pink);
+  outline: 2px solid var(--focus);
   outline-offset: -2px;
 }
 
@@ -205,7 +205,7 @@ fieldset.outage-fieldset p {
 }
 
 .receipt-nav-links a:hover {
-  background: color-mix(in srgb, var(--text) 8%, transparent);
+  background: rgba(15, 23, 42, 0.04);
 }
 
 .receipt-nav-links a:first-child {
