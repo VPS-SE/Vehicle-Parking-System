@@ -20,6 +20,7 @@ class Function(StrEnum):
     MANAGE_LOTS = "manage_lots"
     MANAGE_STAFF = "manage_staff"
     REPORTS = "reports"
+    WAIVE_CHARGES = "waive_charges"
 
 
 PERMISSIONS: dict[Function, set[Role]] = {
@@ -31,6 +32,7 @@ PERMISSIONS: dict[Function, set[Role]] = {
     Function.MANAGE_LOTS: {Role.ADMIN},
     Function.MANAGE_STAFF: {Role.ADMIN},
     Function.REPORTS: {Role.ADMIN},
+    Function.WAIVE_CHARGES: {Role.ADMIN},
 }
 
 

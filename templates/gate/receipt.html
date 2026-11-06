@@ -74,6 +74,8 @@
             <td>
               {% if charge.payment %}
                 Paid
+              {% elif charge.waiver %}
+                Waived
               {% else %}
                 Unpaid
               {% endif %}
@@ -97,6 +99,13 @@
           <td>₹{{ paid_total|floatformat:2 }}</td>
           <td colspan="2"></td>
         </tr>
+        {% if waived_total %}
+        <tr>
+          <td>Waived</td>
+          <td>₹{{ waived_total|floatformat:2 }}</td>
+          <td colspan="2"></td>
+        </tr>
+        {% endif %}
         <tr>
           <th>Balance due</th>
           <th>₹{{ balance_due|floatformat:2 }}</th>
