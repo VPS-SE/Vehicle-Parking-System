@@ -4,10 +4,10 @@ from io import StringIO
 
 import pytest
 from django.core.management import call_command
-from vps.lots.pes import PES_LOTS, seed_pes_lots
 
 from vps.accounts.models import User
 from vps.lots.models import Slot
+from vps.lots.pes import PES_LOTS, seed_pes_lots
 
 pytestmark = pytest.mark.django_db
 

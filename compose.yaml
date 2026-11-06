@@ -38,6 +38,7 @@ services:
       # worker); the development server opened one per request thread (D-1).
       - >-
         python manage.py migrate &&
+        python manage.py seed_pes_lots &&
         python manage.py collectstatic --noinput &&
         exec gunicorn vps.wsgi:application --bind 0.0.0.0:8000
         --workers "$${GUNICORN_WORKERS:-8}" --timeout 60 --access-logfile -
