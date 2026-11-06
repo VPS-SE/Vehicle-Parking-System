@@ -10,6 +10,7 @@ RUN pip install --no-cache-dir -r requirements.txt \
     && useradd --create-home --uid 1000 app
 
 COPY --chown=app:app . .
+RUN DJANGO_SECRET_KEY=build-only python manage.py collectstatic --noinput
 USER app
 
 EXPOSE 8000

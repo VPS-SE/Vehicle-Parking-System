@@ -1,22 +1,33 @@
 {% extends "base.html" %}
+{% load static %}
 {% block title %}Block a slot · {{ lot.name }} · VPS{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/pages/admin.css' %}">{% endblock %}
 {% block content %}
-<h1>Block a slot in {{ lot.name }}</h1>
-<p>
-  Reserved bookings for the blocked period are moved to another suitable free slot, and
-  the driver is e-mailed the new slot. If no slot is free, the booking is cancelled
-  without a fee and the driver is told.
-</p>
-<form method="post" novalidate>
-  {% csrf_token %}
-  {{ form.non_field_errors }}
-  {% for field in form %}
-  <div class="field">
-    {{ field.label_tag }} {{ field }}
-    {{ field.errors }}
+<section class="admin-page" aria-labelledby="block-slot-heading">
+  <div class="admin-page-header">
+    <h1 id="block-slot-heading">Block a slot in {{ lot.name }}</h1>
+    <p>
+      Reserved bookings for the blocked period are moved to another suitable free slot, and
+      the driver is e-mailed the new slot. If no slot is free, the booking is cancelled
+      without a fee and the driver is told.
+    </p>
   </div>
-  {% endfor %}
-  <button type="submit">Block slot</button>
-  <a href="{% url 'lots:list' %}">Back to parking lots</a>
-</form>
+
+  <section class="card admin-form-card">
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {{ form.non_field_errors }}
+      {% for field in form %}
+      <div class="field">
+        {{ field.label_tag }} {{ field }}
+        {{ field.errors }}
+      </div>
+      {% endfor %}
+      <div class="admin-form-actions">
+        <button type="submit">Block slot</button>
+        <a class="button-secondary" href="{% url 'lots:list' %}">Back to parking lots</a>
+      </div>
+    </form>
+  </section>
+</section>
 {% endblock %}

@@ -1,45 +1,52 @@
 
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Vehicle Checkout | Vehicle Parking System{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/gate.css' %}">
+{% endblock %}
+
 {% block content %}
 <section class="booking-page">
-  <h1>Vehicle Checkout</h1>
-  <p>
-    Enter an active booking reference or vehicle registration number
-    to record the vehicle's exit and calculate its charges.
-  </p>
-  {% if corrections_only %}
-  <p>As a Lot Administrator you can only record an exit time noted on paper during an
-    outage: enter that time and the reason below.</p>
-  {% endif %}
+  <div class="booking-card">
+    <h1>Vehicle Checkout</h1>
+    <p>
+      Enter an active booking reference or vehicle registration number
+      to record the vehicle's exit and calculate its charges.
+    </p>
+    {% if corrections_only %}
+    <p>As a Lot Administrator you can only record an exit time noted on paper during an
+      outage: enter that time and the reason below.</p>
+    {% endif %}
 
-  <form method="post">
-    {% csrf_token %}
+    <form method="post">
+      {% csrf_token %}
 
-    {{ form.non_field_errors }}
+      {{ form.non_field_errors }}
 
-    <div class="field">
-      {{ form.query.label_tag }}
-      {{ form.query }}
-      {{ form.query.errors }}
-    </div>
+      <div class="field">
+        {{ form.query.label_tag }}
+        {{ form.query }}
+        {{ form.query.errors }}
+      </div>
 
-    <fieldset>
-      <legend>System outage only</legend>
-      <p>If the exit was written on paper while the system was down, enter that time
-        (up to 24 hours ago) and the reason. Leave both empty to check out now.</p>
-      {% for field in form %}{% if field.name != "query" %}
-        <div class="field">
-          {{ field.label_tag }}
-          {{ field }}
-          {{ field.errors }}
-        </div>
-      {% endif %}{% endfor %}
-    </fieldset>
+      <fieldset class="outage-fieldset">
+        <legend>System outage only</legend>
+        <p>If the exit was written on paper while the system was down, enter that time
+          (up to 24 hours ago) and the reason. Leave both empty to check out now.</p>
+        {% for field in form %}{% if field.name != "query" %}
+          <div class="field">
+            {{ field.label_tag }}
+            {{ field }}
+            {{ field.errors }}
+          </div>
+        {% endif %}{% endfor %}
+      </fieldset>
 
-    <button type="submit">Check Out Vehicle</button>
-  </form>
+      <button type="submit" class="button">Check Out Vehicle</button>
+    </form>
+  </div>
 </section>
 {% endblock %}

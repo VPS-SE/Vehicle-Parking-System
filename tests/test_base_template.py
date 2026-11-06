@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.messages import get_messages
 from django.contrib.messages.storage.fallback import FallbackStorage
 from django.template.loader import render_to_string
@@ -34,6 +35,8 @@ def test_base_template_includes_htmx_and_responsive_styles():
     )
 
     assert "htmx.org@2.0.4" in rendered
-    assert "min-height: 44px" in rendered
-    assert "@media (max-width: 480px)" in rendered
+    assert "css/vps.css" in rendered
+    stylesheet = (settings.BASE_DIR / "static" / "css" / "vps.css").read_text()
+    assert "min-height: 44px" in stylesheet
+    assert "@media (max-width: 480px)" in stylesheet
     assert 'name="viewport"' in rendered

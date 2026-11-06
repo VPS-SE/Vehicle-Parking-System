@@ -1,208 +1,4 @@
 
-<style>
-  .occ-lot {
-    margin-bottom: 1.25rem;
-    padding: 1.4rem;
-    background: #fff;
-    border: 1px solid #e2e8f0;
-    border-radius: .8rem;
-    box-shadow: 0 4px 14px rgb(15 23 42 / 4%);
-  }
-
-  .occ-lot-heading {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: .75rem;
-    margin-bottom: 1.25rem;
-  }
-
-  .occ-lot-heading h2 {
-    margin: 0;
-    font-size: 1.25rem;
-    color: #17251d;
-  }
-
-  .occ-capacity {
-    color: #64748b;
-    font-size: .85rem;
-  }
-
-  .occ-capacity strong {
-    color: #17251d;
-    font-size: 1.15rem;
-  }
-
-  .occ-metrics {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: .75rem;
-    margin-bottom: 1.25rem;
-  }
-
-  .occ-metric {
-    min-width: 0;
-    padding: .85rem;
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: .55rem;
-  }
-
-  .occ-metric-label {
-    display: block;
-    margin-bottom: .3rem;
-    color: #64748b;
-    font-size: .78rem;
-    font-weight: 600;
-  }
-
-  .occ-metric-value {
-    font-size: 1.55rem;
-    font-weight: 800;
-    line-height: 1.2;
-  }
-
-  .occ-free { color: #15803d; }
-  .occ-reserved { color: #b7791f; }
-  .occ-occupied { color: #c24135; }
-  .occ-blocked { color: #64748b; }
-
-  .occ-bar-heading {
-    display: flex;
-    justify-content: space-between;
-    gap: .75rem;
-    margin-bottom: .5rem;
-    font-size: .85rem;
-    font-weight: 600;
-  }
-
-  .occ-bar {
-    display: flex;
-    width: 100%;
-    height: 12px;
-    overflow: hidden;
-    background: #e2e8f0;
-    border-radius: 999px;
-  }
-
-  .occ-bar-segment {
-    height: 100%;
-    min-width: 0;
-  }
-
-  .occ-bar-free { background: #279b65; }
-  .occ-bar-reserved { background: #e8b957; }
-  .occ-bar-occupied { background: #dc6b5c; }
-  .occ-bar-blocked { background: #89939b; }
-
-  .occ-legend {
-    display: flex;
-    flex-wrap: wrap;
-    gap: .9rem;
-    margin-top: .7rem;
-    color: #64748b;
-    font-size: .78rem;
-  }
-
-  .occ-legend-item {
-    display: inline-flex;
-    align-items: center;
-    gap: .35rem;
-  }
-
-  .occ-legend-dot {
-    width: .55rem;
-    height: .55rem;
-    border-radius: 50%;
-  }
-
-  .occ-section-title {
-    margin: 1.5rem 0 .65rem;
-    font-size: 1rem;
-  }
-
-  .occ-table-wrapper {
-    width: 100%;
-    overflow-x: auto;
-  }
-
-  .occ-table {
-    min-width: 34rem;
-    margin-top: .5rem;
-  }
-
-  .occ-table th {
-    background: #f1f5f9;
-    color: #475569;
-    font-size: .8rem;
-    font-weight: 700;
-    white-space: nowrap;
-  }
-
-  .occ-table td,
-  .occ-table th {
-    padding: .75rem .65rem;
-  }
-
-  .occ-table tbody th {
-    background: #fff;
-    color: #17251d;
-  }
-
-  .occ-table tfoot {
-    background: #f8fafc;
-    font-weight: 800;
-  }
-
-  .occ-table tfoot th {
-    background: #f8fafc;
-    color: #17251d;
-  }
-
-  .occ-count {
-    font-weight: 700;
-    font-variant-numeric: tabular-nums;
-  }
-
-  .occ-empty {
-    padding: 2.5rem 1rem;
-    text-align: center;
-    background: #fff;
-    border: 1px dashed #cbd5e1;
-    border-radius: .75rem;
-  }
-
-  .occ-empty h2 {
-    margin-top: 0;
-    font-size: 1.15rem;
-  }
-
-  .occ-empty p {
-    margin-bottom: 0;
-    color: #64748b;
-  }
-
-  .occ-updated {
-    margin-top: .5rem;
-    color: #64748b;
-    font-size: .8rem;
-    text-align: right;
-  }
-
-  @media (max-width: 600px) {
-    .occ-lot { padding: 1rem; }
-
-    .occ-metrics {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .occ-metric-value {
-      font-size: 1.35rem;
-    }
-  }
-</style>
-
 {% for row in rows %}
 <section class="occ-lot" aria-labelledby="lot-{{ row.lot.pk }}">
   <div class="occ-lot-heading">
@@ -213,22 +9,22 @@
   </div>
 
   <div class="occ-metrics">
-    <div class="occ-metric">
+    <div class="occ-metric stat">
       <span class="occ-metric-label">Free</span>
       <span class="occ-metric-value occ-free">{{ row.total.free }}</span>
     </div>
 
-    <div class="occ-metric">
+    <div class="occ-metric stat">
       <span class="occ-metric-label">Reserved</span>
       <span class="occ-metric-value occ-reserved">{{ row.total.reserved }}</span>
     </div>
 
-    <div class="occ-metric">
+    <div class="occ-metric stat">
       <span class="occ-metric-label">Occupied</span>
       <span class="occ-metric-value occ-occupied">{{ row.total.occupied }}</span>
     </div>
 
-    <div class="occ-metric">
+    <div class="occ-metric stat">
       <span class="occ-metric-label">Blocked</span>
       <span class="occ-metric-value occ-blocked">{{ row.total.blocked }}</span>
     </div>
@@ -265,7 +61,7 @@
 
   <h3 class="occ-section-title">Occupancy by slot type</h3>
 
-  <div class="occ-table-wrapper">
+  <div class="occ-table-wrapper" tabindex="0" role="region" aria-label="Occupancy by slot type table for {{ row.lot.name }}">
     <table class="occ-table">
       <thead>
         <tr>
@@ -310,5 +106,5 @@
 
 <p class="occ-updated">
   Last updated: {{ updated_at|date:"H:i:s" }}
-  Â· Automatically refreshes every 30 seconds
+  · Automatically refreshes every 30 seconds
 </p>

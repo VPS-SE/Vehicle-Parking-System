@@ -1,0 +1,184 @@
+/* ==========================================================================
+   Accounts & Staff Administration Pages Styles
+   Staff Management, Drivers, Create Staff, Manage Accessible Permit
+   Uses design tokens from vps.css
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Accounts Page Frame
+   -------------------------------------------------------------------------- */
+.accounts-page {
+  max-width: 72rem;
+  margin: 1.5rem auto;
+}
+
+.accounts-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+  margin-bottom: 1.75rem;
+}
+
+.accounts-heading h1 {
+  margin: 0 0 0.35rem;
+  font-size: clamp(1.8rem, 3.5vw, 2.4rem);
+}
+
+.accounts-heading p {
+  color: var(--text-2);
+  margin: 0;
+}
+
+.accounts-search-card {
+  margin-bottom: 1.5rem;
+  padding: 1.25rem 1.5rem;
+}
+
+.accounts-search-card form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 1rem;
+}
+
+.accounts-search-card .field {
+  flex: 1;
+  min-width: 260px;
+  margin-bottom: 0;
+}
+
+.accounts-search-card button {
+  min-height: 48px;
+}
+
+/* --------------------------------------------------------------------------
+   Accounts Tables
+   -------------------------------------------------------------------------- */
+.accounts-table-wrapper {
+  margin-top: 1rem;
+  outline: none;
+}
+
+.accounts-table-wrapper:focus-visible {
+  outline: 2px solid var(--pink);
+  outline-offset: -2px;
+}
+
+.accounts-table {
+  min-width: 44rem;
+}
+
+.accounts-table td {
+  vertical-align: middle;
+}
+
+/* Status Chips */
+.chip--active {
+  background: color-mix(in srgb, var(--green) 16%, transparent);
+  color: var(--green);
+  border: 1px solid color-mix(in srgb, var(--green) 30%, transparent);
+}
+
+.chip--deactivated {
+  background: color-mix(in srgb, var(--grey) 16%, transparent);
+  color: var(--grey);
+  border: 1px solid color-mix(in srgb, var(--grey) 30%, transparent);
+}
+
+.chip--permit {
+  background: color-mix(in srgb, var(--blue) 16%, transparent);
+  color: var(--blue);
+  border: 1px solid color-mix(in srgb, var(--blue) 30%, transparent);
+}
+
+.chip--no-permit {
+  background: color-mix(in srgb, var(--text) 8%, transparent);
+  color: var(--text-3);
+  border: 1px solid var(--border);
+}
+
+/* Inline action form buttons */
+form.inline button {
+  min-height: 44px;
+  padding: 0.4rem 1rem;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* --------------------------------------------------------------------------
+   Permit Card & Details
+   -------------------------------------------------------------------------- */
+.permit-detail-list {
+  display: grid;
+  gap: 0.75rem;
+  margin: 1.25rem 0;
+  padding: 1rem 1.25rem;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-field);
+}
+
+.permit-detail-list p {
+  margin: 0;
+  color: var(--text-2);
+}
+
+.permit-detail-list p strong {
+  color: var(--text);
+}
+
+.permit-checkbox-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  cursor: pointer;
+  min-height: 44px;
+}
+
+.permit-checkbox-label input[type="checkbox"] {
+  width: 22px;
+  height: 22px;
+  min-height: 22px;
+  accent-color: var(--pink);
+  cursor: pointer;
+}
+
+/* --------------------------------------------------------------------------
+   Responsive adjustments for 375px screens
+   -------------------------------------------------------------------------- */
+@media (max-width: 480px) {
+  .accounts-page {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .accounts-heading {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .accounts-search-card form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .accounts-search-card .field {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .accounts-search-card button {
+    width: 100%;
+  }
+
+  .accounts-table th,
+  .accounts-table td {
+    padding: 0.75rem 0.65rem;
+  }
+}

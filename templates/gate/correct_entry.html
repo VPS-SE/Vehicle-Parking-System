@@ -1,26 +1,33 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Correct Entry Time | Vehicle Parking System{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/gate.css' %}">
+{% endblock %}
+
 {% block content %}
 <section class="booking-page">
-  <h1>Correct entry time</h1>
-  <p>
-    For a vehicle that entered while the system was down: enter the entry time
-    written on paper (up to 24 hours ago) and why. The change is recorded in the audit log.
-  </p>
+  <div class="booking-card">
+    <h1>Correct entry time</h1>
+    <p>
+      For a vehicle that entered while the system was down: enter the entry time
+      written on paper (up to 24 hours ago) and why. The change is recorded in the audit log.
+    </p>
 
-  <form method="post">
-    {% csrf_token %}
-    {{ form.non_field_errors }}
-    {% for field in form %}
-      <div class="field">
-        {{ field.label_tag }}
-        {{ field }}
-        {{ field.errors }}
-      </div>
-    {% endfor %}
-    <button type="submit">Save entry time</button>
-  </form>
+    <form method="post">
+      {% csrf_token %}
+      {{ form.non_field_errors }}
+      {% for field in form %}
+        <div class="field">
+          {{ field.label_tag }}
+          {{ field }}
+          {{ field.errors }}
+        </div>
+      {% endfor %}
+      <button type="submit" class="button">Save entry time</button>
+    </form>
+  </div>
 </section>
 {% endblock %}

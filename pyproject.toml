@@ -1,6 +1,8 @@
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "tests.settings"
 testpaths = ["tests"]
+# WhiteNoise warns that STATIC_ROOT is missing; tests never run collectstatic.
+filterwarnings = ["ignore:No directory at:UserWarning"]
 # Browser and load tests run against a live server: ./run-system-tests.sh
 addopts = "--ignore=tests/system"
 

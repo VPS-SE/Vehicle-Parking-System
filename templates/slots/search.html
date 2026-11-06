@@ -1,6 +1,11 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Find Parking | Vehicle Parking System{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/driver.css' %}">
+{% endblock %}
 
 {% block content %}
 <section class="search-page" aria-labelledby="search-heading">
