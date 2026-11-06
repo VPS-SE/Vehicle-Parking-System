@@ -1,24 +1,28 @@
 <section
   id="lot-map-panel"
   hx-get="{% url 'lots:map' %}{% if refresh_query %}?{{ refresh_query }}{% endif %}"
-  hx-trigger="every 30s"
+  hx-trigger="every 30s [!window.lotmapLive]"
   hx-swap="outerHTML"
 >
   <form class="lotmap-toolbar card" method="get">
-    <label for="lot-select">Parking lot</label>
-    <select id="lot-select" name="lot">
-      {% for lot in lots %}
-        <option value="{{ lot.pk }}"{% if selected_lot and lot.pk == selected_lot.pk %} selected{% endif %}>{{ lot.name }}</option>
-      {% endfor %}
-    </select>
-
-    <label for="lot-search">Search registration</label>
-    <input id="lot-search" name="q" value="{{ search_query }}" placeholder="KA05DM0001" autocomplete="off">
-
-    <button type="submit">Show map</button>
-    {% if search_query %}
-      <a class="button-secondary" href="{% url 'lots:map' %}{% if selected_lot %}?lot={{ selected_lot.pk }}{% endif %}">Clear</a>
-    {% endif %}
+    <div class="lotmap-toolbar__field">
+      <label for="lot-select">Parking lot</label>
+      <select id="lot-select" name="lot">
+        {% for lot in lots %}
+          <option value="{{ lot.pk }}"{% if selected_lot and lot.pk == selected_lot.pk %} selected{% endif %}>{{ lot.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="lotmap-toolbar__field lotmap-toolbar__field--search">
+      <label for="lot-search">Search registration</label>
+      <input id="lot-search" data-lotmap-search name="q" value="{{ search_query }}" placeholder="KA05DM0001" autocomplete="off">
+    </div>
+    <div class="lotmap-toolbar__actions">
+      <button type="submit">Show map</button>
+      {% if search_query %}
+        <a class="button button-secondary" href="{% url 'lots:map' %}{% if selected_lot %}?lot={{ selected_lot.pk }}{% endif %}">Clear</a>
+      {% endif %}
+    </div>
   </form>
 
   <div class="lotmap-legend">
@@ -41,6 +45,14 @@
   {% endif %}
 
   {% if selected_lot and plan %}
+    <div class="lotmap-stats" aria-label="Bays in {{ selected_lot.name }}">
+      <div class="lotmap-stat lotmap-stat--free"><span class="lotmap-stat__label">Free</span><strong class="lotmap-stat__value" data-counter="free">{{ totals.free }}</strong></div>
+      <div class="lotmap-stat lotmap-stat--reserved"><span class="lotmap-stat__label">Reserved</span><strong class="lotmap-stat__value" data-counter="reserved">{{ totals.reserved }}</strong></div>
+      <div class="lotmap-stat lotmap-stat--occupied"><span class="lotmap-stat__label">Occupied</span><strong class="lotmap-stat__value" data-counter="occupied">{{ totals.occupied }}</strong></div>
+      <div class="lotmap-stat lotmap-stat--blocked"><span class="lotmap-stat__label">Blocked</span><strong class="lotmap-stat__value" data-counter="blocked">{{ totals.blocked }}</strong></div>
+      <p class="lotmap-live"><span class="lotmap-live__dot" aria-hidden="true"></span>Live · updated <span data-live-age>just now</span></p>
+    </div>
+    <div class="lotmap-filters" data-lotmap-filters></div>
     {% include "lots/_plan.html" %}
   {% elif selected_lot %}
     <p class="lotmap-message">This lot has no slots yet.</p>

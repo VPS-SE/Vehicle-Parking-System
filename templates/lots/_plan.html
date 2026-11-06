@@ -1,12 +1,22 @@
-<div class="lotmap-stage" id="lotmap-stage">
+<div class="lotmap-stage" id="lotmap-stage"{% if state_url %} data-state-url="{{ state_url }}" data-parked-url="{{ parked_url }}"{% endif %}>
   {% if plan %}
     <svg
       id="lot-map-svg"
       data-lot-id="{% if selected_lot %}{{ selected_lot.pk }}{% else %}{{ reservation.slot.lot_id }}{% endif %}"
       viewBox="0 0 {{ plan.width }} {{ plan.height }}"
-      role="img"
+      {% if bay_views.0.href %}role="group"{% else %}role="img"{% endif %}
       aria-labelledby="lotmap-title lotmap-desc"
+      preserveAspectRatio="xMidYMid meet"
     >
+      <defs>
+        <pattern id="lotmap-hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+          <rect width="6" height="6" class="lotmap-hatch-bg"></rect>
+          <line x1="0" y1="0" x2="0" y2="6" class="lotmap-hatch-line"></line>
+        </pattern>
+        <filter id="lotmap-soft" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="1.5" stdDeviation="1.5" flood-color="#0f172a" flood-opacity="0.12"></feDropShadow>
+        </filter>
+      </defs>
       <title id="lotmap-title">Parking lot map</title>
       <desc id="lotmap-desc">Entry gate at bottom left and exit at bottom right; bays labelled by slot code.</desc>
 
@@ -25,7 +35,7 @@
       <rect class="lotmap-cabin" x="8" y="{{ plan.height|add:'-74' }}" width="22" height="26"></rect>
       <text class="lotmap-cabin-label" x="10" y="{{ plan.height|add:'-58' }}">SEC</text>
 
-      <text class="lotmap-paint" x="25" y="{{ plan.height|add:'-12' }}">ENTRY</text>
+      <text class="lotmap-paint" x="62" y="{{ plan.height|add:'-12' }}">ENTRY</text>
       <text class="lotmap-paint" x="{{ plan.width|add:'-88' }}" y="{{ plan.height|add:'-12' }}">EXIT</text>
       <path class="lotmap-arrow" d="M24 {{ plan.height|add:'-58' }} h24 l-6 -6 m6 6 l-6 6"></path>
       <path class="lotmap-arrow" d="M24 {{ plan.height|add:'-82' }} h24 l-6 -6 m6 6 l-6 6"></path>

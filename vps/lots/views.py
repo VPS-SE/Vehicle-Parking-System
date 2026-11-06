@@ -3,6 +3,7 @@
 from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.db.models import Count
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
@@ -278,7 +279,67 @@ def lot_map(request):
         "slot_rows": slot_rows,
         "link_base": link_base,
         "refresh_query": request.GET.urlencode(),
+        "state_url": reverse("lots:map_state", args=[selected_lot.pk]) if selected_lot else "",
+        "parked_url": reverse("lots:map_parked"),
+        "totals": {
+            state: sum(1 for slot_state in states.values() if slot_state.state == state)
+            for state in services.OCCUPANCY_STATES
+        },
         "updated_at": timezone.localtime(),
     }
     template = "lots/map_panel.html" if request.headers.get("HX-Request") == "true" else "lots/map.html"
     return render(request, template, context)
+
+
+def _slot_json(slot, slot_state):
+    entry = {"state": slot_state.state, "code": slot.code, "type": slot.slot_type}
+    reservation = slot_state.reservation
+    if reservation is not None:
+        entry.update(
+            reg=reservation.vehicle_reg_no,
+            ref=reservation.booking_ref,
+            driver=reservation.driver.full_name,
+            since=reservation.entry_time.isoformat() if reservation.entry_time else None,
+        )
+    return entry
+
+
+@function_required(Function.MANAGE_LOTS)
+@require_GET
+def lot_map_state_json(request, lot_id):
+    """Live state of every bay in one lot, polled by the admin lot map."""
+    lot = get_object_or_404(Lot.objects.active(), pk=lot_id)
+    states = services.lot_map_state(lot)
+    slots = {slot.pk: slot for slot in lot.slots.all()}
+    return JsonResponse(
+        {
+            "updated_at": timezone.now().isoformat(),
+            "slots": {str(pk): _slot_json(slots[pk], state) for pk, state in states.items()},
+        }
+    )
+
+
+@function_required(Function.MANAGE_LOTS)
+@require_GET
+def parked_vehicles_json(request):
+    """Vehicles parked right now, for search suggestions on the admin lot map."""
+    from vps.reservations.models import Reservation
+
+    parked = (
+        Reservation.objects.filter(status=Reservation.Status.ACTIVE, slot__lot__is_archived=False)
+        .select_related("slot__lot")
+        .order_by("vehicle_reg_no")
+    )
+    return JsonResponse(
+        [
+            {
+                "reg": r.vehicle_reg_no,
+                "lot_id": r.slot.lot_id,
+                "lot": r.slot.lot.name,
+                "slot_id": r.slot_id,
+                "code": r.slot.code,
+            }
+            for r in parked
+        ],
+        safe=False,
+    )
