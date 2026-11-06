@@ -1,55 +1,79 @@
-
 {% extends "base.html" %}
 
 {% block title %}Sign In | Vehicle Parking System{% endblock %}
 
 {% block content %}
-<section class="auth-page" aria-labelledby="login-heading">
-  <div class="auth-card">
-    <h1 id="login-heading">Welcome back</h1>
-    <p class="auth-intro">Sign in to manage your parking reservations.</p>
+<div class="auth-split-layout">
+  <div class="hero-column">
+    <div class="aurora-backdrop" aria-hidden="true">
+      <div class="aurora-blob aurora-blob-1"></div>
+      <div class="aurora-blob aurora-blob-2"></div>
+      <div class="aurora-blob aurora-blob-3"></div>
+      <div class="horizon-grid"></div>
+    </div>
 
-    {% if login_error %}
-      <div class="message message-error" role="alert">
-        {{ login_error }}
+    <div class="hero-content">
+      <p class="hero-eyebrow">Vehicle Parking System</p>
+      <h1 class="hero-headline">Park<br><span class="gradient-text">before you arrive.</span></h1>
+      <p class="hero-subline">Find a slot, book it in seconds, and drive straight in.</p>
+      <div class="feature-pills" role="list">
+        <span class="feature-pill" role="listitem">Live availability</span>
+        <span class="feature-pill" role="listitem">Race-safe booking</span>
+        <span class="feature-pill" role="listitem">Pay at the gate</span>
       </div>
-    {% endif %}
-
-    <form method="post" action="{% url 'accounts:login' %}" class="auth-form">
-      {% csrf_token %}
-      {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
-
-      <div class="field">
-        <label for="email">Email address</label>
-        <input
-          id="email"
-          name="email"
-          type="email"
-          maxlength="254"
-          autocomplete="username"
-          value="{{ email|default:'' }}"
-          required>
-      </div>
-
-      <div class="field">
-        <label for="password">Password</label>
-        <input
-          id="password"
-          name="password"
-          type="password"
-          autocomplete="current-password"
-          required>
-      </div>
-
-      <button type="submit" class="auth-button">Sign In</button>
-    </form>
-    <p class="auth-footnote">
-      <a href="{% url 'accounts:password_reset' %}">Forgot your password?</a>
-    </p>
-
-    <p class="auth-footnote">
-      Enter your registered e-mail address and password to continue.
-    </p>
+    </div>
   </div>
-</section>
+
+  <div class="auth-card-column">
+    <section class="auth-page" aria-labelledby="login-heading">
+      <div class="auth-card">
+        <h2 id="login-heading">Welcome back</h2>
+        <p class="auth-intro">Sign in to manage your parking reservations.</p>
+
+        {% if login_error %}
+          <div class="message message-error" role="alert">
+            {{ login_error }}
+          </div>
+        {% endif %}
+
+        <form method="post" action="{% url 'accounts:login' %}" class="auth-form">
+          {% csrf_token %}
+          {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+
+          <div class="field">
+            <label for="email">Email address</label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              maxlength="254"
+              autocomplete="username"
+              value="{{ email|default:'' }}"
+              required>
+          </div>
+
+          <div class="field">
+            <label for="password">Password</label>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              autocomplete="current-password"
+              required>
+          </div>
+
+          <button type="submit" class="auth-button">Sign In</button>
+        </form>
+
+        <p class="auth-footnote">
+          <a href="{% url 'accounts:password_reset' %}">Forgot your password?</a>
+        </p>
+
+        <p class="auth-footnote">
+          Enter your registered e-mail address and password to continue.
+        </p>
+      </div>
+    </section>
+  </div>
+</div>
 {% endblock %}
