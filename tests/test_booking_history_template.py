@@ -21,6 +21,7 @@ def make_reservation():
     )
 
     return SimpleNamespace(
+        pk=14,
         booking_ref="VPS-2026-014",
         slot=slot,
         period=period,

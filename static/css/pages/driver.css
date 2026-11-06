@@ -288,3 +288,23 @@
   color: var(--green-bright);
   text-shadow: none;
 }
+
+/* Cancel a reserved booking from history (FR-RES-04) */
+.history-cancel {
+  margin: 0.35rem 0 0;
+}
+
+.history-cancel-button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--red);
+  font: inherit;
+  font-size: 0.85rem;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.history-cancel-button:hover {
+  color: var(--text);
+}
