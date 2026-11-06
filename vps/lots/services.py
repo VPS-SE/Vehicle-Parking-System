@@ -229,15 +229,23 @@ def _clear_blocked_slot(block, actor):
     from vps.notifications.models import ReservationNotification
     from vps.notifications.services import queue_reservation_notification
     from vps.reservations.models import Reservation
-    from vps.reservations.services import booking_vehicle, free_slots, move_reservation
+    from vps.reservations.services import (
+        booking_vehicle,
+        free_slots,
+        lock_lot_for_allocation,
+        move_reservation,
+    )
 
     moved, cancelled = [], []
-    affected = (
+    affected = list(
         Reservation.objects.select_for_update(of=("self",))
         .select_related("slot__lot", "driver")
         .filter(slot=block.slot, status=Reservation.Status.RESERVED, period__overlap=block.period)
         .order_by("period")
     )
+    # Row locks first, then the lot, in the same order as check-in (no lock cycle).
+    if affected:
+        lock_lot_for_allocation(block.slot.lot_id)
     for reservation in affected:
         old_code = reservation.slot.code
         vehicle = booking_vehicle(reservation)

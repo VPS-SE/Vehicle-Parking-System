@@ -22,6 +22,7 @@ from vps.reservations.services import (
     _try_book,
     booking_vehicle,
     free_slots,
+    lock_lot_for_allocation,
     move_reservation,
 )
 from vps.vehicles.models import Vehicle
@@ -59,6 +60,7 @@ def _reallocate_if_occupied(reservation):
         return None
     vehicle = booking_vehicle(reservation)
     period = reservation.period
+    lock_lot_for_allocation(reservation.slot.lot_id)
     candidates = [
         slot
         for slot in free_slots(reservation.slot.lot, vehicle, period.lower, period.upper)
@@ -211,6 +213,7 @@ def register_walk_in(attendant, lot, registration_no, vehicle_type, now=None):
             vehicle_reg_no=registration_no, status=Reservation.Status.ACTIVE
         ).exists():
             raise ValidationError({"__all__": "This vehicle is already parked."})
+        lock_lot_for_allocation(lot.pk)
 
         def try_book(slot):
             booked["reservation"] = _try_book(
