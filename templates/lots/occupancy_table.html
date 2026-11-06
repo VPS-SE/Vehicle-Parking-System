@@ -9,22 +9,22 @@
   </div>
 
   <div class="occ-metrics">
-    <div class="occ-metric">
+    <div class="occ-metric stat">
       <span class="occ-metric-label">Free</span>
       <span class="occ-metric-value occ-free">{{ row.total.free }}</span>
     </div>
 
-    <div class="occ-metric">
+    <div class="occ-metric stat">
       <span class="occ-metric-label">Reserved</span>
       <span class="occ-metric-value occ-reserved">{{ row.total.reserved }}</span>
     </div>
 
-    <div class="occ-metric">
+    <div class="occ-metric stat">
       <span class="occ-metric-label">Occupied</span>
       <span class="occ-metric-value occ-occupied">{{ row.total.occupied }}</span>
     </div>
 
-    <div class="occ-metric">
+    <div class="occ-metric stat">
       <span class="occ-metric-label">Blocked</span>
       <span class="occ-metric-value occ-blocked">{{ row.total.blocked }}</span>
     </div>
@@ -61,7 +61,7 @@
 
   <h3 class="occ-section-title">Occupancy by slot type</h3>
 
-  <div class="occ-table-wrapper">
+  <div class="occ-table-wrapper" tabindex="0" role="region" aria-label="Occupancy by slot type table for {{ row.lot.name }}">
     <table class="occ-table">
       <thead>
         <tr>

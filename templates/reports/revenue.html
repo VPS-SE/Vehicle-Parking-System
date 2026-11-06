@@ -1,51 +1,57 @@
 
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Revenue report | Vehicle Parking System{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/pages/admin.css' %}">{% endblock %}
 
 {% block content %}
-<section>
-  <h1>Revenue report</h1>
-  <p>Charges, payments by method and unpaid totals per lot, date and slot type, for up to 31 days.</p>
+<section class="report-page" aria-labelledby="revenue-report-heading">
+  <h1 id="revenue-report-heading">Revenue report</h1>
+  <p class="report-intro">Charges, payments by method and unpaid totals per lot, date and slot type, for up to 31 days.</p>
 
-  <form method="get" action="{% url 'reports:revenue' %}">
+  <form method="get" action="{% url 'reports:revenue' %}" class="card report-toolbar">
     {{ form.non_field_errors }}
-    <p>
-      <label for="{{ form.start_date.id_for_label }}">Start date</label>
-      {{ form.start_date }}
-      {{ form.start_date.errors }}
-    </p>
-    <p>
-      <label for="{{ form.end_date.id_for_label }}">End date</label>
-      {{ form.end_date }}
-      {{ form.end_date.errors }}
-    </p>
-    <button type="submit">View report</button>
+    <div class="report-toolbar-fields report-toolbar-two">
+      <div class="field">
+        <label for="{{ form.start_date.id_for_label }}">Start date</label>
+        {{ form.start_date }}
+        {{ form.start_date.errors }}
+      </div>
+      <div class="field">
+        <label for="{{ form.end_date.id_for_label }}">End date</label>
+        {{ form.end_date }}
+        {{ form.end_date.errors }}
+      </div>
+    </div>
+    <div class="report-toolbar-actions">
+      <button type="submit">View report</button>
+      {% if rows is not None %}
+        <a class="button-secondary" href="{% url 'reports:revenue_csv' %}?start_date={{ form.cleaned_data.start_date|date:'Y-m-d' }}&amp;end_date={{ form.cleaned_data.end_date|date:'Y-m-d' }}">
+          Download CSV
+        </a>
+      {% endif %}
+    </div>
   </form>
 
   {% if rows is not None %}
-    <p>
-      <a href="{% url 'reports:revenue_csv' %}?start_date={{ form.cleaned_data.start_date|date:'Y-m-d' }}&amp;end_date={{ form.cleaned_data.end_date|date:'Y-m-d' }}">
-        Download CSV
-      </a>
-    </p>
-
     {% if rows %}
-      <div class="table-wrapper">
-        <table>
+      <section class="card report-table-card">
+      <div class="table-wrapper" tabindex="0" role="region" aria-label="Revenue report table">
+        <table class="report-revenue-table">
           <thead>
             <tr>
               <th scope="col">Lot</th>
               <th scope="col">Date</th>
               <th scope="col">Slot type</th>
-              <th scope="col">Completed stays</th>
-              <th scope="col">Parking (Rs)</th>
-              <th scope="col">Overstay (Rs)</th>
-              <th scope="col">Late cancel and no-show (Rs)</th>
-              <th scope="col">Cash (Rs)</th>
-              <th scope="col">UPI (Rs)</th>
-              <th scope="col">Card (Rs)</th>
-              <th scope="col">Unpaid (Rs)</th>
+              <th scope="col" class="numeric">Completed stays</th>
+              <th scope="col" class="numeric">Parking (Rs)</th>
+              <th scope="col" class="numeric">Overstay (Rs)</th>
+              <th scope="col" class="numeric">Late cancel and no-show (Rs)</th>
+              <th scope="col" class="numeric">Cash (Rs)</th>
+              <th scope="col" class="numeric">UPI (Rs)</th>
+              <th scope="col" class="numeric">Card (Rs)</th>
+              <th scope="col" class="numeric">Unpaid (Rs)</th>
             </tr>
           </thead>
           <tbody>
@@ -54,19 +60,20 @@
                 <td>{{ row.lot_name }}</td>
                 <td>{{ row.date|date:"Y-m-d" }}</td>
                 <td>{{ row.slot_type_label }}</td>
-                <td>{{ row.completed_stays }}</td>
-                <td>{{ row.parking_inr|floatformat:2 }}</td>
-                <td>{{ row.overstay_inr|floatformat:2 }}</td>
-                <td>{{ row.late_noshow_inr|floatformat:2 }}</td>
-                <td>{{ row.cash_inr|floatformat:2 }}</td>
-                <td>{{ row.upi_inr|floatformat:2 }}</td>
-                <td>{{ row.card_inr|floatformat:2 }}</td>
-                <td>{{ row.unpaid_inr|floatformat:2 }}</td>
+                <td class="numeric">{{ row.completed_stays }}</td>
+                <td class="numeric">{{ row.parking_inr|floatformat:2 }}</td>
+                <td class="numeric">{{ row.overstay_inr|floatformat:2 }}</td>
+                <td class="numeric">{{ row.late_noshow_inr|floatformat:2 }}</td>
+                <td class="numeric">{{ row.cash_inr|floatformat:2 }}</td>
+                <td class="numeric">{{ row.upi_inr|floatformat:2 }}</td>
+                <td class="numeric">{{ row.card_inr|floatformat:2 }}</td>
+                <td class="numeric">{{ row.unpaid_inr|floatformat:2 }}</td>
               </tr>
             {% endfor %}
           </tbody>
         </table>
       </div>
+      </section>
     {% else %}
       <p>No charges or payments were recorded during the selected dates.</p>
     {% endif %}

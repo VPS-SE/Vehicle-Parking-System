@@ -1,0 +1,121 @@
+.admin-page,
+.report-page,
+.waivers-page {
+  max-width: 72rem;
+  margin: 1.5rem auto;
+}
+
+.admin-page-header {
+  margin-bottom: 1.25rem;
+}
+
+.admin-page-header h1 {
+  margin-bottom: 0.5rem;
+}
+
+.admin-page-header p,
+.report-page > p,
+.waivers-page > p,
+.report-intro {
+  color: var(--text-2);
+}
+
+.admin-actions,
+.report-toolbar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  align-items: center;
+}
+
+.admin-actions form.inline {
+  margin: 0;
+}
+
+.admin-form-card form {
+  margin: 0;
+}
+
+.admin-form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  align-items: center;
+}
+
+.report-toolbar {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.report-toolbar-fields {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.report-toolbar .field {
+  margin: 0;
+}
+
+.report-toolbar .field > p {
+  margin: 0;
+}
+
+.report-table-card,
+.waiver-table-card {
+  margin-top: 1rem;
+}
+
+.table-wrapper[role="region"]:focus-visible,
+.tariff-table-wrapper[role="region"]:focus-visible,
+.occ-table-wrapper[role="region"]:focus-visible,
+.receipt-table-wrapper[role="region"]:focus-visible {
+  outline: 2px solid var(--pink);
+  outline-offset: 3px;
+}
+
+.lots-table {
+  min-width: 48rem;
+}
+
+.report-revenue-table {
+  min-width: 74rem;
+}
+
+.report-occupancy-table {
+  min-width: 58rem;
+}
+
+.audit-table {
+  min-width: 70rem;
+}
+
+.waivers-table,
+.recent-waivers-table {
+  min-width: 62rem;
+}
+
+table th.numeric,
+table td.numeric {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.audit-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.85rem;
+  margin-top: 1rem;
+}
+
+@media (min-width: 760px) {
+  .report-toolbar-fields {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: end;
+  }
+
+  .report-toolbar-fields.report-toolbar-two {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
