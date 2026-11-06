@@ -23,7 +23,7 @@
     <div class="report-toolbar-actions">
       <button type="submit">View report</button>
       {% if rows is not None %}
-        <a class="button-secondary" href="{% url 'reports:occupancy_csv' %}?lot={{ form.cleaned_data.lot.pk }}&amp;start_date={{ form.cleaned_data.start_date|date:'Y-m-d' }}&amp;end_date={{ form.cleaned_data.end_date|date:'Y-m-d' }}">
+        <a class="button button-secondary" href="{% url 'reports:occupancy_csv' %}?lot={{ form.cleaned_data.lot.pk }}&amp;start_date={{ form.cleaned_data.start_date|date:'Y-m-d' }}&amp;end_date={{ form.cleaned_data.end_date|date:'Y-m-d' }}">
           Download CSV
         </a>
       {% endif %}

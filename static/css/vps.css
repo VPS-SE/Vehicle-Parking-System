@@ -2115,3 +2115,9 @@ header:has(.user-info) .site-nav { grid-column: 1 / -1; grid-row: 2; margin-inli
   header:has(.user-info) .site-nav { gap: 0.1rem; }
   header:has(.user-info) .site-nav a { padding-inline: 0.7rem; }
 }
+
+/* Disabled pagination stays readable (axe color-contrast): muted colour, no fade. */
+.history-page-disabled {
+  opacity: 1;
+  color: var(--text-3);
+}

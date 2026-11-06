@@ -17,7 +17,7 @@
 @media (min-width: 960px) {
   .gate-panels {
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    align-items: stretch;
+    align-items: start;
   }
 
   .gate-panel:last-child {
@@ -53,7 +53,6 @@
 .gate-form {
   display: grid;
   gap: 0.85rem;
-  margin-top: auto;
 }
 
 .gate-form label {
