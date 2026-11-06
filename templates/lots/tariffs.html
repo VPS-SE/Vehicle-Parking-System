@@ -1,6 +1,8 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Tariff Management | Vehicle Parking System{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/pages/admin.css' %}">{% endblock %}
 
 {% block content %}
 <section class="tariff-page" aria-labelledby="tariff-heading">
@@ -105,7 +107,7 @@
     </div>
 
     {% if tariffs %}
-      <div class="tariff-table-wrapper">
+      <div class="tariff-table-wrapper" tabindex="0" role="region" aria-label="Configured tariffs table">
         <table class="tariff-table">
           <thead>
             <tr>
