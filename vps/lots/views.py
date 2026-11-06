@@ -18,6 +18,8 @@ from vps.accounts.roles import Function
 from vps.lots import services
 from vps.lots.forms import LotForm, SlotBlockForm, TariffForm
 from vps.lots.models import Lot, Tariff
+from vps.lots.plan import build_lot_plan
+from vps.vehicles.services import normalise_registration
 
 
 @function_required(Function.MANAGE_LOTS)
@@ -167,3 +169,116 @@ def occupancy(request):
         "lots/occupancy_table.html" if htmx else "lots/occupancy.html",
         {"rows": services.lot_occupancy(), "updated_at": timezone.localtime()},
     )
+
+
+def _route_points(route):
+    return " ".join(f"{x},{y}" for x, y in route)
+
+
+def _bay_views(plan, states=None, highlight=None, link_base=""):
+    states = states or {}
+    rows = []
+    for bay in plan.bays:
+        state = states.get(bay.slot_id)
+        rows.append(
+            {
+                "slot_id": bay.slot_id,
+                "code": bay.code,
+                "slot_type": bay.slot_type,
+                "state": state.state if state else "free",
+                "row": bay.row,
+                "x": bay.x,
+                "y": bay.y,
+                "w": bay.w,
+                "h": bay.h,
+                "label_x": bay.cx,
+                "label_y": bay.cy + 4,
+                "mark_x": bay.x + 5,
+                "mark_y": bay.y + 10,
+                "is_you": bay.slot_id == highlight,
+                "href": f"{link_base}slot={bay.slot_id}" if link_base else "",
+            }
+        )
+    return rows
+
+
+@function_required(Function.MANAGE_LOTS)
+@require_safe
+def lot_map(request):
+    lots = list(Lot.objects.active().order_by("name"))
+    q = (request.GET.get("q") or "").strip()
+    lot_param = request.GET.get("lot")
+    slot_param = request.GET.get("slot")
+    search_result = None
+    search_message = ""
+    selected_lot = None
+    highlight = None
+
+    if q:
+        search_result = services.find_parked_vehicle(q)
+        if search_result and not search_result.slot.lot.is_archived:
+            selected_lot = search_result.slot.lot
+            highlight = search_result.slot_id
+        else:
+            display = normalise_registration(q.replace("-", "")) or (
+                q.upper().replace(" ", "").replace("-", "")
+            )
+            search_message = f"{display} is not parked in any lot right now."
+
+    if selected_lot is None:
+        selected_lot = next((lot for lot in lots if str(lot.pk) == lot_param), None)
+        if selected_lot is None and lots:
+            selected_lot = lots[0]
+
+    states = {}
+    plan = None
+    route = ()
+    route_points = ""
+    slot_detail = None
+    slot_rows = []
+    bay_views = []
+    link_base = ""
+
+    if selected_lot is not None:
+        slots = list(selected_lot.slots.all())
+        if slots:
+            states = services.lot_map_state(selected_lot)
+            plan = build_lot_plan(slots)
+            if highlight is None and slot_param and slot_param.isdigit():
+                slot_id = int(slot_param)
+                if plan.bay_for(slot_id):
+                    highlight = slot_id
+            if highlight is not None:
+                route = plan.route_to(highlight)
+                route_points = _route_points(route)
+            if slot_param and slot_param.isdigit() and plan.bay_for(int(slot_param)):
+                slot_id = int(slot_param)
+                state = states.get(slot_id)
+                slot_detail = {"slot": selected_lot.slots.get(pk=slot_id), "state": state}
+            link_base = f"{reverse('lots:map')}?lot={selected_lot.pk}&"
+            bay_views = _bay_views(plan, states=states, highlight=highlight, link_base=link_base)
+            slot_rows = [
+                {"code": bay["code"], "slot_type": bay["slot_type"], "state": bay["state"]}
+                for bay in bay_views
+            ]
+
+    context = {
+        "lots": lots,
+        "selected_lot": selected_lot,
+        "plan": plan,
+        "states": states,
+        "highlight": highlight,
+        "route": route,
+        "route_points": route_points,
+        "bay_views": bay_views,
+        "search_query": q,
+        "search_result": search_result,
+        "search_message": search_message,
+        "slot_detail": slot_detail,
+        "slot_rows": slot_rows,
+        "link_base": link_base,
+        "refresh_query": request.GET.urlencode(),
+        "updated_at": timezone.localtime(),
+    }
+    template = "lots/map_panel.html" if request.headers.get("HX-Request") == "true" else "lots/map.html"
+    return render(request, template, context)

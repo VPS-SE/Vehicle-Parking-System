@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Lot map · VPS{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/admin.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/lotmap.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="lotmap-page" aria-labelledby="lotmap-admin-heading">
+  <header class="lotmap-header">
+    <h1 id="lotmap-admin-heading">Lot map</h1>
+    <p>View each slot's live state and locate vehicles currently parked.</p>
+  </header>
+  {% include "lots/map_panel.html" %}
+</section>
+{% endblock %}

@@ -1,0 +1,197 @@
+.lotmap-page {
+  display: grid;
+  gap: 1rem;
+}
+
+.lotmap-header p,
+.lotmap-message,
+.lotmap-updated {
+  color: var(--text-2);
+}
+
+.lotmap-toolbar {
+  display: grid;
+  gap: 0.75rem;
+  align-items: end;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+}
+
+.lotmap-toolbar label {
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.lotmap-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.lotmap-stage {
+  background: var(--surface-solid);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+}
+
+#lot-map-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.lotmap-ground,
+.lotmap-driveway,
+.lotmap-gate-band,
+.lotmap-aisle {
+  fill: var(--surface-2);
+}
+
+.lotmap-ground {
+  fill: #5f6368;
+}
+
+.lotmap-driveway,
+.lotmap-gate-band,
+.lotmap-aisle {
+  fill: #6b7280;
+}
+
+.lotmap-barrier {
+  stroke: #f8fafc;
+  stroke-width: 4;
+}
+
+.lotmap-cabin {
+  fill: var(--surface-solid);
+  stroke: var(--text);
+}
+
+.lotmap-cabin-label,
+.lotmap-paint,
+.bay-label,
+.bay-mark {
+  fill: var(--surface-solid);
+  font-size: 11px;
+  font-weight: 700;
+  text-anchor: middle;
+  dominant-baseline: middle;
+}
+
+.lotmap-paint {
+  font-size: 14px;
+  letter-spacing: 0.08em;
+}
+
+.lotmap-arrow {
+  fill: none;
+  stroke: #f8fafc;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.lotmap-lane {
+  stroke: #f8fafc;
+  stroke-width: 2;
+  stroke-dasharray: 10 10;
+}
+
+.bay-shape {
+  fill: var(--grey-tint);
+  stroke: #f8fafc;
+  stroke-width: 1.5;
+}
+
+.bay--twowheeler .bay-shape {
+  fill: var(--blue-tint);
+  stroke: var(--blue);
+  stroke-width: 1;
+}
+
+.bay--standard .bay-shape {
+  fill: transparent;
+  stroke: #f8fafc;
+}
+
+.bay--ev .bay-shape {
+  fill: var(--green-tint);
+  stroke: var(--green);
+}
+
+.bay--accessible .bay-shape {
+  fill: var(--yellow-tint);
+  stroke: var(--yellow);
+}
+
+.bay--occupied .bay-shape {
+  fill: var(--red-tint);
+  stroke: var(--red);
+}
+
+.bay--reserved .bay-shape {
+  fill: var(--yellow-tint);
+  stroke: var(--yellow);
+}
+
+.bay--blocked .bay-shape {
+  fill: #d1d5db;
+  stroke: #6b7280;
+}
+
+.bay--you .bay-shape {
+  fill: var(--rose);
+  stroke: var(--rose);
+}
+
+.bay-link:focus-visible .bay-shape,
+.bay:focus-visible .bay-shape {
+  stroke: var(--focus);
+  stroke-width: 3;
+}
+
+.route {
+  fill: none;
+  stroke: var(--rose);
+  stroke-width: 3;
+  stroke-dasharray: 8 8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.lotmap-detail,
+.lotmap-list {
+  margin-top: 0.75rem;
+}
+
+.lotmap-state--free {
+  color: var(--green);
+}
+
+.lotmap-state--reserved {
+  color: var(--yellow);
+}
+
+.lotmap-state--occupied {
+  color: var(--red);
+}
+
+.lotmap-state--blocked {
+  color: var(--grey);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .bay--you .bay-shape {
+    animation: lotmap-pulse 1.8s ease-in-out infinite;
+  }
+}
+
+@keyframes lotmap-pulse {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 0 rgba(225, 29, 116, 0));
+  }
+  50% {
+    filter: drop-shadow(0 0 6px rgba(225, 29, 116, 0.6));
+  }
+}

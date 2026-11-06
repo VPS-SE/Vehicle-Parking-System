@@ -14,6 +14,7 @@ from django.views.decorators.http import require_GET, require_POST
 from vps.accounts.permissions import function_required
 from vps.accounts.roles import Function
 from vps.billing.models import Charge
+from vps.lots.plan import build_lot_plan
 from vps.reservations.forecast import forecast_panel
 from vps.reservations.forms import ReservationSearchForm
 from vps.reservations.models import Reservation
@@ -21,6 +22,37 @@ from vps.reservations.services import cancel_reservation, free_slots, reserve, v
 
 SEARCH_FIELDS = ("lot", "vehicle", "start", "end")
 SEARCH_PARAMS = (*SEARCH_FIELDS, "vehicle_type")
+
+
+def _route_points(route):
+    return " ".join(f"{x},{y}" for x, y in route)
+
+
+def _bay_views(plan, states=None, highlight=None, link_base=""):
+    states = states or {}
+    rows = []
+    for bay in plan.bays:
+        state = states.get(bay.slot_id)
+        rows.append(
+            {
+                "slot_id": bay.slot_id,
+                "code": bay.code,
+                "slot_type": bay.slot_type,
+                "state": state.state if state else "free",
+                "row": bay.row,
+                "x": bay.x,
+                "y": bay.y,
+                "w": bay.w,
+                "h": bay.h,
+                "label_x": bay.cx,
+                "label_y": bay.cy + 4,
+                "mark_x": bay.x + 5,
+                "mark_y": bay.y + 10,
+                "is_you": bay.slot_id == highlight,
+                "href": f"{link_base}slot={bay.slot_id}" if link_base else "",
+            }
+        )
+    return rows
 
 
 @require_GET
@@ -101,6 +133,9 @@ def reservation_confirmation(request, booking_ref):
         booking_ref=booking_ref,
         driver=request.user,
     )
+    plan = build_lot_plan(reservation.slot.lot.slots.all())
+    route = plan.route_to(reservation.slot_id)
+    bay = plan.bay_for(reservation.slot_id)
     return render(
         request,
         "reservations/confirmation.html",
@@ -108,6 +143,14 @@ def reservation_confirmation(request, booking_ref):
             "booking_reference": reservation.booking_ref,
             "slot_code": reservation.slot.code,
             "lot_name": reservation.slot.lot.name,
+            "reservation": reservation,
+            "plan": plan,
+            "highlight": reservation.slot_id,
+            "route": route,
+            "route_points": _route_points(route),
+            "bay_views": _bay_views(plan, highlight=reservation.slot_id),
+            "lot_id": reservation.slot.lot_id,
+            "you_row": bay.row if bay else None,
         },
     )
 
@@ -164,5 +207,32 @@ def booking_history(request):
         {
             "page_obj": page_obj,
             "reservations": page_obj.object_list,
+        },
+    )
+
+
+@require_GET
+@function_required(Function.OWN_RESERVATIONS)
+def slot_map(request, booking_ref):
+    reservation = get_object_or_404(
+        Reservation.objects.select_related("slot__lot", "driver"),
+        booking_ref=booking_ref,
+        driver=request.user,
+    )
+    plan = build_lot_plan(reservation.slot.lot.slots.all())
+    route = plan.route_to(reservation.slot_id)
+    bay = plan.bay_for(reservation.slot_id)
+    return render(
+        request,
+        "reservations/slot_map.html",
+        {
+            "reservation": reservation,
+            "plan": plan,
+            "highlight": reservation.slot_id,
+            "route": route,
+            "route_points": _route_points(route),
+            "bay_views": _bay_views(plan, highlight=reservation.slot_id),
+            "lot_id": reservation.slot.lot_id,
+            "you_row": bay.row if bay else None,
         },
     )

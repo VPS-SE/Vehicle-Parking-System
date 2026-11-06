@@ -5,6 +5,7 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/pages/driver.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/lotmap.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -56,6 +57,9 @@
                   {{ reservation.vehicle_reg_no }}
                   {% if reservation.status == "Completed" %}
                     <br><a href="{% url 'gate:printable_receipt' reservation.booking_ref %}">Receipt</a>
+                  {% endif %}
+                  {% if reservation.status == "Reserved" or reservation.status == "Active" %}
+                    <br><a href="{% url 'reservations:slot_map' reservation.booking_ref %}">View map</a>
                   {% endif %}
                 </td>
                 <td>{{ reservation.slot.lot.name }}</td>

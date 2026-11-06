@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}View map | Vehicle Parking System{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/driver.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/lotmap.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="lotmap-page" aria-labelledby="driver-map-heading">
+  <header class="lotmap-header">
+    <h1 id="driver-map-heading">View map</h1>
+    <p>Your slot: {{ reservation.slot.code }}, row {{ you_row }} from the entry gate, {{ reservation.slot.lot.name }}</p>
+  </header>
+
+  {% include "lots/_plan.html" %}
+
+  <p><a class="button-secondary" href="{% url 'reservations:history' %}">Back to My Bookings</a></p>
+</section>
+{% endblock %}

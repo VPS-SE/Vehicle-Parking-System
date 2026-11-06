@@ -1,0 +1,60 @@
+<div class="lotmap-stage" id="lotmap-stage">
+  {% if plan %}
+    <svg
+      id="lot-map-svg"
+      data-lot-id="{% if selected_lot %}{{ selected_lot.pk }}{% else %}{{ reservation.slot.lot_id }}{% endif %}"
+      viewBox="0 0 {{ plan.width }} {{ plan.height }}"
+      role="img"
+      aria-labelledby="lotmap-title lotmap-desc"
+    >
+      <title id="lotmap-title">Parking lot map</title>
+      <desc id="lotmap-desc">Entry gate at bottom left and exit at bottom right; bays labelled by slot code.</desc>
+
+      <rect class="lotmap-ground" x="0" y="0" width="{{ plan.width }}" height="{{ plan.height }}"></rect>
+      <rect class="lotmap-driveway" x="0" y="0" width="70" height="{{ plan.height }}"></rect>
+      <rect class="lotmap-gate-band" x="0" y="{{ plan.height|add:'-90' }}" width="{{ plan.width }}" height="90"></rect>
+      <line class="lotmap-lane" x1="35" y1="6" x2="35" y2="{{ plan.height|add:'-6' }}"></line>
+      <line class="lotmap-lane" x1="90" y1="{{ plan.height|add:'-45' }}" x2="{{ plan.width|add:'-20' }}" y2="{{ plan.height|add:'-45' }}"></line>
+
+      {% for aisle in plan.aisles %}
+        <rect class="lotmap-aisle" x="{{ aisle.x }}" y="{{ aisle.y }}" width="{{ aisle.w }}" height="{{ aisle.h }}"></rect>
+        <line class="lotmap-lane" x1="{{ aisle.x|add:'8' }}" y1="{{ aisle.y|add:'30' }}" x2="{{ aisle.x|add:aisle.w|add:'-8' }}" y2="{{ aisle.y|add:'30' }}"></line>
+      {% endfor %}
+
+      <line class="lotmap-barrier" x1="26" y1="{{ plan.height|add:'-37' }}" x2="72" y2="{{ plan.height|add:'-37' }}"></line>
+      <rect class="lotmap-cabin" x="8" y="{{ plan.height|add:'-74' }}" width="22" height="26"></rect>
+      <text class="lotmap-cabin-label" x="10" y="{{ plan.height|add:'-58' }}">SEC</text>
+
+      <text class="lotmap-paint" x="25" y="{{ plan.height|add:'-12' }}">ENTRY</text>
+      <text class="lotmap-paint" x="{{ plan.width|add:'-88' }}" y="{{ plan.height|add:'-12' }}">EXIT</text>
+      <path class="lotmap-arrow" d="M24 {{ plan.height|add:'-58' }} h24 l-6 -6 m6 6 l-6 6"></path>
+      <path class="lotmap-arrow" d="M24 {{ plan.height|add:'-82' }} h24 l-6 -6 m6 6 l-6 6"></path>
+      {% for bay in bay_views %}
+        {% if bay.href %}
+          <a class="bay-link" href="{{ bay.href }}" aria-label="{{ bay.code }}, {{ bay.state }}">
+        {% endif %}
+        <g
+          class="bay bay--{{ bay.slot_type|lower }} bay--{{ bay.state }}{% if bay.is_you %} bay--you{% endif %}"
+          data-slot-id="{{ bay.slot_id }}"
+          data-code="{{ bay.code }}"
+          data-type="{{ bay.slot_type }}"
+          data-state="{{ bay.state }}"
+          {% if bay.is_you %}data-you="true"{% endif %}
+        >
+          <rect class="bay-shape" x="{{ bay.x }}" y="{{ bay.y }}" width="{{ bay.w }}" height="{{ bay.h }}"></rect>
+          {% if bay.slot_type == "EV" %}
+            <text class="bay-mark bay-mark--ev" x="{{ bay.mark_x }}" y="{{ bay.mark_y }}">⚡</text>
+          {% elif bay.slot_type == "Accessible" %}
+            <text class="bay-mark bay-mark--accessible" x="{{ bay.mark_x }}" y="{{ bay.mark_y }}">♿</text>
+          {% endif %}
+          <text class="bay-label" x="{{ bay.label_x }}" y="{{ bay.label_y }}">{{ bay.code }}</text>
+        </g>
+        {% if bay.href %}
+          </a>
+        {% endif %}
+      {% endfor %}
+
+      <polyline id="lot-route" class="route" points="{{ route_points }}"></polyline>
+    </svg>
+  {% endif %}
+</div>
