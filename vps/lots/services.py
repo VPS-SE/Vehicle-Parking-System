@@ -1,16 +1,19 @@
 """Parking-lot business rules, shared by HTTP and non-HTTP callers."""
 
+from dataclasses import dataclass
 from datetime import datetime
 
 from django.contrib.postgres.fields.ranges import DateTimeTZRange
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, transaction
-from django.db.models import Exists, OuterRef
+from django.db.models import Exists, OuterRef, Subquery
 from django.utils import timezone
 
 from vps.audit.models import AuditLog
 from vps.audit.services import log_action
 from vps.lots.models import Lot, Slot, SlotBlock, Tariff
+from vps.reservations.models import Reservation
+from vps.vehicles.services import normalise_registration
 
 DUPLICATE_MESSAGE = "A parking lot with this name and address already exists. Change either field."
 REQUIRED_MESSAGES = {
@@ -373,6 +376,85 @@ def create_tariff(
 OCCUPANCY_STATES = ("free", "reserved", "occupied", "blocked")
 
 
+@dataclass(frozen=True)
+class SlotState:
+    state: str
+    reservation: Reservation | None
+
+
+def _slots_with_flags(queryset, now):
+    active_reservation = Reservation.objects.filter(
+        slot=OuterRef("pk"),
+        status=Reservation.Status.ACTIVE,
+    ).order_by("pk")
+    reserved_reservation = Reservation.objects.filter(
+        slot=OuterRef("pk"),
+        status=Reservation.Status.RESERVED,
+        period__contains=now,
+    ).order_by("period__startswith", "pk")
+    return queryset.annotate(
+        is_occupied=Exists(active_reservation),
+        is_blocked=Exists(SlotBlock.objects.filter(slot=OuterRef("pk"), period__contains=now)),
+        is_reserved=Exists(
+            Reservation.objects.filter(
+                slot=OuterRef("pk"),
+                status=Reservation.Status.RESERVED,
+                period__contains=now,
+            )
+        ),
+        active_reservation_id=Subquery(active_reservation.values("pk")[:1]),
+        reserved_reservation_id=Subquery(reserved_reservation.values("pk")[:1]),
+    )
+
+
+def lot_map_state(lot, now=None) -> dict[int, SlotState]:
+    now = now or timezone.now()
+    slots = list(_slots_with_flags(Slot.objects.filter(lot=lot).order_by("code"), now))
+    reservation_ids = {
+        reservation_id
+        for slot in slots
+        for reservation_id in (slot.active_reservation_id, slot.reserved_reservation_id)
+        if reservation_id is not None
+    }
+    reservations = {
+        reservation.pk: reservation
+        for reservation in Reservation.objects.filter(pk__in=reservation_ids).select_related(
+            "slot__lot", "driver"
+        )
+    }
+    result = {}
+    for slot in slots:
+        if slot.is_occupied:
+            result[slot.pk] = SlotState(
+                state="occupied",
+                reservation=reservations.get(slot.active_reservation_id),
+            )
+        elif slot.is_blocked:
+            result[slot.pk] = SlotState(state="blocked", reservation=None)
+        elif slot.is_reserved:
+            result[slot.pk] = SlotState(
+                state="reserved",
+                reservation=reservations.get(slot.reserved_reservation_id),
+            )
+        else:
+            result[slot.pk] = SlotState(state="free", reservation=None)
+    return result
+
+
+def find_parked_vehicle(registration: str):
+    if not registration or not registration.strip():
+        return None
+    normalised = normalise_registration(registration.replace("-", ""))
+    if not normalised:
+        return None
+    return (
+        Reservation.objects.select_related("slot__lot", "driver")
+        .filter(status=Reservation.Status.ACTIVE, vehicle_reg_no=normalised)
+        .order_by("-entry_time", "-pk")
+        .first()
+    )
+
+
 def lot_occupancy(now=None):
     """FR-SRCH-03: free, reserved, occupied and blocked slots per active lot and slot type.
 
@@ -380,26 +462,12 @@ def lot_occupancy(now=None):
     parked, even one overstaying its window), blocked (a block covers now), reserved (a
     Reserved booking's window covers now), otherwise free. One query for all lots.
     """
-    from vps.reservations.models import Reservation
-
     now = now or timezone.now()
-    slots = (
+    slots = _slots_with_flags(
         Slot.objects.filter(lot__is_archived=False)
-        .annotate(
-            is_occupied=Exists(
-                Reservation.objects.filter(slot=OuterRef("pk"), status=Reservation.Status.ACTIVE)
-            ),
-            is_blocked=Exists(SlotBlock.objects.filter(slot=OuterRef("pk"), period__contains=now)),
-            is_reserved=Exists(
-                Reservation.objects.filter(
-                    slot=OuterRef("pk"),
-                    status=Reservation.Status.RESERVED,
-                    period__contains=now,
-                )
-            ),
-        )
         .select_related("lot")
-        .order_by("lot__name", "lot_id", "slot_type")
+        .order_by("lot__name", "lot_id", "slot_type"),
+        now,
     )
     rows = {}
     for slot in slots:

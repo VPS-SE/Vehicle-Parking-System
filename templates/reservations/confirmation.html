@@ -6,6 +6,7 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/pages/driver.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/lotmap.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -41,6 +42,13 @@
         Back to parking search
       </a>
     </div>
+
+    {% if plan %}
+      <section class="lotmap-inline card" aria-label="Your slot map">
+        <p>Your slot: {{ slot_code }}, row {{ you_row }} from the entry gate, {{ lot_name }}</p>
+        {% include "lots/_plan.html" %}
+      </section>
+    {% endif %}
 
   {% else %}
     <div class="booking-card">
@@ -101,4 +109,5 @@
     </div>
   {% endif %}
 </section>
+{% if plan %}<script type="module" src="{% static 'js/lotmap.js' %}"></script>{% endif %}
 {% endblock %}

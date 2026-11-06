@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}View map | Vehicle Parking System{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/driver.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/lotmap.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="lotmap-page" aria-labelledby="driver-map-heading">
+  <header class="lotmap-header lotmap-header--driver">
+    <p class="lotmap-eyebrow">{{ reservation.slot.lot.name }}</p>
+    <h1 id="driver-map-heading">View map</h1>
+    <p>Your slot: {{ reservation.slot.code }}, row {{ you_row }} from the entry gate, {{ reservation.slot.lot.name }}</p>
+  </header>
+  <div class="lotmap-ticket card" aria-hidden="true">
+    <div class="lotmap-ticket__slot"><span>Slot</span><strong>{{ reservation.slot.code }}</strong></div>
+    <div class="lotmap-ticket__item"><span>Row from gate</span><strong>{{ you_row }}</strong></div>
+    <div class="lotmap-ticket__item"><span>Vehicle</span><strong>{{ reservation.vehicle_reg_no }}</strong></div>
+    <div class="lotmap-ticket__item"><span>Booking</span><strong>{{ reservation.booking_ref }}</strong></div>
+    <p class="lotmap-ticket__hint">Enter at the gate, keep left, and follow the pink line.</p>
+  </div>
+
+  {% include "lots/_plan.html" %}
+
+  <p><a class="button-secondary" href="{% url 'reservations:history' %}">Back to My Bookings</a></p>
+</section>
+<script type="module" src="{% static 'js/lotmap.js' %}"></script>
+{% endblock %}

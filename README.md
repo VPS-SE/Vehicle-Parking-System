@@ -65,6 +65,7 @@ with race-safe slot allocation and a machine-learning availability forecast.
 - Search free slots by lot, vehicle and time
 - See the forecast chance of a free slot on arrival
 - Book with a confirmation page, email and booking reference
+- See your reserved or active bay on a lot map
 - Cancel bookings
 - Booking history with any unpaid balance
 
@@ -83,6 +84,7 @@ with race-safe slot allocation and a machine-learning availability forecast.
 <td>
 
 - Create, edit, archive and restore lots
+- Lot map with live free, reserved, occupied and blocked bays
 - Tariffs per slot type
 - Block a slot for a period; its bookings move elsewhere
 - Live occupancy across lots
@@ -175,6 +177,7 @@ Load the demo data (a 500-slot lot, 120 drivers and 30 days of bookings):
 
 ```sh
 docker compose exec web python manage.py seed_demo_data --seed 2026
+docker compose exec web python manage.py seed_pes_lots
 ```
 
 > [!NOTE]

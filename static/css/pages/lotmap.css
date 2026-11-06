@@ -1,0 +1,873 @@
+/* Lot map: Daylight styling for the generated plan, plus the dynamic layer from js/lotmap.js.
+   Every animation sits behind prefers-reduced-motion: no-preference. */
+
+.lotmap-page {
+  display: grid;
+  gap: 1.1rem;
+}
+
+.lotmap-header p,
+.lotmap-message,
+.lotmap-updated {
+  color: var(--text-2);
+}
+
+.lotmap-eyebrow {
+  margin: 0 0 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--lavender);
+}
+
+/* Toolbar --------------------------------------------------------------- */
+.lotmap-toolbar {
+  display: grid;
+  grid-template-columns: minmax(14rem, 1.1fr) minmax(14rem, 1.4fr) auto;
+  gap: 1rem;
+  align-items: end;
+}
+
+.lotmap-toolbar__field label {
+  display: block;
+  margin-bottom: 0.4rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+.lotmap-toolbar__field select,
+.lotmap-toolbar__field input {
+  width: 100%;
+}
+
+.lotmap-toolbar__actions {
+  display: flex;
+  gap: 0.6rem;
+}
+
+@media (max-width: 760px) {
+  .lotmap-toolbar {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Search suggestions ------------------------------------------------------ */
+.lotmap-search {
+  position: relative;
+}
+
+.lotmap-suggest {
+  position: absolute;
+  z-index: 30;
+  inset: calc(100% + 6px) 0 auto 0;
+  margin: 0;
+  padding: 0.35rem;
+  list-style: none;
+  background: rgba(255, 255, 255, 0.985);
+  -webkit-backdrop-filter: var(--glass);
+  backdrop-filter: var(--glass);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  box-shadow: var(--shadow-card);
+  opacity: 0;
+  transform: translateY(-6px) scale(0.98);
+  transform-origin: top center;
+  pointer-events: none;
+}
+
+.lotmap-suggest.is-open {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+
+.lotmap-suggest__item {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.65rem 0.8rem;
+  border-radius: 12px;
+  cursor: pointer;
+  color: var(--text);
+}
+
+.lotmap-suggest__item span {
+  color: var(--text-2);
+  font-size: 0.875rem;
+}
+
+.lotmap-suggest__item:hover,
+.lotmap-suggest__item[aria-selected="true"] {
+  background: rgba(225, 29, 116, 0.08);
+}
+
+/* Live stats ------------------------------------------------------------- */
+.lotmap-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) auto;
+  gap: 0.75rem;
+  align-items: stretch;
+}
+
+.lotmap-stat {
+  display: grid;
+  gap: 0.2rem;
+  padding: 0.85rem 1rem;
+  background: var(--surface-solid);
+  border: 1px solid var(--border);
+  border-top: 4px solid var(--grey-fill);
+  border-radius: 18px;
+  box-shadow: var(--shadow-card);
+}
+
+.lotmap-stat--free { border-top-color: var(--green-fill); }
+.lotmap-stat--reserved { border-top-color: var(--yellow-fill); }
+.lotmap-stat--occupied { border-top-color: var(--red-fill); }
+
+.lotmap-stat__label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+
+.lotmap-stat__value {
+  font-family: "Inter Tight", "Inter", sans-serif;
+  font-size: clamp(1.6rem, 3vw, 2.1rem);
+  font-weight: 800;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+  display: inline-block;
+}
+
+.lotmap-stat--free .lotmap-stat__value { color: var(--green-bright); }
+.lotmap-stat--reserved .lotmap-stat__value { color: var(--yellow-bright); }
+.lotmap-stat--occupied .lotmap-stat__value { color: var(--red-bright); }
+.lotmap-stat--blocked .lotmap-stat__value { color: var(--grey-bright); }
+
+.lotmap-live {
+  align-self: center;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0.5rem 0.9rem;
+  border-radius: var(--radius-pill);
+  background: var(--green-tint);
+  color: var(--green);
+  font-size: 0.875rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.lotmap-live__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--green-fill);
+  box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.5);
+}
+
+@media (max-width: 760px) {
+  .lotmap-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .lotmap-live {
+    grid-column: 1 / -1;
+    justify-self: start;
+  }
+}
+
+/* Filters --------------------------------------------------------------- */
+.lotmap-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem 1.2rem;
+}
+
+.lotmap-filters:empty {
+  display: none;
+}
+
+.lotmap-filters__group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.lotmap-filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 44px;
+  padding: 0.4rem 0.9rem;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-pill);
+  background: var(--surface-solid);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.lotmap-filter__count {
+  min-width: 1.6em;
+  padding: 0.05rem 0.45rem;
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
+  color: var(--text-2);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.lotmap-filter[aria-pressed="true"] {
+  background: var(--text);
+  border-color: var(--text);
+  color: var(--surface-solid);
+}
+
+.lotmap-filter[aria-pressed="true"] .lotmap-filter__count {
+  background: rgba(255, 255, 255, 0.18);
+  color: var(--surface-solid);
+}
+
+/* Legend (no-JS fallback) ------------------------------------------------- */
+.lotmap-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.lotmap-state--free { color: var(--green); background: var(--green-tint); }
+.lotmap-state--reserved { color: var(--yellow); background: var(--yellow-tint); }
+.lotmap-state--occupied { color: var(--red); background: var(--red-tint); }
+.lotmap-state--blocked { color: var(--grey); background: var(--grey-tint); }
+
+/* Driver ticket ----------------------------------------------------------- */
+.lotmap-ticket {
+  display: grid;
+  grid-template-columns: auto repeat(3, minmax(0, 1fr));
+  gap: 1rem 1.5rem;
+  align-items: center;
+}
+
+.lotmap-ticket span {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+
+.lotmap-ticket strong {
+  font-family: "Inter Tight", "Inter", sans-serif;
+  font-size: 1.15rem;
+  color: var(--text);
+}
+
+.lotmap-ticket__slot {
+  padding: 0.8rem 1.2rem;
+  border-radius: 18px;
+  background: var(--sunset);
+}
+
+.lotmap-ticket__slot span,
+.lotmap-ticket__slot strong {
+  color: var(--on-sunset);
+}
+
+.lotmap-ticket__slot strong {
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.lotmap-ticket__hint {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: var(--text-2);
+}
+
+@media (max-width: 760px) {
+  .lotmap-ticket {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .lotmap-ticket__slot {
+    grid-column: 1 / -1;
+  }
+}
+
+/* Stage ------------------------------------------------------------------ */
+.lotmap-stage {
+  position: relative;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.lotmap-stage:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+}
+
+#lot-map-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* With JavaScript the stage becomes a fixed-height, pannable viewport. */
+.lotmap-stage.is-enhanced {
+  height: clamp(420px, 68vh, 760px);
+  touch-action: none;
+}
+
+.lotmap-world {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform-origin: 0 0;
+}
+
+.lotmap-stage.is-enhanced #lot-map-svg {
+  cursor: grab;
+}
+
+.lotmap-overlay {
+  position: absolute;
+  left: 0;
+  top: 0;
+  pointer-events: none;
+  overflow: visible;
+  will-change: opacity;
+}
+
+.lotmap-stage.is-dragging #lot-map-svg {
+  cursor: grabbing;
+}
+
+/* Ground, lanes and furniture -------------------------------------------- */
+.lotmap-ground { fill: var(--bg-2); }
+
+.lotmap-driveway,
+.lotmap-gate-band,
+.lotmap-aisle {
+  fill: #dfe4ec;
+}
+
+.lotmap-lane {
+  stroke: #ffffff;
+  stroke-width: 2.5;
+  stroke-dasharray: 12 10;
+  stroke-linecap: round;
+}
+
+.lotmap-arrow {
+  fill: none;
+  stroke: #ffffff;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.lotmap-barrier {
+  stroke: #f43f5e;
+  stroke-width: 4;
+  stroke-dasharray: 7 5;
+  stroke-linecap: round;
+}
+
+.lotmap-cabin {
+  fill: var(--surface-solid);
+  stroke: #94a3b8;
+  stroke-width: 1.5;
+  rx: 4;
+}
+
+.lotmap-cabin-label {
+  fill: var(--text-2);
+  font-size: 7px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.lotmap-paint {
+  fill: #64748b;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.22em;
+  text-anchor: middle;
+}
+
+.lotmap-hatch-bg { fill: var(--grey-tint); }
+.lotmap-hatch-line { stroke: #94a3b8; stroke-width: 2; }
+
+/* Bays ------------------------------------------------------------------- */
+.bay-shape {
+  fill: var(--surface-solid);
+  stroke: #c3cbd8;
+  stroke-width: 1.2;
+  rx: 3;
+}
+
+.bay--twowheeler .bay-shape { stroke: #7dd3fc; }
+.bay--ev .bay-shape { stroke: var(--green-fill); }
+.bay--accessible .bay-shape { stroke: var(--yellow-fill); }
+
+.bay--reserved .bay-shape {
+  fill: var(--yellow-tint);
+  stroke: var(--yellow-fill);
+  stroke-width: 1.6;
+}
+
+.bay--occupied .bay-shape {
+  fill: var(--red-tint);
+  stroke: var(--red-fill);
+  stroke-width: 1.6;
+}
+
+.bay--blocked .bay-shape {
+  fill: url(#lotmap-hatch);
+  stroke: #94a3b8;
+}
+
+.bay--you .bay-shape {
+  fill: var(--rose);
+  stroke: var(--rose);
+  stroke-width: 2;
+  filter: url(#lotmap-soft);
+}
+
+.bay-label,
+.bay-mark {
+  fill: var(--text-2);
+  font-size: 9px;
+  font-weight: 700;
+  text-anchor: middle;
+  dominant-baseline: middle;
+  pointer-events: none;
+}
+
+.bay--twowheeler .bay-label {
+  font-size: 7.5px;
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: rotate(-90deg);
+}
+
+.bay--you .bay-label {
+  fill: #ffffff;
+}
+
+.bay-mark {
+  font-size: 9px;
+  text-anchor: start;
+}
+
+.bay-link:focus-visible .bay-shape,
+.bay:focus-visible .bay-shape {
+  stroke: var(--focus);
+  stroke-width: 3;
+}
+
+.bay.is-dim {
+  opacity: 0.15;
+}
+
+.bay.is-found .bay-shape {
+  stroke: var(--rose);
+  stroke-width: 3;
+}
+
+/* Route and marker ------------------------------------------------------ */
+.route {
+  fill: none;
+  stroke: var(--rose);
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.route.is-drawn {
+  stroke-dasharray: 2 9;
+}
+
+.lotmap-marker {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 26px;
+  height: 26px;
+  margin: -13px 0 0 -13px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--surface-solid);
+  border: 2.5px solid var(--rose);
+  box-shadow: 0 0 0 6px rgba(225, 29, 116, 0.16), 0 6px 14px rgba(15, 23, 42, 0.18);
+  pointer-events: none;
+  will-change: transform;
+}
+
+.lotmap-marker__glyph {
+  font-size: 13px;
+  line-height: 1;
+}
+
+.lotmap-marker.is-parked {
+  opacity: 0;
+  transform-origin: center;
+}
+
+.lotmap-beacon {
+  position: absolute;
+  width: var(--size);
+  height: var(--size);
+  margin: calc(var(--size) / -2) 0 0 calc(var(--size) / -2);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(225, 29, 116, 0.35) 0%, rgba(225, 29, 116, 0) 70%);
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+.lotmap-ripple {
+  position: absolute;
+  border-radius: 50%;
+  border: 3px solid currentColor;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+.lotmap-ripple--free { color: var(--green-fill); }
+.lotmap-ripple--reserved { color: var(--yellow-fill); }
+.lotmap-ripple--occupied { color: var(--red-fill); }
+.lotmap-ripple--blocked { color: #94a3b8; }
+
+/* Labels fade in as you zoom (two-wheeler codes are tiny at full view). */
+.lotmap-stage.is-enhanced .bay--twowheeler .bay-label {
+  opacity: clamp(0, calc((var(--zoom, 1) - 1.25) * 2.2), 1);
+}
+
+.lotmap-stage.is-enhanced .bay--you .bay-label {
+  opacity: 1;
+}
+
+/* Floating controls ------------------------------------------------------ */
+.lotmap-controls {
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+  z-index: 5;
+  display: grid;
+  gap: 6px;
+  padding: 6px;
+  background: rgba(255, 255, 255, 0.82);
+  -webkit-backdrop-filter: var(--glass);
+  backdrop-filter: var(--glass);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  box-shadow: var(--shadow-card);
+}
+
+.lotmap-ctl {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 1.25rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: none;
+}
+
+.lotmap-ctl--fit {
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.lotmap-ctl:hover {
+  background: rgba(15, 23, 42, 0.06);
+}
+
+/* Mini-map --------------------------------------------------------------- */
+.lotmap-minimap-wrap {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 5;
+  width: 168px;
+  padding: 6px;
+  background: rgba(255, 255, 255, 0.82);
+  -webkit-backdrop-filter: var(--glass);
+  backdrop-filter: var(--glass);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: var(--shadow-card);
+}
+
+.lotmap-minimap {
+  display: block;
+  width: 100%;
+  height: auto;
+  cursor: pointer;
+  border-radius: 10px;
+  background: #dfe4ec;
+}
+
+.lotmap-minimap__bay { fill: #ffffff; }
+.lotmap-minimap__bay--reserved { fill: var(--yellow-fill); }
+.lotmap-minimap__bay--occupied { fill: var(--red-fill); }
+.lotmap-minimap__bay--blocked { fill: #94a3b8; }
+
+.lotmap-minimap__frame {
+  fill: rgba(225, 29, 116, 0.08);
+  stroke: var(--rose);
+  stroke-width: 6;
+  vector-effect: non-scaling-stroke;
+  rx: 8;
+}
+
+@media (max-width: 600px) {
+  .lotmap-minimap-wrap {
+    display: none;
+  }
+}
+
+/* Hover card ------------------------------------------------------------- */
+.lotmap-card {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 6;
+  min-width: 200px;
+  max-width: 260px;
+  padding: 0.85rem 1rem;
+  background: rgba(255, 255, 255, 0.9);
+  -webkit-backdrop-filter: var(--glass);
+  backdrop-filter: var(--glass);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  box-shadow: 0 18px 48px rgba(15, 23, 42, 0.16);
+  pointer-events: none;
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+.lotmap-card.is-visible {
+  opacity: 1;
+}
+
+.lotmap-card__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.lotmap-card__code {
+  font-family: "Inter Tight", "Inter", sans-serif;
+  font-size: 1.15rem;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+
+.lotmap-card__type,
+.lotmap-card__meta {
+  color: var(--text-2);
+  font-size: 0.85rem;
+}
+
+.lotmap-card__reg {
+  margin-top: 0.4rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--text);
+}
+
+.lotmap-card__you {
+  margin-top: 0.45rem;
+  font-weight: 700;
+  color: var(--rose);
+}
+
+.lotmap-chip {
+  padding: 0.15rem 0.6rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.lotmap-chip--free { background: var(--green-tint); color: var(--green); }
+.lotmap-chip--reserved { background: var(--yellow-tint); color: var(--yellow); }
+.lotmap-chip--occupied { background: var(--red-tint); color: var(--red); }
+.lotmap-chip--blocked { background: var(--grey-tint); color: var(--grey); }
+
+.lotmap-detail,
+.lotmap-list {
+  margin-top: 0.25rem;
+}
+
+/* Motion ----------------------------------------------------------------- */
+@media (prefers-reduced-motion: no-preference) {
+  .bay-shape {
+    transition: fill 600ms var(--ease), stroke 600ms var(--ease), stroke-width 300ms var(--ease);
+  }
+
+  .bay {
+    transition: opacity 360ms var(--ease);
+  }
+
+  .lotmap-stage.is-enhanced #lot-map-svg {
+    opacity: 0;
+    transform: scale(0.985);
+    transition: opacity 700ms var(--ease-out), transform 900ms var(--ease-out);
+  }
+
+  .lotmap-stage.is-ready #lot-map-svg {
+    opacity: 1;
+    transform: none;
+  }
+
+  .lotmap-stage.is-leaving #lot-map-svg {
+    opacity: 0;
+    transform: scale(0.985);
+    transition-duration: 220ms;
+  }
+
+  .lotmap-stage.is-enhanced .bay-label {
+    transition: opacity 260ms var(--ease);
+  }
+
+  .lotmap-beacon {
+    animation: lotmap-beacon 2s ease-out infinite;
+  }
+
+  .lotmap-marker.is-parked {
+    transition: opacity 500ms var(--ease) 200ms;
+  }
+
+  .lotmap-card {
+    transition: opacity 220ms var(--ease);
+  }
+
+  .lotmap-suggest {
+    transition: opacity 200ms var(--ease), transform 260ms var(--ease-out);
+  }
+
+  .lotmap-filter {
+    transition: background 220ms var(--ease), color 220ms var(--ease), border-color 220ms var(--ease), transform 160ms var(--ease);
+  }
+
+  .lotmap-filter:active,
+  .lotmap-ctl:active {
+    transform: scale(0.96);
+  }
+
+  .lotmap-live__dot {
+    animation: lotmap-live 1.8s ease-out infinite;
+  }
+
+  .lotmap-stat__value.is-up {
+    animation: lotmap-bump-up 700ms var(--ease-out);
+  }
+
+  .lotmap-stat__value.is-down {
+    animation: lotmap-bump-down 700ms var(--ease-out);
+  }
+
+  .lotmap-ticket,
+  .lotmap-stats,
+  .lotmap-filters {
+    animation: lotmap-rise 700ms var(--ease-out) both;
+  }
+
+  .lotmap-filters { animation-delay: 80ms; }
+}
+
+@keyframes lotmap-beacon {
+  0% { transform: scale(0.6); opacity: 0.95; }
+  100% { transform: scale(1.8); opacity: 0; }
+}
+
+@keyframes lotmap-live {
+  0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.55); }
+  100% { box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); }
+}
+
+@keyframes lotmap-bump-up {
+  0% { transform: translateY(6px); }
+  100% { transform: none; }
+}
+
+@keyframes lotmap-bump-down {
+  0% { transform: translateY(-6px); }
+  100% { transform: none; }
+}
+
+@keyframes lotmap-rise {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* Smooth page-to-page transitions where the browser supports them. */
+@view-transition {
+  navigation: auto;
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* The page's own <header> must not inherit the sticky site header styles. */
+header.lotmap-header {
+  position: static;
+  display: block;
+  padding: 0;
+  background: none;
+  border: 0;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  box-shadow: none;
+}
+
+header.lotmap-header h1 {
+  margin: 0 0 0.35rem;
+}
+
+#lot-map-panel {
+  display: grid;
+  gap: 1rem;
+}
+
+/* With JavaScript the filter chips replace the static legend. */
+.lotmap-page:has(.lotmap-stage.is-enhanced) .lotmap-legend {
+  display: none;
+}
+
+.bay-link {
+  text-decoration: none;
+}

@@ -35,6 +35,8 @@
         {% elif user.role == "Admin" %}
           {% url 'lots:list' as url_lots %}
           <a class="nav-link{% if request.path == url_lots %} active{% endif %}" href="{{ url_lots }}">Parking lots</a>
+          {% url 'lots:map' as url_lot_map %}
+          <a class="nav-link{% if request.path == url_lot_map %} active{% endif %}" href="{{ url_lot_map }}">Lot map</a>
           {% url 'lots:tariffs' as url_tariffs %}
           <a class="nav-link{% if request.path == url_tariffs %} active{% endif %}" href="{{ url_tariffs }}">Tariffs</a>
           {% url 'reports:revenue' as url_rev %}
