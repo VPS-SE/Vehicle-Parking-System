@@ -1899,6 +1899,13 @@ table td.numeric {
   font-weight: 700;
 }
 
+/* Count columns: header, body and total all right-aligned so digits line up. */
+.occ-table thead th:not(:first-child),
+.occ-table tfoot td {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
 .occ-table tfoot th {
   background: var(--surface-2);
   color: var(--text);
