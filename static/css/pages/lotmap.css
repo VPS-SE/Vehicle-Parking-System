@@ -65,7 +65,7 @@
   margin: 0;
   padding: 0.35rem;
   list-style: none;
-  background: rgba(255, 255, 255, 0.92);
+  background: rgba(255, 255, 255, 0.985);
   -webkit-backdrop-filter: var(--glass);
   backdrop-filter: var(--glass);
   border: 1px solid var(--border);
