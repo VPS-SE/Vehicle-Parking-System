@@ -1,0 +1,3 @@
+Method,Name,Error,Occurrences,First Seen,Last Seen
+GET,/reservations/search/,HTTPError('500 Server Error: Internal Server Error for url: /reservations/search/'),481,2026-11-05T15:23:09Z,2026-11-05T15:24:28Z
+GET,/lots/occupancy/,HTTPError('500 Server Error: Internal Server Error for url: /lots/occupancy/'),163,2026-11-05T15:23:09Z,2026-11-05T15:24:19Z
