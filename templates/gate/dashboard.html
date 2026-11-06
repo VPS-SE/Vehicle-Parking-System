@@ -1,6 +1,11 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Gate Operations | Vehicle Parking System{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/gate.css' %}">
+{% endblock %}
 
 {% block content %}
 <section class="gate-page" aria-labelledby="gate-heading">

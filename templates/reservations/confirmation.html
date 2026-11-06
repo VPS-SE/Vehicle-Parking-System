@@ -1,7 +1,12 @@
 
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Booking Confirmation | Vehicle Parking System{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/driver.css' %}">
+{% endblock %}
 
 {% block content %}
 <section class="booking-page" aria-labelledby="booking-heading">

@@ -1,0 +1,313 @@
+/* ==========================================================================
+   Gate Pages Styles
+   Gate Dashboard, Walk-in, Checkout, Correct Entry, Payments, Receipt
+   Uses design tokens from vps.css
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Gate Console / Dashboard (Three Big Glass Panels)
+   -------------------------------------------------------------------------- */
+.gate-panels {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+@media (min-width: 960px) {
+  .gate-panels {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: stretch;
+  }
+
+  .gate-panel:last-child {
+    grid-column: auto;
+  }
+}
+
+.gate-panel {
+  background: var(--surface);
+  -webkit-backdrop-filter: var(--glass);
+  backdrop-filter: var(--glass);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  padding: clamp(1.25rem, 2.5vw, 1.75rem);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 20px 40px rgba(0, 0, 0, 0.35);
+  display: flex;
+  flex-direction: column;
+}
+
+.gate-panel h2 {
+  font-size: 1.35rem;
+  margin-top: 0;
+  margin-bottom: 0.4rem;
+  color: var(--text);
+}
+
+.gate-panel p {
+  color: var(--text-2);
+  font-size: 0.95rem;
+  margin-bottom: 1.25rem;
+}
+
+.gate-form {
+  display: grid;
+  gap: 0.85rem;
+  margin-top: auto;
+}
+
+.gate-form label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+/* Scanner-friendly 56px inputs with 20px font */
+.gate-form input[type="text"],
+.gate-form input[name="reference"],
+.gate-form input[name="registration_no"],
+.gate-form select,
+.gate-input-scanner {
+  min-height: 56px;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-field);
+  background-color: var(--surface-2);
+  border: 1px solid var(--border-strong);
+  color: var(--text);
+  color-scheme: dark;
+}
+
+.gate-form button {
+  min-height: 48px;
+  font-size: 16px;
+  font-weight: 600;
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+/* --------------------------------------------------------------------------
+   Outage & Form Fieldsets (Checkout & Correct Entry)
+   -------------------------------------------------------------------------- */
+fieldset.outage-fieldset {
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-field);
+  padding: 1.25rem;
+  margin: 1.5rem 0;
+  background: color-mix(in srgb, var(--surface-2) 45%, transparent);
+}
+
+fieldset.outage-fieldset legend {
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--lavender);
+  padding: 0 0.5rem;
+}
+
+fieldset.outage-fieldset p {
+  color: var(--text-2);
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+/* --------------------------------------------------------------------------
+   Gate Payments Page
+   -------------------------------------------------------------------------- */
+.payments-search-card {
+  margin-bottom: 1.75rem;
+}
+
+.payments-form-inline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.payments-form-inline select {
+  min-height: 44px;
+  min-width: 110px;
+  padding: 0.45rem 0.75rem;
+  font-size: 14px;
+  width: auto;
+}
+
+.payments-form-inline button {
+  min-height: 44px;
+  padding: 0.45rem 1rem;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.payments-table {
+  min-width: 50rem;
+}
+
+.payments-table caption {
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  text-align: left;
+  padding: 1rem;
+  color: var(--text);
+}
+
+/* Visually Hidden Helper (accessible for screen readers & axe) */
+.visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+/* --------------------------------------------------------------------------
+   Receipt Page
+   -------------------------------------------------------------------------- */
+.receipt-table-wrapper {
+  margin: 1.5rem 0;
+  outline: none;
+}
+
+.receipt-table-wrapper:focus-visible {
+  outline: 2px solid var(--pink);
+  outline-offset: -2px;
+}
+
+.receipt-nav-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.receipt-nav-links a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0.5rem 1.1rem;
+  border-radius: var(--radius-pill);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  background: var(--surface-2);
+  border: 1px solid var(--border-strong);
+  color: var(--text);
+}
+
+.receipt-nav-links a:hover {
+  background: color-mix(in srgb, var(--text) 8%, transparent);
+}
+
+.receipt-nav-links a:first-child {
+  background: var(--sunset);
+  color: var(--on-sunset);
+  border: none;
+}
+
+/* --------------------------------------------------------------------------
+   Print Styles (Media Print: black on white, no glass, no nav)
+   -------------------------------------------------------------------------- */
+@media print {
+  @page {
+    size: auto;
+    margin: 12mm;
+  }
+
+  html,
+  body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  header,
+  .site-nav,
+  .bg-glow,
+  .receipt-nav-links,
+  .gate-modes,
+  .gate-footnote {
+    display: none !important;
+  }
+
+  .booking-card,
+  .gate-panel,
+  .card,
+  .receipt-card {
+    background: #fff !important;
+    color: #000 !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+  }
+
+  table {
+    border-collapse: collapse !important;
+    width: 100% !important;
+    color: #000 !important;
+  }
+
+  th,
+  td {
+    color: #000 !important;
+    border-bottom: 1px solid #999 !important;
+    background: #fff !important;
+  }
+
+  th {
+    background: #f2f2f2 !important;
+  }
+
+  .booking-detail {
+    border-bottom: 1px solid #ddd !important;
+  }
+
+  .booking-detail span,
+  .booking-detail strong {
+    color: #000 !important;
+  }
+
+  a {
+    color: #000 !important;
+    text-decoration: none !important;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Responsive for 375px mobile screens
+   -------------------------------------------------------------------------- */
+@media (max-width: 480px) {
+  .gate-page {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .gate-panel {
+    padding: 1.15rem;
+  }
+
+  .gate-form input[type="text"],
+  .gate-form input[name="reference"],
+  .gate-form input[name="registration_no"],
+  .gate-form select {
+    font-size: 17px;
+    min-height: 50px;
+  }
+
+  .receipt-nav-links {
+    flex-direction: column;
+  }
+
+  .receipt-nav-links a {
+    width: 100%;
+  }
+}

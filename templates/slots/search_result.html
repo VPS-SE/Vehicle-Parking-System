@@ -3,19 +3,24 @@
     {{ search_error }}
   </div>
 {% elif slot_count != None %}
-  <section class="search-result" aria-labelledby="results-heading">
+  <section class="search-result search-result-hero card" aria-labelledby="results-heading">
     <h2 id="results-heading">Parking availability</h2>
-    <p>
-      <strong>{{ slot_count }}</strong>
-      suitable slot{{ slot_count|pluralize }} available for your selected window.
-    </p>
+    <div class="search-result-hero__count-box">
+      <p class="search-result-hero__label">
+        <strong class="search-result-hero__huge-number">{{ slot_count }}</strong>
+        suitable slot{{ slot_count|pluralize }} available for your selected window.
+      </p>
+    </div>
     {% if forecast %}
       <section class="forecast-panel" aria-labelledby="forecast-heading">
         <h3 id="forecast-heading">Chance of a free slot when you arrive</h3>
         {% if forecast.message %}
           <p>{{ forecast.message }}</p>
         {% else %}
-          <p><strong>{{ forecast.percent }}%</strong> ({{ forecast.band }}){% if forecast.estimate %} · Estimate{% endif %}</p>
+          <div class="forecast-content">
+            <span class="forecast-chip forecast-chip--{{ forecast.band|lower }}" aria-hidden="true">{{ forecast.band }}</span>
+            <p class="forecast-text"><strong>{{ forecast.percent }}%</strong> ({{ forecast.band }}){% if forecast.estimate %} · Estimate{% endif %}</p>
+          </div>
         {% endif %}
       </section>
     {% endif %}
@@ -26,7 +31,7 @@
         <input type="hidden" name="vehicle" value="{{ selected_vehicle }}">
         <input type="hidden" name="start" value="{{ start }}">
         <input type="hidden" name="end" value="{{ end }}">
-        <button type="submit">Book a slot</button>
+        <button type="submit" class="button">Book a slot</button>
       </form>
     {% endif %}
   </section>

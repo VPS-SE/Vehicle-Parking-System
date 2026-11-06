@@ -1,0 +1,279 @@
+/* ==========================================================================
+   Driver Pages Styles
+   Vehicle Registration, Slot Search & Results, Confirmation, Booking History
+   Uses design tokens from vps.css
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Vehicle Registration Page
+   -------------------------------------------------------------------------- */
+.vehicle-list {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0 0;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.vehicle-list-item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.85rem 1.15rem;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-field);
+}
+
+.vehicle-reg-number {
+  font-family: 'Inter Tight', sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--text);
+  font-size: 1.1rem;
+}
+
+.vehicle-type-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.65rem;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--lavender) 16%, transparent);
+  color: var(--lavender);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+/* --------------------------------------------------------------------------
+   Search Page & Hero Result Card
+   -------------------------------------------------------------------------- */
+.search-result-hero {
+  margin-top: 1.75rem;
+  text-align: center;
+  border: 1px solid var(--border-strong);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45);
+  position: relative;
+  overflow: hidden;
+}
+
+.search-result-hero h2 {
+  font-size: clamp(1.4rem, 2.5vw, 1.8rem);
+  margin-bottom: 0.5rem;
+}
+
+.search-result-hero__count-box {
+  padding: 1.5rem 1rem;
+  margin: 1.25rem 0;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-field);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.search-result-hero__huge-number {
+  display: block;
+  font-family: 'Inter Tight', sans-serif;
+  font-size: clamp(3.5rem, 8vw, 5.5rem);
+  line-height: 1;
+  font-weight: 800;
+  color: var(--green);
+  font-variant-numeric: tabular-nums;
+  margin-bottom: 0.5rem;
+  text-shadow: 0 0 30px color-mix(in srgb, var(--green) 35%, transparent);
+}
+
+.search-result-hero__label {
+  margin: 0;
+  color: var(--text-2);
+  font-size: 1.05rem;
+}
+
+/* Forecast Panel as a stat card inside hero */
+.forecast-panel {
+  margin: 1.25rem 0;
+  padding: 1.25rem;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-field);
+  text-align: left;
+}
+
+.forecast-panel h3 {
+  font-size: 1.05rem;
+  margin-top: 0;
+  margin-bottom: 0.65rem;
+  color: var(--lavender);
+  font-weight: 600;
+}
+
+.forecast-content {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0.5rem 0 0;
+}
+
+.forecast-text {
+  margin: 0;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  color: var(--text-2);
+}
+
+.forecast-text strong {
+  font-family: 'Inter Tight', sans-serif;
+  font-size: clamp(1.8rem, 3.5vw, 2.5rem);
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.forecast-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.forecast-chip--high {
+  background: color-mix(in srgb, var(--green) 16%, transparent);
+  color: var(--green);
+  border: 1px solid color-mix(in srgb, var(--green) 30%, transparent);
+}
+
+.forecast-chip--medium {
+  background: color-mix(in srgb, var(--yellow) 16%, transparent);
+  color: var(--yellow);
+  border: 1px solid color-mix(in srgb, var(--yellow) 30%, transparent);
+}
+
+.forecast-chip--low {
+  background: color-mix(in srgb, var(--red) 16%, transparent);
+  color: var(--red);
+  border: 1px solid color-mix(in srgb, var(--red) 30%, transparent);
+}
+
+.forecast-estimate {
+  color: var(--text-3);
+  font-size: 0.9rem;
+}
+
+.booking-form button {
+  width: 100%;
+  font-size: 17px;
+  min-height: 48px;
+  margin-top: 0.75rem;
+}
+
+/* --------------------------------------------------------------------------
+   Driver Booking History
+   -------------------------------------------------------------------------- */
+.history-table-wrapper {
+  outline: none;
+}
+
+.history-table-wrapper:focus-visible {
+  outline: 2px solid var(--pink);
+  outline-offset: -2px;
+}
+
+/* State Chips */
+.chip-state--reserved {
+  background: color-mix(in srgb, var(--yellow) 16%, transparent);
+  color: var(--yellow);
+  border: 1px solid color-mix(in srgb, var(--yellow) 30%, transparent);
+}
+
+.chip-state--active {
+  background: color-mix(in srgb, var(--green) 16%, transparent);
+  color: var(--green);
+  border: 1px solid color-mix(in srgb, var(--green) 30%, transparent);
+}
+
+.chip-state--completed {
+  background: color-mix(in srgb, var(--blue) 16%, transparent);
+  color: var(--blue);
+  border: 1px solid color-mix(in srgb, var(--blue) 30%, transparent);
+}
+
+.chip-state--cancelled {
+  background: color-mix(in srgb, var(--red) 16%, transparent);
+  color: var(--red);
+  border: 1px solid color-mix(in srgb, var(--red) 30%, transparent);
+}
+
+.chip-state--expired {
+  background: color-mix(in srgb, var(--grey) 16%, transparent);
+  color: var(--grey);
+  border: 1px solid color-mix(in srgb, var(--grey) 30%, transparent);
+}
+
+/* Charges list in history table */
+.history-charges {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.history-charges li {
+  font-size: 0.88rem;
+  line-height: 1.35;
+}
+
+.chip-mini {
+  display: inline-block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-left: 0.2rem;
+}
+
+.chip-mini--paid {
+  color: var(--green);
+}
+
+.chip-mini--waived {
+  color: var(--lavender);
+}
+
+.chip-mini--unpaid {
+  color: var(--yellow);
+}
+
+/* --------------------------------------------------------------------------
+   Responsive adjustments for 375px screens
+   -------------------------------------------------------------------------- */
+@media (max-width: 480px) {
+  .vehicle-page,
+  .search-page,
+  .booking-page,
+  .history-page {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .search-result-hero {
+    padding: 1.25rem 1rem;
+  }
+
+  .search-result-hero__huge-number {
+    font-size: 3.5rem;
+  }
+
+  .history-table th,
+  .history-table td {
+    padding: 0.75rem 0.65rem;
+  }
+}

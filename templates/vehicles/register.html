@@ -1,7 +1,12 @@
 
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Add a Vehicle | Vehicle Parking System{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/driver.css' %}">
+{% endblock %}
 
 {% block content %}
 
@@ -116,10 +121,10 @@
     {% if vehicles %}
       <section aria-labelledby="your-vehicles-heading">
         <h2 id="your-vehicles-heading">Your vehicles</h2>
-        <ul>
+        <ul class="vehicle-list">
           {% for vehicle in vehicles %}
-            <li>
-              {{ vehicle.registration_no }} — {{ vehicle.get_vehicle_type_display }}{% if vehicle.nickname %} ({{ vehicle.nickname }}){% endif %}
+            <li class="vehicle-list-item">
+              <span class="vehicle-reg-number">{{ vehicle.registration_no }}</span> — <span class="vehicle-type-badge">{{ vehicle.get_vehicle_type_display }}</span>{% if vehicle.nickname %} ({{ vehicle.nickname }}){% endif %}
             </li>
           {% endfor %}
         </ul>

@@ -191,3 +191,17 @@ def test_completed_booking_links_to_its_receipt_and_nav_links_here(client, histo
     assert f'href="/gate/receipt/{booking.booking_ref}/print/"' in content
     assert f'href="/gate/receipt/{upcoming.booking_ref}/print/"' not in content
     assert 'href="/reservations/history/"' in content
+
+
+@pytest.mark.django_db
+def test_booking_history_badge_shows_real_count(client, history_data):
+    driver = history_data["driver"]
+    history_data["create_booking"](1)
+    history_data["create_booking"](2)
+
+    client.force_login(driver)
+    response = client.get(reverse("reservations:history"))
+
+    assert response.status_code == 200
+    assert "2 bookings" in response.content.decode()
+

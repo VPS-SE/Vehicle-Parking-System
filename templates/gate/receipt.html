@@ -1,6 +1,11 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Checkout Receipt | Vehicle Parking System{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/gate.css' %}">
+{% endblock %}
 
 {% block content %}
 <section class="booking-page">
@@ -57,71 +62,75 @@
 
     <h2>Itemised charges</h2>
 
-    <table>
-      <thead>
-        <tr>
-          <th>Charge</th>
-          <th>Amount (INR)</th>
-          <th>Payment status</th>
-          <th>Payment method</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for charge in charges %}
+    <div class="table-wrapper receipt-table-wrapper" tabindex="0" role="region" aria-label="Itemised charges">
+      <table class="receipt-table">
+        <thead>
           <tr>
-            <td>{{ charge.get_kind_display }}</td>
-            <td>₹{{ charge.amount_inr|floatformat:2 }}</td>
-            <td>
-              {% if charge.payment %}
-                Paid
-              {% elif charge.waiver %}
-                Waived
-              {% else %}
-                Unpaid
-              {% endif %}
-            </td>
-            <td>{% if charge.payment %}{{ charge.payment.get_method_display }}{% else %}—{% endif %}</td>
+            <th scope="col">Charge</th>
+            <th scope="col">Amount (INR)</th>
+            <th scope="col">Payment status</th>
+            <th scope="col">Payment method</th>
           </tr>
-        {% empty %}
+        </thead>
+        <tbody>
+          {% for charge in charges %}
+            <tr>
+              <td>{{ charge.get_kind_display }}</td>
+              <td>₹{{ charge.amount_inr|floatformat:2 }}</td>
+              <td>
+                {% if charge.payment %}
+                  Paid
+                {% elif charge.waiver %}
+                  Waived
+                {% else %}
+                  Unpaid
+                {% endif %}
+              </td>
+              <td>{% if charge.payment %}{{ charge.payment.get_method_display }}{% else %}—{% endif %}</td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="4">No charges recorded.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+        <tfoot>
           <tr>
-            <td colspan="4">No charges recorded.</td>
+            <th>Total</th>
+            <th>₹{{ total|floatformat:2 }}</th>
+            <td colspan="2"></td>
           </tr>
-        {% endfor %}
-      </tbody>
-      <tfoot>
-        <tr>
-          <th>Total</th>
-          <th>₹{{ total|floatformat:2 }}</th>
-          <th colspan="2"></th>
-        </tr>
-        <tr>
-          <td>Paid</td>
-          <td>₹{{ paid_total|floatformat:2 }}</td>
-          <td colspan="2"></td>
-        </tr>
-        {% if waived_total %}
-        <tr>
-          <td>Waived</td>
-          <td>₹{{ waived_total|floatformat:2 }}</td>
-          <td colspan="2"></td>
-        </tr>
-        {% endif %}
-        <tr>
-          <th>Balance due</th>
-          <th>₹{{ balance_due|floatformat:2 }}</th>
-          <th colspan="2"></th>
-        </tr>
-      </tfoot>
-    </table>
+          <tr>
+            <td>Paid</td>
+            <td>₹{{ paid_total|floatformat:2 }}</td>
+            <td colspan="2"></td>
+          </tr>
+          {% if waived_total %}
+          <tr>
+            <td>Waived</td>
+            <td>₹{{ waived_total|floatformat:2 }}</td>
+            <td colspan="2"></td>
+          </tr>
+          {% endif %}
+          <tr>
+            <th>Balance due</th>
+            <th>₹{{ balance_due|floatformat:2 }}</th>
+            <td colspan="2"></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
 
     <p>
       The reservation is Completed, and its slot is available for
       another booking where the time window permits.
     </p>
 
-    <a href="{% url 'gate:printable_receipt' reservation.booking_ref %}">Printable receipt</a>
-    <a href="{% url 'gate:payments' %}">Go to payment processing</a>
-    <a href="{% url 'gate:checkout' %}">Check out another vehicle</a>
+    <div class="receipt-nav-links">
+      <a href="{% url 'gate:printable_receipt' reservation.booking_ref %}">Printable receipt</a>
+      <a href="{% url 'gate:payments' %}">Go to payment processing</a>
+      <a href="{% url 'gate:checkout' %}">Check out another vehicle</a>
+    </div>
   </div>
 </section>
 {% endblock %}

@@ -1,67 +1,81 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Manage Staff | VPS{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/accounts.css' %}">
+{% endblock %}
+
 {% block content %}
-<h1>Manage Staff Accounts</h1>
+<section class="accounts-page" aria-labelledby="staff-heading">
+  <header class="accounts-heading">
+    <div>
+      <span class="eyebrow">ADMINISTRATION</span>
+      <h1 id="staff-heading">Manage Staff Accounts</h1>
+      <p>Deactivate or reactivate Gate Attendant and Lot Administrator accounts.</p>
+    </div>
+    <p>
+      <a href="{% url 'accounts:create_staff' %}" class="button">Create Staff Account</a>
+    </p>
+  </header>
 
-<p>Deactivate or reactivate Gate Attendant and Lot Administrator accounts.</p>
-
-<p>
-    <a href="{% url 'accounts:create_staff' %}">Create Staff Account</a>
-</p>
-
-<table>
-    <thead>
+  <div class="table-wrapper accounts-table-wrapper" tabindex="0" role="region" aria-label="Staff accounts">
+    <table class="accounts-table">
+      <thead>
         <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Role</th>
-            <th>Status</th>
-            <th>Actions</th>
+          <th scope="col">Name</th>
+          <th scope="col">Email</th>
+          <th scope="col">Role</th>
+          <th scope="col">Status</th>
+          <th scope="col">Actions</th>
         </tr>
-    </thead>
+      </thead>
 
-    <tbody>
+      <tbody>
         {% for staff in staff_members %}
         <tr>
-            <td>{{ staff.full_name }}</td>
-            <td>{{ staff.email }}</td>
-            <td>{{ staff.get_role_display }}</td>
+          <td>{{ staff.full_name }}</td>
+          <td>{{ staff.email }}</td>
+          <td>{{ staff.get_role_display }}</td>
 
-            <td>
-                {% if staff.is_active %}
-                    Active
-                {% else %}
-                    Deactivated
-                {% endif %}
-            </td>
+          <td>
+            <span class="chip chip--{% if staff.is_active %}active{% else %}deactivated{% endif %}">
+              {% if staff.is_active %}
+                Active
+              {% else %}
+                Deactivated
+              {% endif %}
+            </span>
+          </td>
 
-            <td>
-                {% if staff.pk == user.pk %}
-                    (you)
-                {% elif staff.is_active %}
-                    <form method="post"
-                          action="{% url 'accounts:deactivate_staff' staff.pk %}"
-                          class="inline">
-                        {% csrf_token %}
-                        <button type="submit">Deactivate</button>
-                    </form>
-                {% else %}
-                    <form method="post"
-                          action="{% url 'accounts:reactivate_staff' staff.pk %}"
-                          class="inline">
-                        {% csrf_token %}
-                        <button type="submit">Reactivate</button>
-                    </form>
-                {% endif %}
-            </td>
+          <td>
+            {% if staff.pk == user.pk %}
+              (you)
+            {% elif staff.is_active %}
+              <form method="post"
+                    action="{% url 'accounts:deactivate_staff' staff.pk %}"
+                    class="inline">
+                {% csrf_token %}
+                <button type="submit" class="button-danger">Deactivate</button>
+              </form>
+            {% else %}
+              <form method="post"
+                    action="{% url 'accounts:reactivate_staff' staff.pk %}"
+                    class="inline">
+                {% csrf_token %}
+                <button type="submit" class="button-secondary">Reactivate</button>
+              </form>
+            {% endif %}
+          </td>
         </tr>
         {% empty %}
         <tr>
-            <td colspan="5">No staff accounts found.</td>
+          <td colspan="5">No staff accounts found.</td>
         </tr>
         {% endfor %}
-    </tbody>
-</table>
+      </tbody>
+    </table>
+  </div>
+</section>
 {% endblock %}
