@@ -1,0 +1,42 @@
+name: Bug report
+description: Something in the app does not work as the SRS says it should
+labels: ["bug"]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Sign in as a Driver
+        2. ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What should have happened
+      description: Include the SRS requirement ID if you know it.
+    validations:
+      required: true
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity (Test Plan scale)
+      options:
+        - S1 - blocker
+        - S2 - major
+        - S3 - minor
+        - S4 - cosmetic
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version or commit
+      placeholder: v1.1.0 or a commit hash

@@ -1,0 +1,23 @@
+cff-version: 1.2.0
+message: "If you refer to this software, please cite it as below."
+title: "Vehicle Parking System"
+abstract: "Parking lot management web app: slot search and booking, gate check-in and billing, admin reports, a live lot map and an occupancy forecast. Team 10, Software Engineering (UE24CS341A), PES University."
+type: software
+version: 1.1.0
+date-released: 2026-11-12
+license: MIT
+repository-code: "https://github.com/VSP-SE/Vehicle-Parking-System"
+authors:
+  - given-names: "D"
+    family-names: "Harikrishnan"
+  - given-names: "Dhruv"
+    family-names: "Purushotham Raju"
+  - given-names: "A"
+    family-names: "Gitanjali"
+  - given-names: "Vivian"
+    family-names: "Sobers E"
+keywords:
+  - parking-management
+  - django
+  - postgresql
+  - fastapi
