@@ -21,6 +21,10 @@ with race-safe slot allocation and a machine-learning availability forecast.
 [![CI](https://img.shields.io/badge/CI-Lint%20%C2%B7%20Tests%20%C2%B7%20Security-512DA8?style=for-the-badge&labelColor=9575CD&logo=githubactions&logoColor=FFFFFF)](.github/workflows/ci.yml)
 [![Team](https://img.shields.io/badge/Team-10%20%C2%B7%20PES%20University-B8860B?style=for-the-badge&labelColor=FFD54F)](#team)
 
+<a href="videos/VPS-Intro.mp4"><img src="docs/images/intro-poster.jpg" alt="Watch the 1-minute intro: what the Vehicle Parking System does, its tech stack and the team" width="820"></a>
+
+<sub>57-second intro: the three roles, the app in use, tech stack, architecture, test results and the team.</sub>
+
 [Features](#features) · [Screenshots](#screenshots) · [Architecture](#architecture) · [Quick start](#quick-start) · [Testing](#testing) · [Docs](#documentation) · [Team](#team)
 
 </div>
@@ -309,6 +313,7 @@ Every pull request runs ruff, the forecast tests, the full suite on PostgreSQL 1
 | UML diagrams (PlantUML and PNG) | [`docs/part-1/diagrams/`](docs/part-1/diagrams/) |
 | Part 3 test reports and evidence | [`docs/part-3/`](docs/part-3/) |
 | Deviations from the SRS, SAD and Test Plan | [`docs/part-4/deviations.md`](docs/part-4/deviations.md) |
+| Intro video (1 min) | [`videos/VPS-Intro.mp4`](videos/VPS-Intro.mp4) |
 | Sprint 1 demo video (1 min 30 s) | [`videos/VPS-Sprint-1-Demo.mp4`](videos/VPS-Sprint-1-Demo.mp4) |
 | Sprint 2 demo video (2 min) | [`videos/VPS-Sprint-2-Demo.mp4`](videos/VPS-Sprint-2-Demo.mp4) |
 | Final walkthrough of every feature (6 min) | [`videos/VPS-Final-Walkthrough.mp4`](videos/VPS-Final-Walkthrough.mp4) |
