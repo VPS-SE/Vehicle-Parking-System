@@ -1,3 +1,3 @@
-Line coverage: 95.94% (required: 70.00%)
-Branch coverage: 91.01% (required: 60.00%)
+Line coverage: 96.12% (required: 70.00%)
+Branch coverage: 91.09% (required: 60.00%)
 Coverage gate PASSED
