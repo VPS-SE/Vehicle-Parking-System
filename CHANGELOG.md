@@ -20,7 +20,11 @@ Final demo release, end of Sprint 3.
 - Deviations from the SRS, SAD and Test Plan in `docs/part-4/deviations.md`; Sprint 2 and
   final walkthrough videos in `videos/` [#146].
 - License (MIT), third-party notices, contributing guide, code of conduct, security policy,
-  issue templates and this changelog.
+  issue templates and this changelog [#147].
+- A 57-second intro video that plays at the top of the README [#148, #149].
+- Docker images for the web app and forecast service on GitHub Packages
+  (`ghcr.io/vsp-se/vehicle-parking-system`, `ghcr.io/vsp-se/vehicle-parking-system-forecast`),
+  published on every merge to `main` and every release [#150].
 
 ### Changed
 
