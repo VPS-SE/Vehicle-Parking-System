@@ -21,9 +21,9 @@ with race-safe slot allocation and a machine-learning availability forecast.
 [![CI](https://img.shields.io/badge/CI-Lint%20%C2%B7%20Tests%20%C2%B7%20Security-512DA8?style=for-the-badge&labelColor=9575CD&logo=githubactions&logoColor=FFFFFF)](.github/workflows/ci.yml)
 [![Team](https://img.shields.io/badge/Team-10%20%C2%B7%20PES%20University-B8860B?style=for-the-badge&labelColor=FFD54F)](#team)
 
-<a href="videos/VPS-Intro.mp4"><img src="docs/images/intro-poster.jpg" alt="Watch the 1-minute intro: what the Vehicle Parking System does, its tech stack and the team" width="820"></a>
+<a href="videos/VPS-Intro.mp4"><img src="docs/images/intro.avif" alt="57-second intro: what the Vehicle Parking System does, its tech stack and the team" width="820"></a>
 
-<sub>57-second intro: the three roles, the app in use, tech stack, architecture, test results and the team.</sub>
+<sub>57-second intro: the three roles, the app in use, tech stack, architecture, test results and the team. Click it for the version with music.</sub>
 
 [Features](#features) · [Screenshots](#screenshots) · [Architecture](#architecture) · [Quick start](#quick-start) · [Testing](#testing) · [Docs](#documentation) · [Team](#team)
 
