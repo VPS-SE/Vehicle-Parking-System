@@ -1,35 +1,18 @@
-Thu Nov  5 10:41:09 PM IST 2026
+Thu Nov 12 12:42:54 PM IST 2026
 $ curl -k -sv --tlsv1.2 https://127.0.0.1:8443/healthz
 * TLSv1.3 (OUT), TLS handshake, Client hello (1):
-{ [5 bytes data]
 * TLSv1.3 (IN), TLS handshake, Server hello (2):
-{ [1210 bytes data]
 * TLSv1.3 (IN), TLS change cipher, Change cipher spec (1):
-{ [1 bytes data]
 * TLSv1.3 (IN), TLS handshake, Encrypted Extensions (8):
-{ [6 bytes data]
 * TLSv1.3 (IN), TLS handshake, Certificate (11):
-{ [811 bytes data]
 * TLSv1.3 (IN), TLS handshake, CERT verify (15):
-{ [264 bytes data]
 * TLSv1.3 (IN), TLS handshake, Finished (20):
-{ [52 bytes data]
 * TLSv1.3 (OUT), TLS change cipher, Change cipher spec (1):
-* TLSv1.3 (OUT), TLS handshake, Finished (20):
-* SSL connection using TLSv1.3 / TLS_AES_256_GCM_SHA384 / X25519MLKEM768 / RSASSA-PSS
-{ [5 bytes data]
-* TLSv1.3 (IN), TLS handshake, Newsession Ticket (4):
-{ [233 bytes data]
-* TLSv1.3 (IN), TLS handshake, Newsession Ticket (4):
-{ [233 bytes data]
-< HTTP/1.1 200 OK
-{ [5 bytes data]
-{"status": "ok"}
 
 $ curl -k -sv --tls-max 1.1 https://127.0.0.1:8443/healthz
-* TLSv1.3 (OUT), TLS alert, protocol version (582):
+* SSL Trust: peer verification disabled
 * TLS connect error: error:0A0000BF:SSL routines::no protocols available
-exit code: 0
+* closing connection #0
 
 $ curl -sI https://127.0.0.1:8443/accounts/login/ (-k)
 HTTP/1.1 405 Method Not Allowed
@@ -42,12 +25,11 @@ Location: https://127.0.0.1:8180/accounts/login/
 $ curl -s http://127.0.0.1:8180/healthz
 {"status": "ok"} HTTP 200
 
-Thu Nov  5 10:42:16 PM IST 2026
-$ openssl s_client -connect 127.0.0.1:8443 -tls1_1 -cipher DEFAULT@SECLEVEL=0  (client allowed to offer TLS 1.1)
-0023F76F5E7F0000:error:0A00042E:SSL routines:ssl3_read_bytes:tlsv1 alert protocol version:ssl/record/rec_layer_s3.c:918:SSL alert number 70
+$ openssl s_client -connect 127.0.0.1:8443 -tls1_1 -cipher DEFAULT@SECLEVEL=0
+00231194C87F0000:error:0A00042E:SSL routines:ssl3_read_bytes:tlsv1 alert protocol version:ssl/record/rec_layer_s3.c:918:SSL alert number 70
 New, (NONE), Cipher is (NONE)
-server log (web-tls.log):
-[2026-11-05 22:42:16 +0530] [478143] [WARNING] Invalid request from ip=127.0.0.1: [SSL: UNSUPPORTED_PROTOCOL] unsupported protocol (_ssl.c:2660)
+Protocol: TLSv1.1
 
 $ openssl s_client -connect 127.0.0.1:8443 -tls1_2
 New, TLSv1.2, Cipher is ECDHE-RSA-AES256-GCM-SHA384
+Protocol: TLSv1.2

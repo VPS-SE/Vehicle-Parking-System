@@ -40,9 +40,9 @@ vps/lots/apps.py                                                              4 
 vps/lots/forms.py                                                            36      0      2      0   100%
 vps/lots/management/__init__.py                                               0      0      0      0   100%
 vps/lots/management/commands/__init__.py                                      0      0      0      0   100%
-vps/lots/management/commands/seed_pes_lots.py                                16      1      4      1    90%   20
+vps/lots/management/commands/seed_pes_lots.py                                12      0      2      0   100%
 vps/lots/models.py                                                           54      1      0      0    98%   93
-vps/lots/pes.py                                                              33      1     14      1    96%   76
+vps/lots/pes.py                                                              42      1     18      1    97%   102
 vps/lots/plan.py                                                            107      5     28      3    94%   75->74, 85, 160-163
 vps/lots/services.py                                                        215     20     80      3    89%   62, 143-155, 188, 207-211, 359-367, 449
 vps/lots/urls.py                                                              4      0      0      0   100%
@@ -85,4 +85,4 @@ vps/vehicles/views.py                                                        25 
 vps/views.py                                                                 12      0      0      0   100%
 vps/wsgi.py                                                                   4      4      0      0     0%   3-9
 ---------------------------------------------------------------------------------------------------------------------
-TOTAL                                                                      2705    105    640     35    95%
+TOTAL                                                                      2710    104    642     34    95%

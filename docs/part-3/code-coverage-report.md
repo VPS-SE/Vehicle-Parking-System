@@ -1,13 +1,13 @@
 # Code Coverage Report
 
-Line coverage of the application (`vps/`) and of the forecast service (`forecast/`). Measured on 5 November 2026.
+Line coverage of the application (`vps/`) and of the forecast service (`forecast/`). Measured on 12 November 2026 on the final code: `main` at 185d8e8 plus the PES tariff fix (PR #145).
 
 ## How it was measured
 
 ```
-./run-coverage.sh run --branch -m pytest -q -p no:cacheprovider
-./run-coverage.sh report -m > docs/part-3/evidence/coverage.txt
-./run-coverage.sh xml -o docs/part-3/evidence/coverage.xml
+coverage run --branch -m pytest -q -p no:cacheprovider --junitxml=docs/part-3/evidence/junit.xml
+coverage report -m > docs/part-3/evidence/coverage.txt
+coverage xml -o docs/part-3/evidence/coverage.xml
 python scripts/check_coverage.py docs/part-3/evidence/coverage.xml
 ```
 
@@ -15,11 +15,11 @@ python scripts/check_coverage.py docs/part-3/evidence/coverage.xml
 
 ## Result
 
-Application: 2314 of 2412 lines covered, **95.94%**. The Test Plan gate is 70%, and `scripts/check_coverage.py` printed:
+Application: 2606 of 2710 lines covered, **96.16%**. The Test Plan gate is 70%, and `scripts/check_coverage.py` printed:
 
 ```
-Line coverage: 95.94% (required: 70.00%)
-Branch coverage: 91.01% (required: 60.00%)
+Line coverage: 96.16% (required: 70.00%)
+Branch coverage: 91.28% (required: 60.00%)
 Coverage gate PASSED
 ```
 
@@ -50,7 +50,7 @@ Forecast service: 252 of 278 statements covered (the TOTAL line, branches includ
 | `vps/billing/urls.py` | 4 | 0 | 100.0% |
 | `vps/billing/views.py` | 28 | 0 | 100.0% |
 | `vps/environment.py` | 24 | 0 | 100.0% |
-| `vps/factories.py` | 115 | 2 | 98.3% |
+| `vps/factories.py` | 115 | 1 | 99.1% |
 | `vps/gate/apps.py` | 4 | 0 | 100.0% |
 | `vps/gate/forms.py` | 23 | 0 | 100.0% |
 | `vps/gate/services.py` | 192 | 2 | 99.0% |
@@ -58,10 +58,13 @@ Forecast service: 252 of 278 statements covered (the TOTAL line, branches includ
 | `vps/gate/views.py` | 139 | 6 | 95.7% |
 | `vps/lots/apps.py` | 4 | 0 | 100.0% |
 | `vps/lots/forms.py` | 36 | 0 | 100.0% |
+| `vps/lots/management/commands/seed_pes_lots.py` | 12 | 0 | 100.0% |
 | `vps/lots/models.py` | 54 | 1 | 98.1% |
-| `vps/lots/services.py` | 185 | 19 | 89.7% |
+| `vps/lots/pes.py` | 42 | 1 | 97.6% |
+| `vps/lots/plan.py` | 107 | 5 | 95.3% |
+| `vps/lots/services.py` | 215 | 20 | 90.7% |
 | `vps/lots/urls.py` | 4 | 0 | 100.0% |
-| `vps/lots/views.py` | 93 | 6 | 93.5% |
+| `vps/lots/views.py` | 176 | 6 | 96.6% |
 | `vps/notifications/apps.py` | 4 | 0 | 100.0% |
 | `vps/notifications/management/commands/send_reservation_notifications.py` | 7 | 0 | 100.0% |
 | `vps/notifications/models.py` | 29 | 1 | 96.6% |
@@ -79,8 +82,8 @@ Forecast service: 252 of 278 statements covered (the TOTAL line, branches includ
 | `vps/reservations/models.py` | 27 | 0 | 100.0% |
 | `vps/reservations/services.py` | 148 | 10 | 93.2% |
 | `vps/reservations/urls.py` | 4 | 0 | 100.0% |
-| `vps/reservations/views.py` | 84 | 3 | 96.4% |
-| `vps/settings.py` | 47 | 0 | 100.0% |
+| `vps/reservations/views.py` | 105 | 3 | 97.1% |
+| `vps/settings.py` | 50 | 0 | 100.0% |
 | `vps/urls.py` | 9 | 1 | 88.9% |
 | `vps/vehicles/apps.py` | 4 | 0 | 100.0% |
 | `vps/vehicles/forms.py` | 15 | 0 | 100.0% |
@@ -106,12 +109,12 @@ Forecast service: 252 of 278 statements covered (the TOTAL line, branches includ
 
 | Module | Line coverage | Missed lines | Why |
 |---|---|---|---|
+| `vps/asgi.py`, `vps/wsgi.py` | 0.0% | 3, 5, 7, 9 | Server entry points. Gunicorn imports `wsgi.py`; the test client never does. Both ran in the system tests, which are not measured. |
 | `vps/accounts/services.py` | 87.8% | 58-62, 69, 88-89, 96-97, 118-122, 163, 168, 198, 203, 233, 281 | Race fallbacks (`IntegrityError` after the duplicate-e-mail check) and role guards that the views already enforce. See the Branch Coverage Report. |
-| `vps/urls.py` | 88.9% | 26 | See the missed line list. |
-| `vps/lots/services.py` | 89.7% | 59, 140-152, 185, 204-208, 356-364 | Missed lines are `IntegrityError` fallbacks after the pre-checks (duplicate slot code, overlapping block, duplicate tariff date) and one missing-time guard. |
-| `vps/billing/models.py` | 92.3% | 27, 47, 69 | See the missed line list. |
-| `vps/reservations/services.py` | 93.2% | 113-117, 185-190, 274 | See the missed line list. |
-| `vps/lots/views.py` | 93.5% | 46-51, 106 | See the missed line list. |
+| `vps/urls.py` | 88.9% | 26 | The static-files route added only when DEBUG is on. |
+| `vps/lots/services.py` | 90.7% | 62, 143-148, 155, 188, 207-211, 359-360, 365-367, 449 | `IntegrityError` fallbacks after the pre-checks (duplicate slot code, overlapping block, duplicate tariff date), one missing-time guard, and line 449: a registration that is empty after removing spaces and hyphens, which the lot map search refuses earlier. |
+| `vps/billing/models.py` | 92.3% | 27, 47, 69 | `__str__` methods. |
+| `vps/reservations/services.py` | 93.2% | 113-117, 185-186, 189-190, 274 | See the Branch Coverage Report. |
 
 In `forecast/train/train.py` the uncovered lines are `load_history` and `main`, which read from PostgreSQL. They were run by hand against the seeded demo database while #127 was being built. No automated test covers them.
 

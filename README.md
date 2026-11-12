@@ -7,9 +7,9 @@
 A full parking-lot platform for drivers, gate attendants and lot administrators,<br>
 with race-safe slot allocation and a machine-learning availability forecast.
 
-[![Test Plan](https://img.shields.io/badge/Test%20Plan-49%20of%2051%20Pass%20%C2%B7%200%20Fail-2E7D32?style=for-the-badge&labelColor=66BB6A)](docs/part-3/system-validation-report.md)
-[![Tests](https://img.shields.io/badge/Tests-771%20Passing-1B5E20?style=for-the-badge&labelColor=43A047&logo=pytest&logoColor=FFFFFF)](docs/part-3/unit-test-report.md)
-[![Coverage](https://img.shields.io/badge/Coverage-95.94%25%20Line%20%C2%B7%2091.01%25%20Branch-00695C?style=for-the-badge&labelColor=26A69A)](docs/part-3/code-coverage-report.md)
+[![Test Plan](https://img.shields.io/badge/Test%20Plan-52%20of%2054%20Pass%20%C2%B7%200%20Fail-2E7D32?style=for-the-badge&labelColor=66BB6A)](docs/part-3/system-validation-report.md)
+[![Tests](https://img.shields.io/badge/Tests-816%20Passing-1B5E20?style=for-the-badge&labelColor=43A047&logo=pytest&logoColor=FFFFFF)](docs/part-3/unit-test-report.md)
+[![Coverage](https://img.shields.io/badge/Coverage-96.16%25%20Line%20%C2%B7%2091.28%25%20Branch-00695C?style=for-the-badge&labelColor=26A69A)](docs/part-3/code-coverage-report.md)
 [![Load](https://img.shields.io/badge/Load-200%20Sessions%20%C2%B7%200%20Failures-1565C0?style=for-the-badge&labelColor=42A5F5)](docs/part-3/system-validation-report.md)
 [![Accessibility](https://img.shields.io/badge/Accessibility-WCAG%202.1%20AA%20%C2%B7%200%20Violations-6A1B9A?style=for-the-badge&labelColor=AB47BC)](docs/part-3/system-validation-report.md)
 [![Allocation](https://img.shields.io/badge/Allocation-Race--Safe%20%C2%B7%20Advisory%20Lock-B71C1C?style=for-the-badge&labelColor=EF5350)](vps/reservations/services.py)
@@ -255,15 +255,15 @@ pytest -c tests/system/pytest.ini                         # browser tests, again
 
 The browser tests use Playwright, and the load tests (`tests/system/locust_*.py`) use Locust. Install both separately; they are not in the requirements files. The system tests read `VPS_BASE_URL` (default `http://127.0.0.1:8100`), `VPS_HTTP_PROD_URL`, `VPS_TLS_URL` and `VPS_SERVER_LOGS`.
 
-### Part 3 results
+### Test results (final code, 12 November)
 
 | Check | Result |
 |---|---|
-| App test suite | **771 passed**, 0 failed |
-| Line / branch coverage | **95.94% / 91.01%** (CI gate: 70% / 60%) |
-| Test Plan cases | **49 of 51 pass**, none fail; 2 not run (timed user trial, month-long uptime) |
+| App test suite | **816 passed**, 0 failed |
+| Line / branch coverage | **96.16% / 91.28%** (CI gate: 70% / 60%) |
+| Test Plan cases | **52 of 54 pass**, none fail; 2 not run (timed user trial, month-long uptime) |
 | Forecast and browser tests | 16 and 17 passed |
-| Load | 200 concurrent sessions with 0 failures; booking, check-in and check-out p95 of 120 ms or less at 50 users |
+| Load (5 November) | 200 concurrent sessions with 0 failures; booking, check-in and check-out p95 of 120 ms or less at 50 users |
 | Accessibility | 0 WCAG 2.1 AA violations (axe-core) on 15 pages |
 
 Full reports: [unit tests](docs/part-3/unit-test-report.md) · [line coverage](docs/part-3/code-coverage-report.md) · [branch coverage](docs/part-3/branch-coverage-report.md) · [system validation](docs/part-3/system-validation-report.md) · [code review](docs/part-3/code-review.md) · [second review](docs/part-3/code-review-2.md) · [raw evidence](docs/part-3/evidence/)
@@ -292,7 +292,8 @@ Every pull request runs ruff, the forecast tests, the full suite on PostgreSQL 1
 ├── tests/                app tests; tests/system/ has browser and load tests
 ├── docker/postgres/init/ database initialisation scripts
 ├── scripts/              coverage gate
-├── docs/                 Part 1 and Part 3 documents, README images
+├── docs/                 Part 1, Part 3 and Part 4 documents, README images
+├── videos/               sprint demo videos and the final walkthrough
 └── compose.yaml
 ```
 
@@ -305,7 +306,10 @@ Every pull request runs ruff, the forecast tests, the full suite on PostgreSQL 1
 | Software Architecture and Design | [`docs/part-1/VPS_SAD.docx`](docs/part-1/VPS_SAD.docx) |
 | UML diagrams (PlantUML and PNG) | [`docs/part-1/diagrams/`](docs/part-1/diagrams/) |
 | Part 3 test reports and evidence | [`docs/part-3/`](docs/part-3/) |
-| Sprint 1 demo video | [`videos/VPS-Sprint-1-Demo.mp4`](videos/VPS-Sprint-1-Demo.mp4) |
+| Deviations from the SRS, SAD and Test Plan | [`docs/part-4/deviations.md`](docs/part-4/deviations.md) |
+| Sprint 1 demo video (1 min) | [`videos/VPS-Sprint-1-Demo.mp4`](videos/VPS-Sprint-1-Demo.mp4) |
+| Sprint 2 demo video (2 min) | [`videos/VPS-Sprint-2-Demo.mp4`](videos/VPS-Sprint-2-Demo.mp4) |
+| Final walkthrough of every feature (6 min) | [`videos/VPS-Final-Walkthrough.mp4`](videos/VPS-Final-Walkthrough.mp4) |
 
 ## Team
 
