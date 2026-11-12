@@ -189,6 +189,19 @@ The four PES University lots are created when the web container starts (`python 
 > [!NOTE]
 > Gunicorn does not reload on code changes. Run `docker compose restart web`, or use `python manage.py runserver` on the host while developing. `docker compose down -v` deletes the database volume.
 
+### With the published images
+
+Each release and each merge to `main` publishes the web and forecast images to GitHub Packages. To run them without building, point Compose at them:
+
+```sh
+export VPS_WEB_IMAGE=ghcr.io/vsp-se/vehicle-parking-system:latest
+export VPS_FORECAST_IMAGE=ghcr.io/vsp-se/vehicle-parking-system-forecast:latest
+docker compose pull
+docker compose up --no-build
+```
+
+Replace `latest` with a version such as `1.1.0` to run a release.
+
 ### Without Docker
 
 You need Python 3.12 or newer and a local PostgreSQL 16 database.
@@ -215,6 +228,7 @@ python manage.py runserver
 | `POSTGRES_HOST`, `POSTGRES_PORT` | Database host and port for Django on the host (Compose uses `db`) |
 | `FORECAST_DB_PASSWORD` | Password for the trainer's read-only `forecast_ro` role, set before the volume is first created |
 | `FORECAST_URL` | Forecast service URL for Django on the host; empty runs without a forecast |
+| `VPS_WEB_IMAGE`, `VPS_FORECAST_IMAGE` | Images Compose runs; set them to the published images to skip the build |
 | `GUNICORN_WORKERS` | Gunicorn processes in Compose, one database connection each |
 | `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD`, `EMAIL_USE_TLS` | SMTP settings for booking and password-reset email |
 | `VPS_TEST_SQLITE` | `1` runs the tests on SQLite instead of PostgreSQL |
