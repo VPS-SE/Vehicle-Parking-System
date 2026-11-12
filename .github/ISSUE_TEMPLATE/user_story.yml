@@ -1,0 +1,32 @@
+name: User story
+description: A feature from the SRS, written from a user's point of view
+labels: ["user story"]
+body:
+  - type: textarea
+    id: story
+    attributes:
+      label: Story
+      description: As a <role>, I want <goal>, so that <reason>.
+    validations:
+      required: true
+  - type: input
+    id: requirements
+    attributes:
+      label: SRS requirements
+      placeholder: FR-RES-04, SEC-07
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: Measurable conditions; reference the Test Plan case (TC-..) if there is one.
+    validations:
+      required: true
+  - type: dropdown
+    id: points
+    attributes:
+      label: Story points (Fibonacci)
+      options: ["1", "2", "3", "5", "8", "13"]
+    validations:
+      required: true

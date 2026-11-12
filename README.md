@@ -12,6 +12,7 @@ with race-safe slot allocation and a machine-learning availability forecast.
 [![Coverage](https://img.shields.io/badge/Coverage-96.16%25%20Line%20%C2%B7%2091.28%25%20Branch-00695C?style=for-the-badge&labelColor=26A69A)](docs/part-3/code-coverage-report.md)
 [![Load](https://img.shields.io/badge/Load-200%20Sessions%20%C2%B7%200%20Failures-1565C0?style=for-the-badge&labelColor=42A5F5)](docs/part-3/system-validation-report.md)
 [![Accessibility](https://img.shields.io/badge/Accessibility-WCAG%202.1%20AA%20%C2%B7%200%20Violations-6A1B9A?style=for-the-badge&labelColor=AB47BC)](docs/part-3/system-validation-report.md)
+[![License](https://img.shields.io/badge/License-MIT-37474F?style=for-the-badge&labelColor=78909C)](LICENSE)
 [![Allocation](https://img.shields.io/badge/Allocation-Race--Safe%20%C2%B7%20Advisory%20Lock-B71C1C?style=for-the-badge&labelColor=EF5350)](vps/reservations/services.py)
 [![Forecast](https://img.shields.io/badge/Forecast-FastAPI%20%C2%B7%20scikit--learn-E65100?style=for-the-badge&labelColor=FF9800&logo=fastapi&logoColor=FFFFFF)](forecast/)
 [![Language](https://img.shields.io/badge/Language-Python%203.12-1C1C1C?style=for-the-badge&labelColor=424242&logo=python&logoColor=FFD700)](requirements.txt)
@@ -177,8 +178,9 @@ Load the demo data (a 500-slot lot, 120 drivers and 30 days of bookings):
 
 ```sh
 docker compose exec web python manage.py seed_demo_data --seed 2026
-docker compose exec web python manage.py seed_pes_lots
 ```
+
+The four PES University lots are created when the web container starts (`python manage.py seed_pes_lots`, which does nothing once they exist).
 
 > [!NOTE]
 > Gunicorn does not reload on code changes. Run `docker compose restart web`, or use `python manage.py runserver` on the host while developing. `docker compose down -v` deletes the database volume.
@@ -307,7 +309,7 @@ Every pull request runs ruff, the forecast tests, the full suite on PostgreSQL 1
 | UML diagrams (PlantUML and PNG) | [`docs/part-1/diagrams/`](docs/part-1/diagrams/) |
 | Part 3 test reports and evidence | [`docs/part-3/`](docs/part-3/) |
 | Deviations from the SRS, SAD and Test Plan | [`docs/part-4/deviations.md`](docs/part-4/deviations.md) |
-| Sprint 1 demo video (1 min) | [`videos/VPS-Sprint-1-Demo.mp4`](videos/VPS-Sprint-1-Demo.mp4) |
+| Sprint 1 demo video (1 min 30 s) | [`videos/VPS-Sprint-1-Demo.mp4`](videos/VPS-Sprint-1-Demo.mp4) |
 | Sprint 2 demo video (2 min) | [`videos/VPS-Sprint-2-Demo.mp4`](videos/VPS-Sprint-2-Demo.mp4) |
 | Final walkthrough of every feature (6 min) | [`videos/VPS-Final-Walkthrough.mp4`](videos/VPS-Final-Walkthrough.mp4) |
 
@@ -317,7 +319,15 @@ Team 10, Section C · Software Engineering (UE24CS341A), Semester 5 · Departmen
 
 | Name | SRN | GitHub |
 |---|---|---|
-|D Harikrishnan  | PES1UG24CS136 | [@dhkrish06](https://github.com/dhkrish06) |
+| D Harikrishnan | PES1UG24CS136 | [@dhkrish06](https://github.com/dhkrish06) |
 | Dhruv Purushotham Raju | PES1UG24CS154 | [@dhruvpurushotham1718-ui](https://github.com/dhruvpurushotham1718-ui) |
 | A Gitanjali | PES1UG24CS170 | [@git17616](https://github.com/git17616) |
 | Vivian Sobers E | PES1UG24CS901 | [@VivianSobers](https://github.com/VivianSobers) |
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the workflow, [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) for conduct, [SECURITY.md](SECURITY.md) to report a vulnerability privately, and [CHANGELOG.md](CHANGELOG.md) for what changed in each release.
+
+## License
+
+Released under the [MIT License](LICENSE). Copyright (c) 2026 D Harikrishnan, Dhruv Purushotham Raju, A Gitanjali and Vivian Sobers E. Third-party components keep their own licenses; see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). The Inter fonts are under the SIL Open Font License 1.1.
