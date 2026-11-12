@@ -20,7 +20,7 @@ services:
       start_period: 10s
 
   web:
-    image: vps-web
+    image: ${VPS_WEB_IMAGE:-vps-web}
     build: .
     env_file: &web-env-file
       - .env
@@ -58,7 +58,7 @@ services:
       start_period: 30s
 
   scheduler:
-    image: vps-web
+    image: ${VPS_WEB_IMAGE:-vps-web}
     build: .
     env_file: *web-env-file
     environment: *web-environment
@@ -81,7 +81,7 @@ services:
 
   # FR-FCST-01: the forecast API, on the private network only (no published port).
   forecast:
-    image: vps-forecast
+    image: ${VPS_FORECAST_IMAGE:-vps-forecast}
     build:
       context: .
       dockerfile: forecast/Dockerfile
@@ -101,7 +101,7 @@ services:
   # FR-FCST-02: retrain once a week through the read-only role. The first run happens at
   # start-up, so the service has a (baseline) model straight away.
   forecast-trainer:
-    image: vps-forecast
+    image: ${VPS_FORECAST_IMAGE:-vps-forecast}
     build:
       context: .
       dockerfile: forecast/Dockerfile
