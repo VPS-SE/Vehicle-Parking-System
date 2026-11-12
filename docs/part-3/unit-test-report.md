@@ -1,6 +1,6 @@
 # Unit Test Report
 
-Vehicle Parking System, Team 10, Section C. Part 3. Tests run on 5 November 2026.
+Vehicle Parking System, Team 10, Section C. Part 3. Tests run on 12 November 2026, on the final code: `main` at 185d8e8 (all pull requests up to #139 merged) plus the PES tariff fix in PR #145.
 
 ## Scope
 
@@ -8,7 +8,7 @@ Unit and integration tests for the Django application (`tests/`) and for the for
 
 ## Environment
 
-- Application tests: Django 5.2.18, Python 3.13.14, PostgreSQL 16.15, pytest 9.1.1, pytest-django 4.14.0, coverage 7.16.2. Local PostgreSQL 16 in Docker, with `btree_gist` enabled.
+- Application tests: Django 5.2.18, Python 3.14.5, PostgreSQL 16.15, pytest 9.1.1, pytest-django 4.14.0, coverage 7.17.2. Local PostgreSQL 16 in Docker, with `btree_gist` enabled.
 - Forecast tests: FastAPI 0.162.0, scikit-learn 1.9.1, Python 3.13.14.
 - CI runs the same suites on every pull request, on ubuntu-latest with Python 3.12.
 
@@ -16,10 +16,10 @@ Unit and integration tests for the Django application (`tests/`) and for the for
 
 | Suite | Command | Started | Tests | Passed | Failed | Errors | Skipped | Time (s) | Raw output |
 |---|---|---|---|---|---|---|---|---|---|
-| Application | `./run-coverage.sh run -m pytest -q --junitxml=docs/part-3/evidence/junit.xml` | 2026-11-05 22:48 | 771 | 771 | 0 | 0 | 0 | 128.3 | `evidence/junit.xml` |
-| Forecast service | `./run-forecast-tests.sh -q --junitxml=...` | 2026-11-05 22:35 | 16 | 16 | 0 | 0 | 0 | 2.1 | `evidence/forecast-junit.xml` |
+| Application | `coverage run --branch -m pytest -q --junitxml=docs/part-3/evidence/junit.xml` | 2026-11-12 12:41 | 816 | 816 | 0 | 0 | 0 | 60.6 | `evidence/junit.xml` |
+| Forecast service | `pytest forecast/tests --cov=forecast --cov-branch --junitxml=...` | 2026-11-12 12:22 | 16 | 16 | 0 | 0 | 0 | 2.0 | `evidence/forecast-junit.xml` |
 
-The application suite ran under coverage, so the JUnit file and the coverage figures come from the same run (`evidence/coverage-run.txt`). It ran on branch `test/part3-closeout`, which adds the charge waiver and Gunicorn change (PR #129) and the booking lock fix (PR #130) to `main`. An earlier run on 5 November, before those changes, had 723 tests; the 48 added since are the waiver tests (22), the TC-45 to TC-49 business-rule tests (21) and the concurrent-booking test (5 runs). No test is marked xfail or skipped.
+The application suite ran under coverage, so the JUnit file and the coverage figures come from the same run (`evidence/coverage-run.txt`). The Part 3 run on 5 November had 771 tests. The 45 added since cover the work merged after it: the lot map (36 tests, TC-52), the PES lot seed (7, TC-53) and two booking-history tests, one for the new Cancel booking button (TC-54) and one for the booking count badge fixed during the redesign. No test is marked xfail or skipped.
 
 ## Results by test file
 
@@ -32,7 +32,7 @@ The application suite ran under coverage, so the JUnit file and the coverage fig
 | `tests/test_audit_search.py` | 6 | 6 | 0 |
 | `tests/test_base_template.py` | 2 | 2 | 0 |
 | `tests/test_booking_flow.py` | 19 | 19 | 0 |
-| `tests/test_booking_history.py` | 8 | 8 | 0 |
+| `tests/test_booking_history.py` | 10 | 10 | 0 |
 | `tests/test_booking_history_template.py` | 3 | 3 | 0 |
 | `tests/test_cancellation.py` | 12 | 12 | 0 |
 | `tests/test_charge_waiver.py` | 22 | 22 | 0 |
@@ -57,6 +57,10 @@ The application suite ran under coverage, so the JUnit file and the coverage fig
 | `tests/test_gate_dashboard_template.py` | 4 | 4 | 0 |
 | `tests/test_healthz.py` | 4 | 4 | 0 |
 | `tests/test_login_template.py` | 2 | 2 | 0 |
+| `tests/test_lot_map_admin.py` | 9 | 9 | 0 |
+| `tests/test_lot_map_json.py` | 7 | 7 | 0 |
+| `tests/test_lot_map_services.py` | 6 | 6 | 0 |
+| `tests/test_lot_plan.py` | 9 | 9 | 0 |
 | `tests/test_lots.py` | 91 | 91 | 0 |
 | `tests/test_models.py` | 20 | 20 | 0 |
 | `tests/test_notifications.py` | 11 | 11 | 0 |
@@ -73,8 +77,10 @@ The application suite ran under coverage, so the JUnit file and the coverage fig
 | `tests/test_review_findings.py` | 7 | 7 | 0 |
 | `tests/test_review_findings_2.py` | 3 | 3 | 0 |
 | `tests/test_roles.py` | 29 | 29 | 0 |
+| `tests/test_seed_pes_lots.py` | 7 | 7 | 0 |
 | `tests/test_settings.py` | 8 | 8 | 0 |
 | `tests/test_slot_blocks.py` | 5 | 5 | 0 |
+| `tests/test_slot_map_views.py` | 5 | 5 | 0 |
 | `tests/test_slot_search_template.py` | 2 | 2 | 0 |
 | `tests/test_staff_creation.py` | 5 | 5 | 0 |
 | `tests/test_staff_management.py` | 10 | 10 | 0 |
@@ -148,7 +154,10 @@ Each Test Plan case below has unit or integration tests that ran and passed. The
 | TC-47 | Cancellation and no-show fees at the 60-minute boundary | `tests/test_tc45_tc49_business_rules.py` | 1 test, 1 passed |
 | TC-48 | A booking is held for 15 minutes after its start | `tests/test_tc45_tc49_business_rules.py` | 1 test, 1 passed |
 | TC-49 | Billing blocks, 1-hour minimum and overstay grace | `tests/test_tc45_tc49_business_rules.py` | 17 tests, 17 passed |
-| TC-50 | An administrator waives a charge with a written reason | `tests/test_charge_waiver.py` | 23 tests, 23 passed |
+| TC-50 | An administrator waives a charge with a written reason | `tests/test_charge_waiver.py` | 22 tests, 22 passed |
+| TC-52 | Lot map: driver's slot and route, admin live map and registration search | `tests/test_lot_plan.py`, `tests/test_lot_map_services.py`, `tests/test_lot_map_admin.py`, `tests/test_slot_map_views.py`, `tests/test_lot_map_json.py` | 36 tests, 36 passed |
+| TC-53 | The four PES lots are seeded with slots and tariffs | `tests/test_seed_pes_lots.py` | 7 tests, 7 passed |
+| TC-54 | A driver cancels a reserved booking from My bookings | `tests/test_booking_history.py` | 1 test, 1 passed |
 
 ## Failures
 

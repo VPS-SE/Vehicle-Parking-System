@@ -1,12 +1,12 @@
 # System Validation Report
 
-Vehicle Parking System, Team 10, Section C. Part 3. System testing on 5 November 2026. The final runs used branch `test/part3-closeout`: `main` plus the charge waiver and Gunicorn change (PR #129) and the booking lock fix (PR #130). Those two PRs must be merged for `main` to match what was tested.
+Vehicle Parking System, Team 10, Section C. Part 3. System testing on 5 November 2026, repeated on 12 November 2026 on the final code after Sprint 3 closed. The 12 November runs used `main` at 185d8e8 (every pull request up to #139 merged, including the redesign of all pages and the lot map) plus the PES tariff fix in PR #145. Load tests were not repeated; their results below are from 5 November (Section 5).
 
 ## 1. Summary
 
-The Test Plan now has 51 test cases. TC-45 to TC-51 were added on 5 November for the seven requirements that had no test case. 49 passed and 2 were not run. None failed. The two not run need things a laptop cannot give: TC-41 is a timed trial with first-time users, and TC-51 is a month of monitored uptime. All four exit criteria are met, with the caveat that TC-51 is listed but not executed (Section 6).
+The Test Plan now has 54 test cases. TC-45 to TC-51 were added on 5 November for the seven requirements that had no test case, and TC-52 to TC-54 on 12 November for the work added in Sprint 3 (the lot map, the PES lots and cancelling from My bookings; see `docs/part-4/deviations.md`). 52 passed and 2 were not run. None failed. The two not run need things a laptop cannot give: TC-41 is a timed trial with first-time users, and TC-51 is a month of monitored uptime. All four exit criteria are met, with the caveat that TC-51 is listed but not executed (Section 6).
 
-Testing found two new application defects, both fixed and re-tested (Section 7). The serious one, D-4, showed up only under concurrent bookings. With 50 users booking at once, 39% of bookings failed: some with HTTP 500 from database deadlocks, others refused as "no slot" while hundreds were free. After the fix the same load ran with no failures.
+The 5 November testing found two new application defects, both fixed and re-tested (Section 7). Recording the final demo on 6 November found two more (D-6, D-7), also fixed and re-tested. The serious one, D-4, showed up only under concurrent bookings. With 50 users booking at once, 39% of bookings failed: some with HTTP 500 from database deadlocks, others refused as "no slot" while hundreds were free. After the fix the same load ran with no failures.
 
 ## 2. Environment
 
@@ -21,17 +21,17 @@ Testing found two new application defects, both fixed and re-tested (Section 7).
 
 | Run | Command | Started | Result | Raw output |
 |---|---|---|---|---|
-| Unit and integration, with coverage | `./run-coverage.sh run -m pytest` | 22:48 | 771 passed, 0 failed | `evidence/junit.xml`, `evidence/coverage-run.txt` |
-| Forecast service | `./run-forecast-tests.sh` | 22:35 | 16 passed | `evidence/forecast-junit.xml` |
-| Browser (system) tests | `./run-system-tests.sh` | 22:47 | 17 passed, 0 failed | `evidence/system-junit.xml` |
+| Unit and integration, with coverage | `coverage run --branch -m pytest` | 12 Nov 12:41 | 816 passed, 0 failed | `evidence/junit.xml`, `evidence/coverage-run.txt` |
+| Forecast service | `pytest forecast/tests --cov=forecast` | 12 Nov 12:22 | 16 passed | `evidence/forecast-junit.xml`, `evidence/forecast-run.txt` |
+| Browser (system) tests | `pytest -c tests/system/pytest.ini` | 12 Nov 12:26 | 17 passed, 0 failed | `evidence/system-junit.xml`, `evidence/system-run.txt` |
 | Load: bookings, check-in, check-out, 50 users | Locust, 120 s | 22:28 | 0 failures | `evidence/locust-booking50*` |
 | Same, before the D-4 fix | Locust, 120 s | 22:21 | 187 failures | `evidence/locust-booking50-before-fix.txt` |
 | Load: 200 separate sessions | Locust, 120 s | 22:30 | 0 failures | `evidence/locust-sessions200*` |
 | Load: search, 50 users | Locust, 60 s | 22:40 | 0 failures | `evidence/locust-gunicorn50*` |
 | Load: forecast service, 20 users | Locust, 60 s | 20:54 | 0 failures | `evidence/locust-forecast*` |
-| TLS and redirect checks | curl, openssl s_client | 22:41 | see TC-38 | `evidence/tls-checks.txt` |
-| Accessibility | axe-core in Playwright | 22:47 (with the browser tests) | 0 violations | `evidence/axe-violations.json`, `evidence/axe-sanity.txt` |
-| Static security scan | `bandit -r vps forecast` | 22:51 | 0 high, 1 medium, 3 low | `evidence/bandit.txt` |
+| TLS and redirect checks | curl, openssl s_client | 12 Nov 12:42 | see TC-38 | `evidence/tls-checks.txt` |
+| Accessibility | axe-core in Playwright | 12 Nov 12:26 (with the browser tests) | 0 violations | `evidence/axe-violations.json`, `evidence/axe-sanity.txt` |
+| Static security scan | `bandit -r vps forecast` | 12 Nov 12:43 | 0 high, 1 medium, 3 low | `evidence/bandit.txt` |
 
 The forecast load test ran earlier on 5 November against the same forecast code. The earlier development-server load runs (`evidence/locust50*`, `evidence/locust200*`) are kept as the evidence for defect D-1.
 
@@ -93,6 +93,9 @@ Pass: every test mapped to the case ran and passed, and together they cover the 
 | TC-48 | A booking is held for 15 minutes after its start | BR-06, FR-RES-05 | Functional / Unit / High | **Pass** | 1 test, 1 passed: `test_tc45_tc49_business_rules.py` |  |
 | TC-49 | Billing blocks, 1-hour minimum and overstay grace | BR-07, FR-BILL-02, FR-BILL-03 | Functional / Unit / High | **Pass** | 17 tests, 17 passed: `test_tc45_tc49_business_rules.py` |  |
 | TC-50 | An administrator waives a charge with a written reason | BR-09, SEC-07 | Functional / System / High | **Pass** | 23 tests, 23 passed: `test_closeout.py`, `test_charge_waiver.py` |  |
+| TC-52 | Lot map: the driver's slot and route, and the admin live map with registration search | FR-LOT-05, FR-LOT-06 (added, see `docs/part-4/deviations.md`) | Functional / Integration / High | **Pass** | 36 tests, 36 passed: `test_lot_plan.py`, `test_lot_map_services.py`, `test_lot_map_admin.py`, `test_slot_map_views.py`, `test_lot_map_json.py` | Also checked by hand in the browser and in the final demo video: the route follows the lanes, the live map recolours a bay within 10 s, search finds a vehicle in another lot. |
+| TC-53 | The four PES lots are seeded with slots and tariffs | FR-LOT-01, FR-BILL-01 | Functional / Integration / Medium | **Pass** | 7 tests, 7 passed: `test_seed_pes_lots.py` | Includes the D-7 regression tests. |
+| TC-54 | A driver cancels a reserved booking from My bookings | FR-RES-04 | Functional / Integration / Medium | **Pass** | 1 test, 1 passed: `test_booking_history.py` | The cancellation rules themselves are TC-09 and TC-47. |
 | TC-51 | Monthly availability of the deployed system | NFR-AVL-01 | Non-functional (availability) / System / Medium | **Not run** | - | Needs a deployed system monitored over a calendar month. |
 
 ## 5. Performance
@@ -172,10 +175,10 @@ All runs on Gunicorn with 8 workers. In the search run, signed-in drivers search
 
 | Criterion | Result | Detail |
 |---|---|---|
-| All High priority test cases pass | Met | 27 High priority cases, all passed. TC-38 ran against a local TLS listener, because there is no staging server. |
-| No open S1 or S2 defects | Met, once PR #130 is merged | D-4 (S2) was found and fixed during this testing. The fix is in PR #130 and was re-tested on the test branch. No other defect is open. |
-| Coverage targets met | Met | 95.94% line, 91.01% branch; targets 70% and 60% (`evidence/coverage-gate.txt`). |
-| Traceability shows every requirement covered | Met, with one case not run | All 81 requirement IDs in the SRS now appear in a test case. TC-45 to TC-51 were added for BR-02, BR-03, BR-05, BR-06, BR-07, BR-09 and NFR-AVL-01. TC-51 (NFR-AVL-01) has not been run, so availability is covered on paper only. |
+| All High priority test cases pass | Met | 28 High priority cases (27 plus TC-52), all passed. TC-38 ran against a local TLS listener, because there is no staging server. |
+| No open S1 or S2 defects | Met, once PR #145 is merged | D-4 (S2) was fixed in PR #130, which is merged. D-7 (S2) is fixed in PR #145 and was re-tested on the final code. No other defect is open. |
+| Coverage targets met | Met | 96.16% line, 91.28% branch; targets 70% and 60% (`evidence/coverage-gate.txt`). |
+| Traceability shows every requirement covered | Met, with one case not run | All 81 requirement IDs in the SRS appear in a test case, and so do the two requirements added in Sprint 3 (FR-LOT-05 and FR-LOT-06, TC-52). TC-45 to TC-51 were added for BR-02, BR-03, BR-05, BR-06, BR-07, BR-09 and NFR-AVL-01. TC-51 (NFR-AVL-01) has not been run, so availability is covered on paper only. |
 
 ## 7. Defects
 
@@ -186,6 +189,8 @@ All runs on Gunicorn with 8 workers. In the search run, signed-in drivers search
 | D-3 | S4 | No test case covered BR-02, BR-03, BR-05, BR-06, BR-07, BR-09 or NFR-AVL-01. | Traceability check | Fixed: TC-45 to TC-51 added. |
 | D-4 | S2 | Concurrent bookings in one lot all chose the same best slot, then queued on the overlap constraint. Some deadlocked (HTTP 500). Others gave up after 3 attempts with "No slot available" while slots were free. Steps: run `tests/system/locust_booking.py` with 50 users, or the new unit test `test_concurrent_bookings_with_free_slots_all_succeed` (30 drivers, 30 slots), which failed 5 of 5 times before the fix. | `evidence/locust-booking50-before-fix.txt`, `evidence/deadlock-excerpt.txt` | Fixed in PR #130: slot allocation in a lot is serialised with a transaction-level lock. Re-tested: 0 failures, reserve 95th percentile 120 ms. |
 | D-5 | S4 | The forecast panel was a `div` with `aria-label` and no role, which axe-core listed for review (aria-prohibited-attr) and screen readers may ignore. | `evidence/axe-sanity.txt` (before and after) | Fixed in PR #130: it is now a labelled `section`. |
+| D-6 | S3 | Drivers could not cancel a booking. The cancel view existed (FR-RES-04) but no page had a button for it. | Found while recording the final demo | Fixed in PR #139: Reserved bookings in My bookings have a Cancel booking button. Re-tested by TC-54. |
+| D-7 | S2 | On a fresh database the PES lots had no tariffs, so a booking there could not be checked out ("No applicable tariff exists"). The web container seeds the lots before any admin account exists, and the seed skipped tariffs without an admin. | Found while recording the final demo | Fixed in PR #145: tariffs are always created, and a re-run fills in missing ones. Re-tested by TC-53. |
 
 ## 8. Security validation (Test Plan Section 5.1)
 
